@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2018 VMware, Inc. All Rights Reserved.
+ *
+ * This product is licensed to you under the BSD-2 license (the "License").
+ * You may not use this product except in compliance with the BSD-2 License.
+ *
+ * This product may include a number of subcomponents with separate copyright
+ * notices and license terms. Your use of these subcomponents is subject to the
+ * terms and conditions of the subcomponent's license, as noted in the LICENSE
+ * file.
+ *
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
+/**
+ * This package includes implementations of notations used in RPC methods.
+ *
+ * @see <a href=https://tools.ietf.org/html/rfc7047#section-4.1>OVSDB Management Protocol 4.1</a>
+ */
+
+package com.vmware.ovsdb.protocol.methods;

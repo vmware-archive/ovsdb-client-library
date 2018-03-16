@@ -67,6 +67,9 @@ Be sure to add a comment to the PR indicating your new changes are ready to revi
 notification when you git push.
 
 ### Code Style
+Google Java style is used: [intellij-java-google-style](https://github.com/google/styleguide/blob/gh-pages/intellij-java-google-style.xml)
+or [eclipse-java-google-style](https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml).
+The only difference is: tab size is 4 instead of 2.
 
 ### Formatting Commit Messages
 
@@ -81,3 +84,22 @@ and commits.
 When opening a new issue, try to roughly follow the commit message format conventions above.
 
 ## Repository Structure
+```
+ovsdb-client-library
+ |
+ +---README.md
+ |
+ +---pom.xml
+ |
+ +---json-rpc
+ |      |
+ |      +---pom.xml
+ |      |
+ |      +---src
+ |
+ +---ovsdb-client
+ |      |
+ |      +---pom.xml
+ |      |
+ |      +---src
+```
