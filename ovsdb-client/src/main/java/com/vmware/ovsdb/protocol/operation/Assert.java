@@ -38,21 +38,21 @@ import static com.vmware.ovsdb.protocol.util.OvsdbConstant.ASSERT;
  */
 public class Assert extends Operation {
 
-    private final String lock;
+  private final String lock;
 
-    public Assert(String lock) {
-        super(ASSERT);
-        this.lock = lock;
-    }
+  public Assert(String lock) {
+    super(ASSERT);
+    this.lock = lock;
+  }
 
-    public String getLock() {
-        return lock;
-    }
+  public String getLock() {
+    return lock;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "lock=" + lock
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "lock=" + lock
+        + "]";
+  }
 }

@@ -25,22 +25,22 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * </pre>
  */
 public enum Mutator {
-    SUM("+="),
-    DIFFERENCE("-="),
-    PRODUCT("*="),
-    QUOTIENT("/="),
-    REMINDER("%="),
-    INSERT("insert"),
-    DELETE("delete");
+  SUM("+="),
+  DIFFERENCE("-="),
+  PRODUCT("*="),
+  QUOTIENT("/="),
+  REMINDER("%="),
+  INSERT("insert"),
+  DELETE("delete");
 
-    private String name;
+  private String name;
 
-    Mutator(String name) {
-        this.name = name;
-    }
+  Mutator(String name) {
+    this.name = name;
+  }
 
-    @JsonValue
-    public String toString() {
-        return name;
-    }
+  @JsonValue
+  public String toString() {
+    return name;
+  }
 }

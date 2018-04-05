@@ -41,19 +41,19 @@ import static com.vmware.ovsdb.protocol.util.OvsdbConstant.COMMIT;
  */
 public class Commit extends Operation {
 
-    private final boolean durable;
+  private final boolean durable;
 
-    public Commit(boolean durable) {
-        super(COMMIT);
-        this.durable = durable;
-    }
+  public Commit(boolean durable) {
+    super(COMMIT);
+    this.durable = durable;
+  }
 
-    public boolean isDurable() {
-        return durable;
-    }
+  public boolean isDurable() {
+    return durable;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " [" + "durable=" + durable + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " [" + "durable=" + durable + "]";
+  }
 }

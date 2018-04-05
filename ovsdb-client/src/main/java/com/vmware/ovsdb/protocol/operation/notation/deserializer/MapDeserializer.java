@@ -23,40 +23,40 @@ import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Map;
 import com.vmware.ovsdb.protocol.operation.notation.Pair;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.io.IOException;
 import java.util.List;
 
 public class MapDeserializer<K, V> extends StdDeserializer<Map<K, V>> {
 
-    protected MapDeserializer() {
-        this(null);
+  protected MapDeserializer() {
+    this(null);
+  }
+
+  protected MapDeserializer(Class<?> vc) {
+    super(vc);
+  }
+
+  @Override
+  public Map<K, V> deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    ArrayNode arrayNode = jp.getCodec().readTree(jp);
+    if (arrayNode.size() != 2) {
+      throw new IOException(
+          "<map> should be a 2-element JSON array. Found "
+              + arrayNode.size() + " elements");
     }
 
-    protected MapDeserializer(Class<?> vc) {
-        super(vc);
+    if (!OvsdbConstant.MAP.equals(arrayNode.get(0).asText())) {
+      throw new IOException(
+          "First element of <map> should be \"" + OvsdbConstant.MAP
+              + "\"");
     }
 
-    @Override
-    public Map<K, V> deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        ArrayNode arrayNode = jp.getCodec().readTree(jp);
-        if (arrayNode.size() != 2) {
-            throw new IOException(
-                "<map> should be a 2-element JSON array. Found "
-                    + arrayNode.size() + " elements");
-        }
-
-        if (!OvsdbConstant.MAP.equals(arrayNode.get(0).asText())) {
-            throw new IOException(
-                "First element of <map> should be \"" + OvsdbConstant.MAP
-                    + "\"");
-        }
-
-        List<Pair<K, V>> pairs = JsonUtil.treeToValueNoException(
-            arrayNode.get(1), new TypeReference<List<Pair<K, V>>>() {
-            }
-        );
-        return new Map<>(pairs);
-    }
+    List<Pair<K, V>> pairs = JsonUtil.treeToValueNoException(
+        arrayNode.get(1), new TypeReference<List<Pair<K, V>>>() {}
+    );
+    return new Map<>(pairs);
+  }
 }

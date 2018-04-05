@@ -17,6 +17,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
@@ -25,50 +26,50 @@ import org.junit.Test;
 
 public class RowTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        String expectedResult
-            = "{\"name\":\"ls1\",\"description\":\"First Logical Switch\","
-            + "\"tunnel_key\":5001}";
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    String expectedResult
+        = "{\"name\":\"ls1\",\"description\":\"First Logical Switch\","
+        + "\"tunnel_key\":5001}";
 
-        Row row = new Row().column("name", Atom.string("ls1"))
-            .column("description", Atom.string("First Logical Switch"))
-            .column("tunnel_key", Atom.integer(5001));
+    Row row = new Row().column("name", Atom.string("ls1"))
+        .column("description", Atom.string("First Logical Switch"))
+        .column("tunnel_key", Atom.integer(5001));
 
-        assertEquals(expectedResult, JsonUtil.serialize(row));
+    assertEquals(expectedResult, JsonUtil.serialize(row));
 
-        row = new Row(ImmutableMap.of(
-            "name", Atom.string("ls1"),
-            "description", Atom.string("First Logical Switch"),
-            "tunnel_key", Atom.integer(5001)
-        ));
+    row = new Row(ImmutableMap.of(
+        "name", Atom.string("ls1"),
+        "description", Atom.string("First Logical Switch"),
+        "tunnel_key", Atom.integer(5001)
+    ));
 
-        assertEquals(expectedResult, JsonUtil.serialize(row));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(row));
+  }
 
-    @Test
-    public void testDeserialization() throws IOException {
-        Row expectedResult = new Row().column("name", Atom.string("ls1"))
-            .column("description", Atom.string("First Logical Switch"))
-            .column("tunnel_key", Atom.integer(5001));
+  @Test
+  public void testDeserialization() throws IOException {
+    Row expectedResult = new Row().column("name", Atom.string("ls1"))
+        .column("description", Atom.string("First Logical Switch"))
+        .column("tunnel_key", Atom.integer(5001));
 
-        String textRow = JsonUtil.serialize(expectedResult.getColumns());
+    String textRow = JsonUtil.serialize(expectedResult.getColumns());
 
-        assertEquals(
-            expectedResult, JsonUtil.deserialize(textRow, Row.class));
-    }
+    assertEquals(
+        expectedResult, JsonUtil.deserialize(textRow, Row.class));
+  }
 
-    @Test
-    public void testDeserialization2() throws IOException {
-        Row expectedResult = new Row()
-            .stringColumn("name", "ls1")
-            .mapColumn("vlan_stats", null);
+  @Test
+  public void testDeserialization2() throws IOException {
+    Row expectedResult = new Row()
+        .stringColumn("name", "ls1")
+        .mapColumn("vlan_stats", null);
 
-        String textRow = JsonUtil.serialize(expectedResult.getColumns());
+    String textRow = JsonUtil.serialize(expectedResult.getColumns());
 
-        Row row = JsonUtil.deserialize(textRow, Row.class);
+    Row row = JsonUtil.deserialize(textRow, Row.class);
 
-        assertEquals("ls1", row.getStringColumn("name"));
-        assertNull(row.getMapColumn("vlan_stats"));
-    }
+    assertEquals("ls1", row.getStringColumn("name"));
+    assertNull(row.getMapColumn("vlan_stats"));
+  }
 }

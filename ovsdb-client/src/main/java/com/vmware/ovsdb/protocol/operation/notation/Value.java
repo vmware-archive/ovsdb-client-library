@@ -33,6 +33,6 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.ValueDeserializ
 @JsonDeserialize(using = ValueDeserializer.class)
 public abstract class Value {
 
-    protected Value() {
-    }
+  protected Value() {
+  }
 }

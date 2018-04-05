@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
@@ -23,35 +24,35 @@ import org.junit.Test;
 
 public class ConditionTest {
 
-    private final String jsonString1 = "[\"name\",\"==\",\"ls1\"]";
+  private final String jsonString1 = "[\"name\",\"==\",\"ls1\"]";
 
-    private final Condition condition1 = new Condition(
-        "name", Function.EQUALS, Atom.string("ls1"));
+  private final Condition condition1 = new Condition(
+      "name", Function.EQUALS, Atom.string("ls1"));
 
-    private final String jsonString2
-        = "[\"numbers\",\"includes\",[\"set\",[1,2,3,4]]]";
+  private final String jsonString2
+      = "[\"numbers\",\"includes\",[\"set\",[1,2,3,4]]]";
 
-    private final Condition condition2 = new Condition(
-        "numbers", Function.INCLUDES, Set.of(1L, 2L, 3L, 4L)
-    );
+  private final Condition condition2 = new Condition(
+      "numbers", Function.INCLUDES, Set.of(1L, 2L, 3L, 4L)
+  );
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        assertEquals(jsonString1, JsonUtil.serialize(condition1));
-        assertEquals(jsonString2, JsonUtil.serialize(condition2));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    assertEquals(jsonString1, JsonUtil.serialize(condition1));
+    assertEquals(jsonString2, JsonUtil.serialize(condition2));
+  }
 
-    @Test
-    public void testDeserialization() throws IOException {
-        assertEquals(
-            condition1, JsonUtil.deserialize(jsonString1, Condition.class));
+  @Test
+  public void testDeserialization() throws IOException {
+    assertEquals(
+        condition1, JsonUtil.deserialize(jsonString1, Condition.class));
 
-        assertEquals(
-            condition2, JsonUtil.deserialize(jsonString2, Condition.class));
-    }
+    assertEquals(
+        condition2, JsonUtil.deserialize(jsonString2, Condition.class));
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidCondition1() throws IOException {
-        JsonUtil.deserialize("[\"name\"]", Condition.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidCondition1() throws IOException {
+    JsonUtil.deserialize("[\"name\"]", Condition.class);
+  }
 }

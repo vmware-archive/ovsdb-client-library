@@ -17,6 +17,7 @@ package com.vmware.ovsdb.protocol.operation.result;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
+
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.methods.LockResult;
 import java.io.IOException;
@@ -24,22 +25,22 @@ import org.junit.Test;
 
 public class LockResultTest {
 
-    @Test
-    public void testDeserialization() throws IOException {
-        String json = "{\"locked\":true}";
+  @Test
+  public void testDeserialization() throws IOException {
+    String json = "{\"locked\":true}";
 
-        LockResult lockResult = JsonUtil.deserialize(json, LockResult.class);
-        assertTrue(lockResult.isLocked());
+    LockResult lockResult = JsonUtil.deserialize(json, LockResult.class);
+    assertTrue(lockResult.isLocked());
 
-        json = "{\"locked\":false}";
+    json = "{\"locked\":false}";
 
-        lockResult = JsonUtil.deserialize(json, LockResult.class);
-        assertFalse(lockResult.isLocked());
-    }
+    lockResult = JsonUtil.deserialize(json, LockResult.class);
+    assertFalse(lockResult.isLocked());
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidResult() throws IOException {
-        String json = "{\"locked\":t}";
-        JsonUtil.deserialize(json, LockResult.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidResult() throws IOException {
+    String json = "{\"locked\":t}";
+    JsonUtil.deserialize(json, LockResult.class);
+  }
 }

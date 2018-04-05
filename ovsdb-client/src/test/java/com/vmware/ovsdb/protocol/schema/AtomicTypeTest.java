@@ -21,6 +21,7 @@ import static com.vmware.ovsdb.protocol.schema.Constants.JSON_STRING;
 import static com.vmware.ovsdb.protocol.schema.Constants.JSON_UUID;
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
@@ -28,41 +29,41 @@ import org.junit.Test;
 
 public class AtomicTypeTest {
 
-    @Test
-    public void testDeserialization() throws JsonProcessingException {
-        assertEquals(
-            JSON_INTEGER, JsonUtil.serialize(AtomicType.INTEGER));
-        assertEquals(
-            JSON_REAL, JsonUtil.serialize(AtomicType.REAL));
-        assertEquals(
-            JSON_BOOLEAN, JsonUtil.serialize(AtomicType.BOOLEAN));
-        assertEquals(
-            JSON_STRING, JsonUtil.serialize(AtomicType.STRING));
-        assertEquals(
-            JSON_UUID, JsonUtil.serialize(AtomicType.UUID));
-    }
+  @Test
+  public void testDeserialization() throws JsonProcessingException {
+    assertEquals(
+        JSON_INTEGER, JsonUtil.serialize(AtomicType.INTEGER));
+    assertEquals(
+        JSON_REAL, JsonUtil.serialize(AtomicType.REAL));
+    assertEquals(
+        JSON_BOOLEAN, JsonUtil.serialize(AtomicType.BOOLEAN));
+    assertEquals(
+        JSON_STRING, JsonUtil.serialize(AtomicType.STRING));
+    assertEquals(
+        JSON_UUID, JsonUtil.serialize(AtomicType.UUID));
+  }
 
-    @Test
-    public void testSerialization() throws IOException {
-        assertEquals(
-            AtomicType.INTEGER,
-            JsonUtil.deserialize(JSON_INTEGER, AtomicType.class)
-        );
-        assertEquals(
-            AtomicType.REAL,
-            JsonUtil.deserialize(JSON_REAL, AtomicType.class)
-        );
-        assertEquals(
-            AtomicType.BOOLEAN,
-            JsonUtil.deserialize(JSON_BOOLEAN, AtomicType.class)
-        );
-        assertEquals(
-            AtomicType.STRING,
-            JsonUtil.deserialize(JSON_STRING, AtomicType.class)
-        );
-        assertEquals(
-            AtomicType.UUID,
-            JsonUtil.deserialize(JSON_UUID, AtomicType.class)
-        );
-    }
+  @Test
+  public void testSerialization() throws IOException {
+    assertEquals(
+        AtomicType.INTEGER,
+        JsonUtil.deserialize(JSON_INTEGER, AtomicType.class)
+    );
+    assertEquals(
+        AtomicType.REAL,
+        JsonUtil.deserialize(JSON_REAL, AtomicType.class)
+    );
+    assertEquals(
+        AtomicType.BOOLEAN,
+        JsonUtil.deserialize(JSON_BOOLEAN, AtomicType.class)
+    );
+    assertEquals(
+        AtomicType.STRING,
+        JsonUtil.deserialize(JSON_STRING, AtomicType.class)
+    );
+    assertEquals(
+        AtomicType.UUID,
+        JsonUtil.deserialize(JSON_UUID, AtomicType.class)
+    );
+  }
 }

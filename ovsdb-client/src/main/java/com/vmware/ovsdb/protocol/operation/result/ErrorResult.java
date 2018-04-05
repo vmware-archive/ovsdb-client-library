@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * Representation of {@literal <error>}.
+ *
  * <pre>
  * {@literal
  * A JSON object with the following members:
@@ -48,60 +50,63 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * "details" string.  An <error> MAY also have other members that
  * describe the error in more detail.  This document does not specify
  * the names or values of these members.
+ * }
  * </pre>
+ *
+ * @see <a href=https://tools.ietf.org/html/rfc7047#section-3.1>OVSDB Management Protocol 4.1</a>
  */
 public class ErrorResult extends OperationResult {
 
-    private String error;
+  private String error;
 
-    private String details;
+  private String details;
 
-    @JsonCreator
-    public ErrorResult(
-        @JsonProperty(value = "error", required = true) String error,
-        @JsonProperty(value = "details", required = true) String details
-    ) {
-        this.error = error;
-        this.details = details;
+  @JsonCreator
+  public ErrorResult(
+      @JsonProperty(value = "error", required = true) String error,
+      @JsonProperty(value = "details", required = true) String details
+  ) {
+    this.error = error;
+    this.details = details;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public String getDetails() {
+    return details;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof ErrorResult)) {
+      return false;
     }
 
-    public String getError() {
-        return error;
+    ErrorResult that = (ErrorResult) other;
+
+    if (error != null ? !error.equals(that.error) : that.error != null) {
+      return false;
     }
+    return details != null ? details.equals(that.details) : that.details == null;
+  }
 
-    public String getDetails() {
-        return details;
-    }
+  @Override
+  public int hashCode() {
+    int result = error != null ? error.hashCode() : 0;
+    result = 31 * result + (details != null ? details.hashCode() : 0);
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ErrorResult)) {
-            return false;
-        }
-
-        ErrorResult that = (ErrorResult) o;
-
-        if (error != null ? !error.equals(that.error) : that.error != null) {
-            return false;
-        }
-        return details != null ? details.equals(that.details) : that.details == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = error != null ? error.hashCode() : 0;
-        result = 31 * result + (details != null ? details.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "error=" + error
-            + ", details=" + details
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "error=" + error
+        + ", details=" + details
+        + "]";
+  }
 }

@@ -23,35 +23,36 @@ import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import com.vmware.ovsdb.protocol.operation.notation.Map;
 import com.vmware.ovsdb.protocol.operation.notation.Set;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
+
 import java.io.IOException;
 
 public class ValueDeserializer extends StdDeserializer<Value> {
 
-    protected ValueDeserializer() {
-        this(null);
-    }
+  protected ValueDeserializer() {
+    this(null);
+  }
 
-    protected ValueDeserializer(Class<? extends Value> vc) {
-        super(vc);
-    }
+  protected ValueDeserializer(Class<? extends Value> vc) {
+    super(vc);
+  }
 
-    @Override
-    public Value deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        JsonNode jsonNode = jp.getCodec().readTree(jp);
-        Atom atom = JsonUtil.treeToValueNoException(jsonNode, Atom.class);
-        if (atom != null) {
-            return atom;
-        }
-        Set set = JsonUtil.treeToValueNoException(jsonNode, Set.class);
-        if (set != null) {
-            return set;
-        }
-        Map map = JsonUtil.treeToValueNoException(jsonNode, Map.class);
-        if (map != null) {
-            return map;
-        }
-        throw new IOException(jsonNode + " is not a valid <value>");
+  @Override
+  public Value deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    JsonNode jsonNode = jp.getCodec().readTree(jp);
+    Atom atom = JsonUtil.treeToValueNoException(jsonNode, Atom.class);
+    if (atom != null) {
+      return atom;
     }
+    Set set = JsonUtil.treeToValueNoException(jsonNode, Set.class);
+    if (set != null) {
+      return set;
+    }
+    Map map = JsonUtil.treeToValueNoException(jsonNode, Map.class);
+    if (map != null) {
+      return map;
+    }
+    throw new IOException(jsonNode + " is not a valid <value>");
+  }
 }

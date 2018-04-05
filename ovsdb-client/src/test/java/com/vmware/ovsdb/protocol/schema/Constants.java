@@ -16,14 +16,14 @@ package com.vmware.ovsdb.protocol.schema;
 
 public class Constants {
 
-    public static final String JSON_INTEGER = "\"integer\"";
+  public static final String JSON_INTEGER = "\"integer\"";
 
-    public static final String JSON_REAL = "\"real\"";
+  public static final String JSON_REAL = "\"real\"";
 
-    public static final String JSON_BOOLEAN = "\"boolean\"";
+  public static final String JSON_BOOLEAN = "\"boolean\"";
 
-    public static final String JSON_STRING = "\"string\"";
+  public static final String JSON_STRING = "\"string\"";
 
-    public static final String JSON_UUID = "\"uuid\"";
+  public static final String JSON_UUID = "\"uuid\"";
 
 }

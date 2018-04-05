@@ -21,10 +21,10 @@ import com.vmware.ovsdb.protocol.methods.TableUpdates;
  */
 public interface MonitorCallback {
 
-    /**
-     * Called when there are updates for the corresponding monitor request.
-     *
-     * @param tableUpdates updates from the monitored tables
-     */
-    void update(TableUpdates tableUpdates);
+  /**
+   * Called when there are updates for the corresponding monitor request.
+   *
+   * @param tableUpdates updates from the monitored tables
+   */
+  void update(TableUpdates tableUpdates);
 }

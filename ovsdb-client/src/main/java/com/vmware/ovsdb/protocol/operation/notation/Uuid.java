@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.UuidDeserializer;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.util.UUID;
 
 /**
+ * Representation of {@literal <uuid>}.
  * <pre>
  * {@literal
  * <uuid>
@@ -24,54 +26,54 @@ import java.util.UUID;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class Uuid {
 
-    public String UUID = OvsdbConstant.UUID; // For serializing
+  public String uuidString = OvsdbConstant.UUID; // For serializing
 
-    private UUID uuid;
+  private UUID uuid;
 
-    public Uuid() {
+  public Uuid() {
+  }
+
+  public Uuid(UUID uuid) {
+    this.uuid = uuid;
+  }
+
+  public static Uuid of(UUID uuid) {
+    return new Uuid(uuid);
+  }
+
+  public UUID getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(UUID uuid) {
+    this.uuid = uuid;
+  }
+
+  @Override
+  public int hashCode() {
+    return uuid != null
+        ? uuid.hashCode()
+        : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Uuid)) {
+      return false;
     }
 
-    public Uuid(UUID uuid) {
-        this.uuid = uuid;
-    }
+    Uuid uuid1 = (Uuid) other;
 
-    public static Uuid of(UUID uuid) {
-        return new Uuid(uuid);
-    }
+    return uuid != null
+        ? uuid.equals(uuid1.uuid)
+        : uuid1.uuid == null;
+  }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid != null
-            ? uuid.hashCode()
-            : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Uuid)) {
-            return false;
-        }
-
-        Uuid uuid1 = (Uuid) o;
-
-        return uuid != null
-            ? uuid.equals(uuid1.uuid)
-            : uuid1.uuid == null;
-    }
-
-    @Override
-    public String toString() {
-        return uuid.toString();
-    }
+  @Override
+  public String toString() {
+    return uuid.toString();
+  }
 }

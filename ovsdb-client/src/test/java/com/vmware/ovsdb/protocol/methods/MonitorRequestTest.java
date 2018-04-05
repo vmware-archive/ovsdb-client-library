@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
@@ -23,24 +24,24 @@ import org.junit.Test;
 
 public class MonitorRequestTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        String expectedResult = "{}";
-        MonitorRequest monitorRequest = new MonitorRequest();
-        assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    String expectedResult = "{}";
+    MonitorRequest monitorRequest = new MonitorRequest();
+    assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
 
-        expectedResult = "{\"columns\":[],\"select\":{}}";
-        monitorRequest = new MonitorRequest(
-            ImmutableList.of(), new MonitorSelect());
-        assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
+    expectedResult = "{\"columns\":[],\"select\":{}}";
+    monitorRequest = new MonitorRequest(
+        ImmutableList.of(), new MonitorSelect());
+    assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
 
-        expectedResult
-            = "{\"columns\":[\"name\",\"description\"],"
-            + "\"select\":{\"initial\":true}}";
-        monitorRequest = new MonitorRequest(
-            ImmutableList.of("name", "description"),
-            new MonitorSelect(true, null, null, null)
-        );
-        assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
-    }
+    expectedResult
+        = "{\"columns\":[\"name\",\"description\"],"
+        + "\"select\":{\"initial\":true}}";
+    monitorRequest = new MonitorRequest(
+        ImmutableList.of("name", "description"),
+        new MonitorSelect(true, null, null, null)
+    );
+    assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
+  }
 }

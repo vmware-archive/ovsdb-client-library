@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.annotation;
 
 import java.lang.annotation.ElementType;
@@ -25,11 +26,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface JsonRpcServiceMethod {
 
-    /**
-     * JSON-RPC methods name. The value is the RPC method name. By default the value is empty and
-     * the Java method name is used.
-     *
-     * @return JSON-RPC method name
-     */
-    String value() default "";
+  /**
+   * JSON-RPC methods name. The value is the RPC method name. By default the value is empty and the
+   * Java method name is used.
+   *
+   * @return JSON-RPC method name
+   */
+  String value() default "";
 }

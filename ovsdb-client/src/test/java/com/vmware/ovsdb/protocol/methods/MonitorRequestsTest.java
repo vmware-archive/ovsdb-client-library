@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -24,33 +25,33 @@ import org.junit.Test;
 
 public class MonitorRequestsTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        String expectedResult = "{}";
-        MonitorRequests monitorRequests = new MonitorRequests(
-            ImmutableMap.of());
-        assertEquals(
-            expectedResult, JsonUtil.serialize(monitorRequests));
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    String expectedResult = "{}";
+    MonitorRequests monitorRequests = new MonitorRequests(
+        ImmutableMap.of());
+    assertEquals(
+        expectedResult, JsonUtil.serialize(monitorRequests));
 
-        expectedResult
-            = "{\"Logical_Switch\":{\"columns\":[\"name\",\"tunnel_key\"]},"
-            + "\"Physical_Switch\":{\"columns\":[\"name\",\"ports\"],"
-            + "\"select\":{\"initial\":true,\"insert\":false,"
-            + "\"delete\":true}}}";
-        monitorRequests = new MonitorRequests(
-            ImmutableMap.of(
-                "Logical_Switch",
-                new MonitorRequest(
-                    ImmutableList.of("name", "tunnel_key"),
-                    null
-                ),
-                "Physical_Switch", new MonitorRequest(
-                    ImmutableList.of("name", "ports"),
-                    new MonitorSelect(true, false, true, null)
-                )
+    expectedResult
+        = "{\"Logical_Switch\":{\"columns\":[\"name\",\"tunnel_key\"]},"
+        + "\"Physical_Switch\":{\"columns\":[\"name\",\"ports\"],"
+        + "\"select\":{\"initial\":true,\"insert\":false,"
+        + "\"delete\":true}}}";
+    monitorRequests = new MonitorRequests(
+        ImmutableMap.of(
+            "Logical_Switch",
+            new MonitorRequest(
+                ImmutableList.of("name", "tunnel_key"),
+                null
+            ),
+            "Physical_Switch", new MonitorRequest(
+                ImmutableList.of("name", "ports"),
+                new MonitorSelect(true, false, true, null)
             )
-        );
-        assertEquals(
-            expectedResult, JsonUtil.serialize(monitorRequests));
-    }
+        )
+    );
+    assertEquals(
+        expectedResult, JsonUtil.serialize(monitorRequests));
+  }
 }

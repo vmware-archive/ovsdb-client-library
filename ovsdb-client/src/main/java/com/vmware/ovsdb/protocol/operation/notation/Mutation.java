@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.operation.notation;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
+ * Representation of {@literal <mutation>}.
+ *
  * <pre>
  * {@literal
  * <mutation>
@@ -85,36 +87,43 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class Mutation {
 
-    private final String column;
+  private final String column;
 
-    private final Mutator mutator;
+  private final Mutator mutator;
 
-    private final Value value;
+  private final Value value;
 
-    public Mutation(String column, Mutator mutator, Value value) {
-        this.column = column;
-        this.mutator = mutator;
-        this.value = value;
-    }
+  /**
+   * Create a {@link Mutation} object.
+   *
+   * @param column value of the "column" field
+   * @param mutator value of the "mutator" field
+   * @param value value of the "value" field
+   */
+  public Mutation(String column, Mutator mutator, Value value) {
+    this.column = column;
+    this.mutator = mutator;
+    this.value = value;
+  }
 
-    public String getColumn() {
-        return column;
-    }
+  public String getColumn() {
+    return column;
+  }
 
-    public Mutator getMutator() {
-        return mutator;
-    }
+  public Mutator getMutator() {
+    return mutator;
+  }
 
-    public Value getValue() {
-        return value;
-    }
+  public Value getValue() {
+    return value;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "column=" + column
-            + ", mutator=" + mutator
-            + ", value=" + value
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "column=" + column
+        + ", mutator=" + mutator
+        + ", value=" + value
+        + "]";
+  }
 }

@@ -20,27 +20,27 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.vmware.ovsdb.protocol.methods.TableUpdate;
 import com.vmware.ovsdb.protocol.methods.TableUpdates;
+
 import java.io.IOException;
 import java.util.Map;
 
 public class TableUpdatesDeserializer extends StdDeserializer<TableUpdates> {
 
-    protected TableUpdatesDeserializer() {
-        this(null);
-    }
+  protected TableUpdatesDeserializer() {
+    this(null);
+  }
 
-    protected TableUpdatesDeserializer(Class<?> vc) {
-        super(vc);
-    }
+  protected TableUpdatesDeserializer(Class<?> vc) {
+    super(vc);
+  }
 
-    @Override
-    public TableUpdates deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        TypeReference<Map<String, TableUpdate>> typeRef
-            = new TypeReference<Map<String, TableUpdate>>() {
-        };
-        Map<String, TableUpdate> tableUpdates = jp.readValueAs(typeRef);
-        return new TableUpdates(tableUpdates);
-    }
+  @Override
+  public TableUpdates deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    TypeReference<Map<String, TableUpdate>> typeRef =
+        new TypeReference<Map<String, TableUpdate>>() {};
+    Map<String, TableUpdate> tableUpdates = jp.readValueAs(typeRef);
+    return new TableUpdates(tableUpdates);
+  }
 }

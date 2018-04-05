@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,11 +19,12 @@ import com.vmware.ovsdb.jsonrpc.v1.model.JsonRpcV1Request;
 import com.vmware.ovsdb.jsonrpc.v1.model.JsonRpcV1Response;
 
 public class TestUtil {
-    public static JsonNode getRequestNode(String id, String method, Object... params) {
-        return JsonUtil.toJsonNode(new JsonRpcV1Request(id, method, params));
-    }
 
-    public static JsonNode getResponseNode(String id, Object result, String error) {
-        return JsonUtil.toJsonNode(new JsonRpcV1Response(result, error, id));
-    }
+  public static JsonNode getRequestNode(String id, String method, Object... params) {
+    return JsonUtil.toJsonNode(new JsonRpcV1Request(id, method, params));
+  }
+
+  public static JsonNode getResponseNode(String id, Object result, String error) {
+    return JsonUtil.toJsonNode(new JsonRpcV1Response(result, error, id));
+  }
 }

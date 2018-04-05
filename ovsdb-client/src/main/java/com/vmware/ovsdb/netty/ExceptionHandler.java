@@ -16,19 +16,20 @@ package com.vmware.ovsdb.netty;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 class ExceptionHandler extends ChannelDuplexHandler {
 
-    private static final Logger LOGGER = LoggerFactory
-        .getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(MethodHandles.lookup().lookupClass());
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-        throws Exception {
-        LOGGER.error("Channel " + ctx.channel() + " encountered exception. Closing.", cause);
-        ctx.close();
-    }
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+      throws Exception {
+    LOGGER.error("Channel " + ctx.channel() + " encountered exception. Closing.", cause);
+    ctx.close();
+  }
 }

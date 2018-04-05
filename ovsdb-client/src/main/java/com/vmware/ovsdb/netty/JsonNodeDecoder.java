@@ -19,30 +19,31 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.util.CharsetUtil;
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+
 class JsonNodeDecoder extends JsonObjectDecoder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      MethodHandles.lookup().lookupClass());
 
-    @Override
-    protected void decode(
-        ChannelHandlerContext ctx, ByteBuf in, List<Object> out
-    ) throws Exception {
-        List<Object> jsonByteBufs = new ArrayList<>();
-        super.decode(ctx, in, jsonByteBufs);
+  @Override
+  protected void decode(
+      ChannelHandlerContext ctx, ByteBuf in, List<Object> out
+  ) throws Exception {
+    List<Object> jsonByteBufs = new ArrayList<>();
+    super.decode(ctx, in, jsonByteBufs);
 
-        for (Object byteBuf : jsonByteBufs) {
-            ByteBuf json = (ByteBuf) byteBuf;
-            String textJson = json.toString(CharsetUtil.UTF_8);
+    for (Object byteBuf : jsonByteBufs) {
+      ByteBuf json = (ByteBuf) byteBuf;
+      String textJson = json.toString(CharsetUtil.UTF_8);
 
-            LOGGER.debug("Received message {} from channel {}", textJson, ctx.channel());
-            out.add(JsonUtil.readTree(textJson));
-        }
+      LOGGER.debug("Received message {} from channel {}", textJson, ctx.channel());
+      out.add(JsonUtil.readTree(textJson));
     }
+  }
 }

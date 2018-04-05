@@ -19,72 +19,72 @@ import com.vmware.ovsdb.protocol.operation.notation.Row;
 
 public class RowUpdate {
 
-    private Row old;
+  private Row oldRow;
 
-    @JsonProperty(value = "new")
-    private Row _new;
+  @JsonProperty(value = "new")
+  private Row newRow;
 
-    public RowUpdate() {
+  public RowUpdate() {
+  }
+
+  public RowUpdate(Row oldRow, Row newRow) {
+    this.oldRow = oldRow;
+    this.newRow = newRow;
+  }
+
+  public Row getOld() {
+    return oldRow;
+  }
+
+  public void setOld(Row oldRow) {
+    this.oldRow = oldRow;
+  }
+
+  public Row getNew() {
+    return newRow;
+  }
+
+  public void setNew(Row newRow) {
+    this.newRow = newRow;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = oldRow != null
+        ? oldRow.hashCode()
+        : 0;
+    result = 31 * result + (newRow != null
+        ? newRow.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof RowUpdate)) {
+      return false;
     }
 
-    public RowUpdate(Row old, Row _new) {
-        this.old = old;
-        this._new = _new;
+    RowUpdate rowUpdate = (RowUpdate) other;
+
+    if (oldRow != null
+        ? !oldRow.equals(rowUpdate.oldRow)
+        : rowUpdate.oldRow != null) {
+      return false;
     }
+    return newRow != null
+        ? newRow.equals(rowUpdate.newRow)
+        : rowUpdate.newRow == null;
+  }
 
-    public Row getOld() {
-        return old;
-    }
-
-    public void setOld(Row old) {
-        this.old = old;
-    }
-
-    public Row getNew() {
-        return _new;
-    }
-
-    public void setNew(Row _new) {
-        this._new = _new;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = old != null
-            ? old.hashCode()
-            : 0;
-        result = 31 * result + (_new != null
-            ? _new.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof RowUpdate)) {
-            return false;
-        }
-
-        RowUpdate rowUpdate = (RowUpdate) o;
-
-        if (old != null
-            ? !old.equals(rowUpdate.old)
-            : rowUpdate.old != null) {
-            return false;
-        }
-        return _new != null
-            ? _new.equals(rowUpdate._new)
-            : rowUpdate._new == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "old=" + old
-            + ", _new=" + _new
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "old=" + oldRow
+        + ", new=" + newRow
+        + "]";
+  }
 }

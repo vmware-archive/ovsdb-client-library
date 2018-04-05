@@ -23,40 +23,40 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UpdateResult extends OperationResult {
 
-    private long count;
+  private long count;
 
-    @JsonCreator
-    public UpdateResult(@JsonProperty(value = "count", required = true) long count) {
-        this.count = count;
+  @JsonCreator
+  public UpdateResult(@JsonProperty(value = "count", required = true) long count) {
+    this.count = count;
+  }
+
+  public Long getCount() {
+    return count;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof UpdateResult)) {
+      return false;
     }
 
-    public Long getCount() {
-        return count;
-    }
+    UpdateResult that = (UpdateResult) other;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UpdateResult)) {
-            return false;
-        }
+    return count == that.count;
+  }
 
-        UpdateResult that = (UpdateResult) o;
+  @Override
+  public int hashCode() {
+    return (int) (count ^ (count >>> 32));
+  }
 
-        return count == that.count;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (count ^ (count >>> 32));
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "count=" + count
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "count=" + count
+        + "]";
+  }
 }

@@ -22,47 +22,48 @@ import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import com.vmware.ovsdb.protocol.operation.notation.NamedUuid;
 import com.vmware.ovsdb.protocol.operation.notation.Uuid;
+
 import java.io.IOException;
 
 public class AtomDeserializer extends StdDeserializer<Atom> {
 
-    protected AtomDeserializer() {
-        this(null);
-    }
+  protected AtomDeserializer() {
+    this(null);
+  }
 
-    protected AtomDeserializer(Class<?> vc) {
-        super(vc);
-    }
+  protected AtomDeserializer(Class<?> vc) {
+    super(vc);
+  }
 
-    @Override
-    public Atom deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        JsonNode jsonNode = jp.getCodec().readTree(jp);
-        if (jsonNode.isTextual()) {
-            // <string>
-            return Atom.string(jsonNode.asText());
-        } else if (jsonNode.isIntegralNumber()) {
-            // <integer>
-            return Atom.integer(jsonNode.asLong());
-        } else if (jsonNode.isDouble()) {
-            // <real>
-            return Atom.real(jsonNode.asDouble());
-        } else if (jsonNode.isBoolean()) {
-            // <boolean>
-            return Atom.bool(jsonNode.asBoolean());
-        } else if (jsonNode.isArray()) {
-            // <uuid>
-            Uuid uuid = JsonUtil.treeToValueNoException(jsonNode, Uuid.class);
-            if (uuid != null) {
-                return Atom.uuid(uuid);
-            }
-            // <named-uuid>
-            NamedUuid namedUuid = JsonUtil.treeToValueNoException(jsonNode, NamedUuid.class);
-            if (namedUuid != null) {
-                return Atom.namedUuid(namedUuid);
-            }
-        }
-        throw new IOException(jsonNode + " is not a valid <atom>");
+  @Override
+  public Atom deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    JsonNode jsonNode = jp.getCodec().readTree(jp);
+    if (jsonNode.isTextual()) {
+      // <string>
+      return Atom.string(jsonNode.asText());
+    } else if (jsonNode.isIntegralNumber()) {
+      // <integer>
+      return Atom.integer(jsonNode.asLong());
+    } else if (jsonNode.isDouble()) {
+      // <real>
+      return Atom.real(jsonNode.asDouble());
+    } else if (jsonNode.isBoolean()) {
+      // <boolean>
+      return Atom.bool(jsonNode.asBoolean());
+    } else if (jsonNode.isArray()) {
+      // <uuid>
+      Uuid uuid = JsonUtil.treeToValueNoException(jsonNode, Uuid.class);
+      if (uuid != null) {
+        return Atom.uuid(uuid);
+      }
+      // <named-uuid>
+      NamedUuid namedUuid = JsonUtil.treeToValueNoException(jsonNode, NamedUuid.class);
+      if (namedUuid != null) {
+        return Atom.namedUuid(namedUuid);
+      }
     }
+    throw new IOException(jsonNode + " is not a valid <atom>");
+  }
 }

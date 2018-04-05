@@ -20,18 +20,18 @@ package com.vmware.ovsdb.protocol.operation.result;
  */
 public class EmptyResult extends OperationResult {
 
-    @Override
-    public int hashCode() {
-        return 0;
-    }
+  @Override
+  public int hashCode() {
+    return 0;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        return this == o || o instanceof EmptyResult;
-    }
+  @Override
+  public boolean equals(Object other) {
+    return this == other || other instanceof EmptyResult;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " []";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " []";
+  }
 }

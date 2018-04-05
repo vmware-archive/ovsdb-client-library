@@ -18,22 +18,23 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
+
 import java.io.IOException;
 
 public class RowSerializer extends StdSerializer<Row> {
 
-    public RowSerializer() {
-        this(null);
-    }
+  public RowSerializer() {
+    this(null);
+  }
 
-    protected RowSerializer(Class<Row> t) {
-        super(t);
-    }
+  protected RowSerializer(Class<Row> klass) {
+    super(klass);
+  }
 
-    @Override
-    public void serialize(
-        Row row, JsonGenerator jgen, SerializerProvider provider
-    ) throws IOException {
-        jgen.writeObject(row.getColumns());
-    }
+  @Override
+  public void serialize(
+      Row row, JsonGenerator jgen, SerializerProvider provider
+  ) throws IOException {
+    jgen.writeObject(row.getColumns());
+  }
 }

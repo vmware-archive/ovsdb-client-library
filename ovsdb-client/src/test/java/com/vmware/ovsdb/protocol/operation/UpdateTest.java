@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
@@ -26,19 +27,19 @@ import org.junit.Test;
 
 public class UpdateTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Row row = new Row(ImmutableMap.of("name", Atom.string("ls2"),
-            "tunnel_key", Atom.integer(5002)
-        ));
-        Update update = new Update("Logical_Switch", row)
-            .where("name", Function.EQUALS, "ls1");
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Row row = new Row(ImmutableMap.of("name", Atom.string("ls2"),
+        "tunnel_key", Atom.integer(5002)
+    ));
+    Update update = new Update("Logical_Switch", row)
+        .where("name", Function.EQUALS, "ls1");
 
-        String expectedResult
-            = "{\"op\":\"update\",\"table\":\"Logical_Switch\","
-            + "\"where\":[[\"name\",\"==\",\"ls1\"]],"
-            + "\"row\":{\"name\":\"ls2\",\"tunnel_key\":5002}}";
+    String expectedResult
+        = "{\"op\":\"update\",\"table\":\"Logical_Switch\","
+        + "\"where\":[[\"name\",\"==\",\"ls1\"]],"
+        + "\"row\":{\"name\":\"ls2\",\"tunnel_key\":5002}}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(update));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(update));
+  }
 }

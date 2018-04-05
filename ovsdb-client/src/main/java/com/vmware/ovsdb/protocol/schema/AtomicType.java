@@ -26,20 +26,20 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * </pre>
  */
 public enum AtomicType {
-    INTEGER("integer"),
-    REAL("real"),
-    BOOLEAN("boolean"),
-    STRING("string"),
-    UUID("uuid");
+  INTEGER("integer"),
+  REAL("real"),
+  BOOLEAN("boolean"),
+  STRING("string"),
+  UUID("uuid");
 
-    private String atomicType;
+  private String atomicType;
 
-    AtomicType(String atomicType) {
-        this.atomicType = atomicType;
-    }
+  AtomicType(String atomicType) {
+    this.atomicType = atomicType;
+  }
 
-    @JsonValue
-    public String toString() {
-        return atomicType;
-    }
+  @JsonValue
+  public String toString() {
+    return atomicType;
+  }
 }

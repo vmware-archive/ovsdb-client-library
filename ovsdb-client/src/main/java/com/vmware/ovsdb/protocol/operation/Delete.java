@@ -24,10 +24,13 @@ import com.vmware.ovsdb.protocol.operation.notation.NamedUuid;
 import com.vmware.ovsdb.protocol.operation.notation.Set;
 import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Representation of delete operation.
+ *
  * <pre>
  * {@literal
  * The "delete" object contains the following members:
@@ -48,70 +51,76 @@ import java.util.List;
  */
 public class Delete extends Operation {
 
-    private final String table;
+  private final String table;
 
-    private final List<Condition> where;
+  private final List<Condition> where;
 
-    public Delete(String table) {
-        this(table, new ArrayList<>());
-    }
+  public Delete(String table) {
+    this(table, new ArrayList<>());
+  }
 
-    public Delete(String table, List<Condition> where) {
-        super(DELETE);
-        this.table = table;
-        this.where = where;
-    }
+  /**
+   * Create a {@link Delete} object.
+   *
+   * @param table value of the "table" field
+   * @param where value of the "where" field
+   */
+  public Delete(String table, List<Condition> where) {
+    super(DELETE);
+    this.table = table;
+    this.where = where;
+  }
 
-    public Delete where(String column, Function function, Value value) {
-        where.add(new Condition(column, function, value));
-        return this;
-    }
+  public Delete where(String column, Function function, Value value) {
+    where.add(new Condition(column, function, value));
+    return this;
+  }
 
-    public Delete where(String column, Function function, String string) {
-        return where(column, function, Atom.string(string));
-    }
+  public Delete where(String column, Function function, String string) {
+    return where(column, function, Atom.string(string));
+  }
 
-    public Delete where(String column, Function function, long integer) {
-        return where(column, function, Atom.integer(integer));
-    }
+  public Delete where(String column, Function function, long integer) {
+    return where(column, function, Atom.integer(integer));
+  }
 
-    public Delete where(String column, Function function, boolean bool) {
-        return where(column, function, Atom.bool(bool));
-    }
+  public Delete where(String column, Function function, boolean bool) {
+    return where(column, function, Atom.bool(bool));
+  }
 
-    public Delete where(String column, Function function, Uuid uuid) {
-        return where(column, function, Atom.uuid(uuid));
-    }
+  public Delete where(String column, Function function, Uuid uuid) {
+    return where(column, function, Atom.uuid(uuid));
+  }
 
-    public Delete where(String column, Function function, NamedUuid namedUuid) {
-        return where(column, function, Atom.namedUuid(namedUuid));
-    }
+  public Delete where(String column, Function function, NamedUuid namedUuid) {
+    return where(column, function, Atom.namedUuid(namedUuid));
+  }
 
-    public <K, V> Delete where(
-        String column, Function function, java.util.Map<K, V> map
-    ) {
-        return where(column, function, Map.of(map));
-    }
+  public <K, V> Delete where(
+      String column, Function function, java.util.Map<K, V> map
+  ) {
+    return where(column, function, Map.of(map));
+  }
 
-    public <T> Delete where(
-        String column, Function function, java.util.Set<T> set
-    ) {
-        return where(column, function, Set.of(set));
-    }
+  public <T> Delete where(
+      String column, Function function, java.util.Set<T> set
+  ) {
+    return where(column, function, Set.of(set));
+  }
 
-    public String getTable() {
-        return table;
-    }
+  public String getTable() {
+    return table;
+  }
 
-    public List<Condition> getWhere() {
-        return where;
-    }
+  public List<Condition> getWhere() {
+    return where;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "table=" + table
-            + ", where=" + where
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "table=" + table
+        + ", where=" + where
+        + "]";
+  }
 }

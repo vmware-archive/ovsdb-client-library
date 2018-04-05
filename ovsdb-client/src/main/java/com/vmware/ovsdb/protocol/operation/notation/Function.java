@@ -15,10 +15,13 @@
 package com.vmware.ovsdb.protocol.operation.notation;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Representation of {@literal <function>}.
+ *
  * <pre>
  * {@literal
  * <function>
@@ -27,35 +30,35 @@ import java.util.Map;
  * </pre>
  */
 public enum Function {
-    LESS_THAN("<"),
-    LESS_THAN_OR_EQUALS("<="),
-    EQUALS("=="),
-    NOT_EQUALS("!="),
-    GREATER_THAN(">"),
-    GREATER_THAN_OR_EQUALS(">="),
-    INCLUDES("includes"),
-    EXCLUDES("excludes");
+  LESS_THAN("<"),
+  LESS_THAN_OR_EQUALS("<="),
+  EQUALS("=="),
+  NOT_EQUALS("!="),
+  GREATER_THAN(">"),
+  GREATER_THAN_OR_EQUALS(">="),
+  INCLUDES("includes"),
+  EXCLUDES("excludes");
 
-    private static final Map<String, Function> lookup = new HashMap<>();
+  private static final Map<String, Function> lookup = new HashMap<>();
 
-    static {
-        for (Function function : Function.values()) {
-            lookup.put(function.toString(), function);
-        }
+  static {
+    for (Function function : Function.values()) {
+      lookup.put(function.toString(), function);
     }
+  }
 
-    private String name;
+  private String name;
 
-    Function(String name) {
-        this.name = name;
-    }
+  Function(String name) {
+    this.name = name;
+  }
 
-    public static Function fromString(String function) {
-        return lookup.get(function);
-    }
+  public static Function fromString(String function) {
+    return lookup.get(function);
+  }
 
-    @JsonValue
-    public String toString() {
-        return name;
-    }
+  @JsonValue
+  public String toString() {
+    return name;
+  }
 }

@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.spi;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,17 +23,17 @@ import com.vmware.ovsdb.jsonrpc.v1.exception.JsonRpcTransportException;
  */
 public interface JsonRpcTransporter {
 
-    /**
-     * Send a JSON data to peer.
-     *
-     * @param data JSON data to send
-     * @throws JsonRpcTransportException if fail to send the data
-     */
-    void send(JsonNode data) throws JsonRpcTransportException;
+  /**
+   * Send a JSON data to peer.
+   *
+   * @param data JSON data to send
+   * @throws JsonRpcTransportException if fail to send the data
+   */
+  void send(JsonNode data) throws JsonRpcTransportException;
 
-    /**
-     * Close the transporter.
-     */
-    void close();
+  /**
+   * Close the transporter.
+   */
+  void close();
 
 }

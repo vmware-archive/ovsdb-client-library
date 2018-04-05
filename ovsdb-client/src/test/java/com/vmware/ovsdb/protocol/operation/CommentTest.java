@@ -16,18 +16,19 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
 public class CommentTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Comment comment = new Comment("Transaction from me");
-        String expectedResult
-            = "{\"op\":\"comment\",\"comment\":\"Transaction from me\"}";
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Comment comment = new Comment("Transaction from me");
+    String expectedResult
+        = "{\"op\":\"comment\",\"comment\":\"Transaction from me\"}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(comment));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(comment));
+  }
 }

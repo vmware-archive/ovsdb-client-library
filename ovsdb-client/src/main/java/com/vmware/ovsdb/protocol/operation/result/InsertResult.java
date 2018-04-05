@@ -25,40 +25,40 @@ import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 @JsonDeserialize
 public class InsertResult extends OperationResult {
 
-    private Uuid uuid;
+  private Uuid uuid;
 
-    @JsonCreator
-    public InsertResult(@JsonProperty(value = "uuid", required = true) Uuid uuid) {
-        this.uuid = uuid;
+  @JsonCreator
+  public InsertResult(@JsonProperty(value = "uuid", required = true) Uuid uuid) {
+    this.uuid = uuid;
+  }
+
+  public Uuid getUuid() {
+    return uuid;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof InsertResult)) {
+      return false;
     }
 
-    public Uuid getUuid() {
-        return uuid;
-    }
+    InsertResult that = (InsertResult) other;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof InsertResult)) {
-            return false;
-        }
+    return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
+  }
 
-        InsertResult that = (InsertResult) o;
+  @Override
+  public int hashCode() {
+    return uuid != null ? uuid.hashCode() : 0;
+  }
 
-        return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "uuid=" + uuid
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "uuid=" + uuid
+        + "]";
+  }
 }

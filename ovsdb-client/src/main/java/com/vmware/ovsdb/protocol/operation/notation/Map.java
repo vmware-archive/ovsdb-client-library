@@ -18,10 +18,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.MapDeserializer;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * Representation of {@literal <map>}.
+ *
  * <pre>
  * {@literal
  * <map>
@@ -40,56 +43,61 @@ import java.util.stream.Collectors;
 @JsonDeserialize(using = MapDeserializer.class)
 public class Map<K, V> extends Value {
 
-    public String MAP = OvsdbConstant.MAP; // For serializing
+  public String mapString = OvsdbConstant.MAP; // For serializing
 
-    private List<Pair<K, V>> pairs;
+  private List<Pair<K, V>> pairs;
 
-    public Map(List<Pair<K, V>> pairs) {
-        this.pairs = pairs;
+  public Map(List<Pair<K, V>> pairs) {
+    this.pairs = pairs;
+  }
+
+  /**
+   * Create a {@link Map} object using a {@link java.util.Map} object.
+   *
+   * @param map value of the map
+   */
+  public static <K, V> Map of(java.util.Map<K, V> map) {
+    if (map == null) {
+      return null;
+    }
+    return new Map<>(
+        map.keySet().stream().map(
+            key -> new Pair<>(new Atom<>(key), new Atom<>(map.get(key)))
+        ).collect(Collectors.toList())
+    );
+  }
+
+  public List<Pair<K, V>> getPairs() {
+    return pairs;
+  }
+
+  public void setPairs(List<Pair<K, V>> pairs) {
+    this.pairs = pairs;
+  }
+
+  @Override
+  public int hashCode() {
+    return pairs != null ? pairs.hashCode() : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Map)) {
+      return false;
     }
 
-    public static <K, V> Map of(java.util.Map<K, V> map) {
-        if (map == null) {
-            return null;
-        }
-        return new Map<>(
-            map.keySet().stream().map(
-                key -> new Pair<>(new Atom<>(key), new Atom<>(map.get(key)))
-            ).collect(Collectors.toList())
-        );
-    }
+    Map<?, ?> map = (Map<?, ?>) other;
 
-    public List<Pair<K, V>> getPairs() {
-        return pairs;
-    }
+    return pairs != null
+        ? pairs.equals(map.pairs)
+        : map.pairs == null;
+  }
 
-    public void setPairs(List<Pair<K, V>> pairs) {
-        this.pairs = pairs;
-    }
-
-    @Override
-    public int hashCode() {
-        return pairs != null ? pairs.hashCode() : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Map)) {
-            return false;
-        }
-
-        Map<?, ?> map = (Map<?, ?>) o;
-
-        return pairs != null
-            ? pairs.equals(map.pairs)
-            : map.pairs == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + pairs;
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + pairs;
+  }
 }

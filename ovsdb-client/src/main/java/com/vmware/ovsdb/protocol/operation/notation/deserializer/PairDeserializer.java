@@ -22,39 +22,38 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import com.vmware.ovsdb.protocol.operation.notation.Pair;
+
 import java.io.IOException;
 
 public class PairDeserializer<K, V> extends StdDeserializer<Pair<K, V>> {
 
-    protected PairDeserializer() {
-        this(null);
+  protected PairDeserializer() {
+    this(null);
+  }
+
+  protected PairDeserializer(Class<?> vc) {
+    super(vc);
+  }
+
+  @Override
+  public Pair<K, V> deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    ArrayNode arrayNode = jp.getCodec().readTree(jp);
+    if (arrayNode.size() != 2) {
+      throw new IOException(
+          "<pair> should be a 2-element JSON array. Found "
+              + arrayNode.size() + " elements");
     }
 
-    protected PairDeserializer(Class<?> vc) {
-        super(vc);
-    }
-
-    @Override
-    public Pair<K, V> deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        ArrayNode arrayNode = jp.getCodec().readTree(jp);
-        if (arrayNode.size() != 2) {
-            throw new IOException(
-                "<pair> should be a 2-element JSON array. Found "
-                    + arrayNode.size() + " elements");
-        }
-
-        Atom<K> key = JsonUtil.treeToValueNoException(
-            arrayNode.get(0),
-            new TypeReference<Atom<K>>() {
-            }
-        );
-        Atom<V> value = JsonUtil.treeToValueNoException(
-            arrayNode.get(1),
-            new TypeReference<Atom<V>>() {
-            }
-        );
-        return new Pair<>(key, value);
-    }
+    Atom<K> key = JsonUtil.treeToValueNoException(
+        arrayNode.get(0),
+        new TypeReference<Atom<K>>() {}
+    );
+    Atom<V> value = JsonUtil.treeToValueNoException(
+        arrayNode.get(1),
+        new TypeReference<Atom<V>>() {}
+    );
+    return new Pair<>(key, value);
+  }
 }

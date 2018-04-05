@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
@@ -23,31 +24,31 @@ import org.junit.Test;
 
 public class SelectTest {
 
-    @Test
-    public void testSerialization1() throws JsonProcessingException {
-        Select select = new Select("Logical_Switch")
-            .where("name", Function.INCLUDES, "ls")
-            .where("tunnel_key", Function.GREATER_THAN, 5001L)
-            .columns("_uuid", "name", "other_config");
-        String expectedResult
-            = "{\"op\":\"select\",\"table\":\"Logical_Switch\","
-            + "\"where\":[[\"name\",\"includes\",\"ls\"],"
-            + "[\"tunnel_key\",\">\",5001]],"
-            + "\"columns\":[\"_uuid\",\"name\",\"other_config\"]}";
+  @Test
+  public void testSerialization1() throws JsonProcessingException {
+    Select select = new Select("Logical_Switch")
+        .where("name", Function.INCLUDES, "ls")
+        .where("tunnel_key", Function.GREATER_THAN, 5001L)
+        .columns("_uuid", "name", "other_config");
+    String expectedResult
+        = "{\"op\":\"select\",\"table\":\"Logical_Switch\","
+        + "\"where\":[[\"name\",\"includes\",\"ls\"],"
+        + "[\"tunnel_key\",\">\",5001]],"
+        + "\"columns\":[\"_uuid\",\"name\",\"other_config\"]}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(select));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(select));
+  }
 
-    @Test
-    public void testSerialization2() throws JsonProcessingException {
-        Select select = new Select("Logical_Switch")
-            .where("name", Function.INCLUDES, "ls")
-            .where("tunnel_key", Function.GREATER_THAN, 5001L);
-        String expectedResult
-            = "{\"op\":\"select\",\"table\":\"Logical_Switch\","
-            + "\"where\":[[\"name\",\"includes\",\"ls\"],"
-            + "[\"tunnel_key\",\">\",5001]]}";
+  @Test
+  public void testSerialization2() throws JsonProcessingException {
+    Select select = new Select("Logical_Switch")
+        .where("name", Function.INCLUDES, "ls")
+        .where("tunnel_key", Function.GREATER_THAN, 5001L);
+    String expectedResult
+        = "{\"op\":\"select\",\"table\":\"Logical_Switch\","
+        + "\"where\":[[\"name\",\"includes\",\"ls\"],"
+        + "[\"tunnel_key\",\">\",5001]]}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(select));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(select));
+  }
 }

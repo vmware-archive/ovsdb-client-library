@@ -22,32 +22,33 @@ import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Condition;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
+
 import java.io.IOException;
 
 public class ConditionDeserializer extends StdDeserializer<Condition> {
 
-    protected ConditionDeserializer() {
-        this(null);
-    }
+  protected ConditionDeserializer() {
+    this(null);
+  }
 
-    protected ConditionDeserializer(Class<?> vc) {
-        super(vc);
-    }
+  protected ConditionDeserializer(Class<?> vc) {
+    super(vc);
+  }
 
-    @Override
-    public Condition deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        ArrayNode arrayNode = jp.getCodec().readTree(jp);
-        if (arrayNode.size() != 3) {
-            throw new IOException(
-                "<condition> should be a 3-element JSON array. Found "
-                    + arrayNode.size() + " elements");
-        }
-        String column = arrayNode.get(0).asText();
-        String function = arrayNode.get(1).asText();
-        Value value = JsonUtil.treeToValueNoException(arrayNode.get(2), Value.class);
-        return new Condition(column, Function.fromString(function), value);
+  @Override
+  public Condition deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    ArrayNode arrayNode = jp.getCodec().readTree(jp);
+    if (arrayNode.size() != 3) {
+      throw new IOException(
+          "<condition> should be a 3-element JSON array. Found "
+              + arrayNode.size() + " elements");
     }
+    String column = arrayNode.get(0).asText();
+    String function = arrayNode.get(1).asText();
+    Value value = JsonUtil.treeToValueNoException(arrayNode.get(2), Value.class);
+    return new Condition(column, Function.fromString(function), value);
+  }
 
 }

@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
 
 /**
+ * Representation ofo insert operation.
+ *
  * <pre>
  * {@literal
  * The "insert" object contains the following members:
@@ -71,48 +73,55 @@ import com.vmware.ovsdb.protocol.operation.notation.Row;
  */
 public class Insert extends Operation {
 
-    private final String table;
+  private final String table;
 
-    private final Row row;
+  private final Row row;
 
-    @JsonProperty(value = "uuid-name")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String uuidName;
+  @JsonProperty(value = "uuid-name")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String uuidName;
 
-    public Insert(String table, Row row) {
-        this(table, row, null);
-    }
+  public Insert(String table, Row row) {
+    this(table, row, null);
+  }
 
-    public Insert(String table, Row row, String uuidName) {
-        super(INSERT);
-        this.table = table;
-        this.row = row;
-        this.uuidName = uuidName;
-    }
+  /**
+   * Create a {@link Insert} object.
+   *
+   * @param table value of the "table" field
+   * @param row value of the "row" field
+   * @param uuidName value of the "uuidName" field
+   */
+  public Insert(String table, Row row, String uuidName) {
+    super(INSERT);
+    this.table = table;
+    this.row = row;
+    this.uuidName = uuidName;
+  }
 
-    public Insert withId(String uuidName) {
-        this.uuidName = uuidName;
-        return this;
-    }
+  public Insert withId(String uuidName) {
+    this.uuidName = uuidName;
+    return this;
+  }
 
-    public String getTable() {
-        return table;
-    }
+  public String getTable() {
+    return table;
+  }
 
-    public Row getRow() {
-        return row;
-    }
+  public Row getRow() {
+    return row;
+  }
 
-    public String getUuidName() {
-        return uuidName;
-    }
+  public String getUuidName() {
+    return uuidName;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "table=" + table
-            + ", row=" + row
-            + ", uuidName=" + uuidName
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "table=" + table
+        + ", row=" + row
+        + ", uuidName=" + uuidName
+        + "]";
+  }
 }

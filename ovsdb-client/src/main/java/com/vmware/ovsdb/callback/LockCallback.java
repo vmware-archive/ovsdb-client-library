@@ -19,14 +19,14 @@ package com.vmware.ovsdb.callback;
  */
 public interface LockCallback {
 
-    /**
-     * Called when the lock is acquired.
-     */
-    void locked();
+  /**
+   * Called when the lock is acquired.
+   */
+  void locked();
 
 
-    /**
-     * Called when the lock is stolen.
-     */
-    void stolen();
+  /**
+   * Called when the lock is stolen.
+   */
+  void stolen();
 }

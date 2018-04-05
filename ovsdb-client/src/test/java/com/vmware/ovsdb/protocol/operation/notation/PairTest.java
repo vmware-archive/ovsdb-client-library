@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
@@ -23,31 +24,31 @@ import org.junit.Test;
 
 public class PairTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        String expectedString = "[\"string\",123]";
-        Pair<String, Long> pair = new Pair<>(
-            Atom.string("string"), Atom.integer(123));
-        assertEquals(expectedString, JsonUtil.serialize(pair));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    String expectedString = "[\"string\",123]";
+    Pair<String, Long> pair = new Pair<>(
+        Atom.string("string"), Atom.integer(123));
+    assertEquals(expectedString, JsonUtil.serialize(pair));
+  }
 
-    @Test
-    public void testDeserialization() throws IOException {
-        String jsonString = "[\"string\",123]";
-        Pair<String, Long> pair = new Pair<>(
-            Atom.string("string"), Atom.integer(123));
-        assertEquals(pair, JsonUtil.deserialize(jsonString, Pair.class));
-    }
+  @Test
+  public void testDeserialization() throws IOException {
+    String jsonString = "[\"string\",123]";
+    Pair<String, Long> pair = new Pair<>(
+        Atom.string("string"), Atom.integer(123));
+    assertEquals(pair, JsonUtil.deserialize(jsonString, Pair.class));
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidPair1() throws IOException {
-        String jsonString = "[\"string\",123,true]";
-        JsonUtil.deserialize(jsonString, Pair.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidPair1() throws IOException {
+    String jsonString = "[\"string\",123,true]";
+    JsonUtil.deserialize(jsonString, Pair.class);
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidPair2() throws IOException {
-        String jsonString = "[\"string\"]";
-        JsonUtil.deserialize(jsonString, Pair.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidPair2() throws IOException {
+    String jsonString = "[\"string\"]";
+    JsonUtil.deserialize(jsonString, Pair.class);
+  }
 }

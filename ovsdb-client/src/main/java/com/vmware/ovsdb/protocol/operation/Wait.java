@@ -19,9 +19,12 @@ import static com.vmware.ovsdb.protocol.util.OvsdbConstant.WAIT;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Condition;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
+
 import java.util.List;
 
 /**
+ * Representation of wait> operation.
+ *
  * <pre>
  * {@literal
  * The "wait" object contains the following members:
@@ -67,72 +70,81 @@ import java.util.List;
  */
 public class Wait extends Operation {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Integer timeout;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Integer timeout;
 
-    private final String table;
+  private final String table;
 
-    private final List<Condition> where;
+  private final List<Condition> where;
 
-    private final List<String> columns;
+  private final List<String> columns;
 
-    private final String until;
+  private final String until;
 
-    private final List<Row> rows;
+  private final List<Row> rows;
 
-    public Wait(
-        String table, List<Condition> where,
-        List<String> columns, String until, List<Row> rows
-    ) {
-        this(table, null, where, columns, until, rows);
-    }
+  public Wait(
+      String table, List<Condition> where,
+      List<String> columns, String until, List<Row> rows
+  ) {
+    this(table, null, where, columns, until, rows);
+  }
 
-    public Wait(
-        String table, Integer timeout, List<Condition> where,
-        List<String> columns, String until, List<Row> rows
-    ) {
-        super(WAIT);
-        this.table = table;
-        this.timeout = timeout;
-        this.where = where;
-        this.columns = columns;
-        this.until = until;
-        this.rows = rows;
-    }
+  /**
+   * Create a {@link Wait} object.
+   *
+   * @param table value of the "table" field
+   * @param timeout value of the "timeout" field
+   * @param where value of the "where" field
+   * @param columns value of the "columns" field
+   * @param rows value of the "rows" field
+   */
+  public Wait(
+      String table, Integer timeout, List<Condition> where,
+      List<String> columns, String until, List<Row> rows
+  ) {
+    super(WAIT);
+    this.table = table;
+    this.timeout = timeout;
+    this.where = where;
+    this.columns = columns;
+    this.until = until;
+    this.rows = rows;
+  }
 
-    public Integer getTimeout() {
-        return timeout;
-    }
+  public Integer getTimeout() {
+    return timeout;
+  }
 
-    public String getTable() {
-        return table;
-    }
+  public String getTable() {
+    return table;
+  }
 
-    public List<Condition> getWhere() {
-        return where;
-    }
+  public List<Condition> getWhere() {
+    return where;
+  }
 
-    public List<String> getColumns() {
-        return columns;
-    }
+  public List<String> getColumns() {
+    return columns;
+  }
 
-    public String getUntil() {
-        return until;
-    }
+  public String getUntil() {
+    return until;
+  }
 
-    public List<Row> getRows() {
-        return rows;
-    }
+  public List<Row> getRows() {
+    return rows;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "timeout=" + timeout
-            + ", table=" + table
-            + ", where=" + where
-            + ", columns=" + columns
-            + ", until=" + until
-            + ", rows=" + rows
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "timeout=" + timeout
+        + ", table=" + table
+        + ", where=" + where
+        + ", columns=" + columns
+        + ", until=" + until
+        + ", rows=" + rows
+        + "]";
+  }
 }

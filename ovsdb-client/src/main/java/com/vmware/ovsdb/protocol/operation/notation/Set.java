@@ -18,11 +18,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.SetDeserializer;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 /**
+ * Representation of {@literal <set>}.
+ *
  * <pre>
  * {@literal
  * <set>
@@ -43,78 +46,83 @@ import java.util.stream.Collectors;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class Set extends Value {
 
-    public String SET = OvsdbConstant.SET; // For serializing
+  public String setString = OvsdbConstant.SET; // For serializing
 
-    private java.util.Set<Atom> set;
+  private java.util.Set<Atom> set;
 
-    public Set() {
-        this(new HashSet<>());
+  public Set() {
+    this(new HashSet<>());
+  }
+
+  public Set(java.util.Set<Atom> set) {
+    this.set = set;
+  }
+
+  public static Set of(Object... elements) {
+    return new Set(Arrays.stream(elements).map(Atom::new).collect(
+        Collectors.toSet()));
+  }
+
+  public static Set of(Atom... elements) {
+    return new Set(Arrays.stream(elements).collect(Collectors.toSet()));
+  }
+
+  /**
+   * Create a {@link Set} object using a {@link java.util.Set} object.
+   *
+   * @param set value of the set
+   */
+  public static <T> Set of(java.util.Set<T> set) {
+    if (set == null) {
+      return null;
+    }
+    return new Set(
+        set.stream().map(Atom::new).collect(
+            Collectors.toSet())
+    );
+  }
+
+  public java.util.Set<Atom> getSet() {
+    return set;
+  }
+
+  public void setSet(java.util.Set<Atom> set) {
+    this.set = set;
+  }
+
+  public void addValue(Atom value) {
+    set.add(value);
+  }
+
+  public void removeValue(Atom value) {
+    set.remove(value);
+  }
+
+  @Override
+  public int hashCode() {
+    return set != null
+        ? set.hashCode()
+        : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Set)) {
+      return false;
     }
 
-    public Set(java.util.Set<Atom> set) {
-        this.set = set;
-    }
+    Set uuid1 = (Set) other;
 
-    public static Set of(Object... elements) {
-        return new Set(Arrays.stream(elements).map(Atom::new).collect(
-            Collectors.toSet()));
-    }
+    return set != null
+        ? set.equals(uuid1.set)
+        : uuid1.set == null;
+  }
 
-    public static Set of(Atom... elements) {
-        return new Set(Arrays.stream(elements).collect(Collectors.toSet()));
-    }
-
-    public static <T> Set of(java.util.Set<T> set) {
-        if (set == null) {
-            return null;
-        }
-        return new Set(
-            set.stream().map(Atom::new).collect(
-                Collectors.toSet())
-        );
-    }
-
-    public java.util.Set<Atom> getSet() {
-        return set;
-    }
-
-    public void setSet(java.util.Set<Atom> set) {
-        this.set = set;
-    }
-
-    public void addValue(Atom value) {
-        set.add(value);
-    }
-
-    public void removeValue(Atom value) {
-        set.remove(value);
-    }
-
-    @Override
-    public int hashCode() {
-        return set != null
-            ? set.hashCode()
-            : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Set)) {
-            return false;
-        }
-
-        Set uuid1 = (Set) o;
-
-        return set != null
-            ? set.equals(uuid1.set)
-            : uuid1.set == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + set;
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + set;
+  }
 }

@@ -20,6 +20,8 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
 import com.vmware.ovsdb.protocol.schema.deserializer.BaseTypeDeserializer;
 
 /**
+ * Representation of {@literal <base-type>}.
+ *
  * <pre>
  * {@literal
  * <base-type>
@@ -94,67 +96,74 @@ import com.vmware.ovsdb.protocol.schema.deserializer.BaseTypeDeserializer;
 @JsonDeserialize(using = BaseTypeDeserializer.class)
 public abstract class BaseType {
 
-    private final AtomicType type;
+  private final AtomicType type;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Value enums;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Value enums;
 
-    protected BaseType(AtomicType type) {
-        this(type, null);
+  protected BaseType(AtomicType type) {
+    this(type, null);
+  }
+
+  protected BaseType(AtomicType type, Value enums) {
+    this.type = type;
+    this.enums = enums;
+  }
+
+  /**
+   * Create a {@link BaseType} with given {@link AtomicType} object.
+   *
+   * @param atomicType an {@link AtomicType} object to build the {@link BaseType}
+   */
+  public static BaseType atomicType(AtomicType atomicType) {
+    BaseType baseType = null;
+    switch (atomicType) {
+      case INTEGER:
+        baseType = new IntegerBaseType();
+        break;
+      case REAL:
+        baseType = new RealBaseType();
+        break;
+      case BOOLEAN:
+        baseType = new BooleanBaseType();
+        break;
+      case STRING:
+        baseType = new StringBaseType();
+        break;
+      case UUID:
+        baseType = new UuidBaseType();
+        break;
+      default:
+        break;
+    }
+    return baseType;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = type.hashCode();
+    result = 31 * result + (enums != null
+        ? enums.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof BaseType)) {
+      return false;
     }
 
-    protected BaseType(AtomicType type, Value enums) {
-        this.type = type;
-        this.enums = enums;
+    BaseType baseType = (BaseType) other;
+
+    if (type != baseType.type) {
+      return false;
     }
-
-    public static BaseType atomicType(AtomicType atomicType) {
-        BaseType baseType = null;
-        switch (atomicType) {
-            case INTEGER:
-                baseType = new IntegerBaseType();
-                break;
-            case REAL:
-                baseType = new RealBaseType();
-                break;
-            case BOOLEAN:
-                baseType = new BooleanBaseType();
-                break;
-            case STRING:
-                baseType = new StringBaseType();
-                break;
-            case UUID:
-                baseType = new UuidBaseType();
-                break;
-        }
-        return baseType;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = type.hashCode();
-        result = 31 * result + (enums != null
-            ? enums.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof BaseType)) {
-            return false;
-        }
-
-        BaseType baseType = (BaseType) o;
-
-        if (type != baseType.type) {
-            return false;
-        }
-        return enums != null
-            ? enums.equals(baseType.enums)
-            : baseType.enums == null;
-    }
+    return enums != null
+        ? enums.equals(baseType.enums)
+        : baseType.enums == null;
+  }
 }

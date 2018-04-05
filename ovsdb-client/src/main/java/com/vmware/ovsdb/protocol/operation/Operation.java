@@ -34,13 +34,13 @@ package com.vmware.ovsdb.protocol.operation;
  */
 public abstract class Operation {
 
-    private final String op;
+  private final String op;
 
-    protected Operation(String op) {
-        this.op = op;
-    }
+  protected Operation(String op) {
+    this.op = op;
+  }
 
-    public String getOp() {
-        return op;
-    }
+  public String getOp() {
+    return op;
+  }
 }

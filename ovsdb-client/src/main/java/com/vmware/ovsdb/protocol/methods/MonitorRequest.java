@@ -15,9 +15,12 @@
 package com.vmware.ovsdb.protocol.methods;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 /**
+ * Representation of {@literal <monitor-request>}.
+ *
  * <pre>
  * {@literal <monitor-request>} is an object with the following members:
  *
@@ -27,42 +30,51 @@ import java.util.List;
  */
 public class MonitorRequest {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> columns;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<String> columns;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MonitorSelect select;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private MonitorSelect select;
 
-    public MonitorRequest() {
+  /**
+   * Create an {@link MonitorRequest} object with all fields being default values.
+   */
+  public MonitorRequest() {
 
-    }
+  }
 
-    public MonitorRequest(List<String> columns, MonitorSelect select) {
-        this.columns = columns;
-        this.select = select;
-    }
+  /**
+   * Create an {@link MonitorRequest} object.
+   *
+   * @param columns value of the "columns" field
+   * @param select value of the "select" field
+   */
+  public MonitorRequest(List<String> columns, MonitorSelect select) {
+    this.columns = columns;
+    this.select = select;
+  }
 
-    public List<String> getColumns() {
-        return columns;
-    }
+  public List<String> getColumns() {
+    return columns;
+  }
 
-    public void setColumns(List<String> columns) {
-        this.columns = columns;
-    }
+  public void setColumns(List<String> columns) {
+    this.columns = columns;
+  }
 
-    public MonitorSelect getSelect() {
-        return select;
-    }
+  public MonitorSelect getSelect() {
+    return select;
+  }
 
-    public void setSelect(MonitorSelect select) {
-        this.select = select;
-    }
+  public void setSelect(MonitorSelect select) {
+    this.select = select;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "columns=" + columns
-            + ", select=" + select
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "columns=" + columns
+        + ", select=" + select
+        + "]";
+  }
 }

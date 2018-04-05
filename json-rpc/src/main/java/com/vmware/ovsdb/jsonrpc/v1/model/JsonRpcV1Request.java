@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.model;
 
 import static com.vmware.ovsdb.jsonrpc.v1.util.JsonRpcConstant.ID;
@@ -23,60 +24,76 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 
 /**
- * A remote methods is invoked by sending a request to a remote service. The request is a single
- * object serialized using  JSON. <p> It has three properties: <p> methods - A String containing the
- * name of the methods to be invoked. params - An Array of objects to pass as arguments to the
- * methods. id - The request id. This can be of any type. It is used to match the response with the
- * request that it is replying to.
+ * The request is a single object serialized using  JSON. It has three properties:
+ * <p>
+ *   methods - A String containing the name of the methods to be invoked.
+ *   params - An Array of objects to pass as arguments to the methods.
+ *   id - The request id. This can be of any type. It is used to match the response with the request
+ *   that it is replying to.
+ * </p>
  *
  * @see <a href=http://www.jsonrpc.org/specification_v1>JSON-RPC 1.0 Specification</a>
  */
 public class JsonRpcV1Request {
 
-    private final String method;
+  private final String method;
 
-    private final ArrayNode params;
+  private final ArrayNode params;
 
-    private final String id;
+  private final String id;
 
-    @JsonCreator
-    public JsonRpcV1Request(
-        @JsonProperty(value = METHOD, required = true) String method,
-        @JsonProperty(value = PARAMS, required = true) ArrayNode params,
-        @JsonProperty(value = ID, required = true) String id
-    ) {
-        this.method = method;
-        this.params = params;
-        this.id = id;
+  /**
+   * Create a {@link JsonRpcV1Request}.
+   *
+   * @param method request method
+   * @param params request parameters formatted as a {@link ArrayNode} object
+   * @param id unique request id
+   */
+  @JsonCreator
+  public JsonRpcV1Request(
+      @JsonProperty(value = METHOD, required = true) String method,
+      @JsonProperty(value = PARAMS, required = true) ArrayNode params,
+      @JsonProperty(value = ID, required = true) String id
+  ) {
+    this.method = method;
+    this.params = params;
+    this.id = id;
+  }
+
+  /**
+   * Create a {@link JsonRpcV1Request}.
+   *
+   * @param id unique request id
+   * @param method request method
+   * @param params request parameters
+   */
+  public JsonRpcV1Request(String id, String method, Object... params) {
+    this.method = method;
+    this.params = JsonUtil.createArrayNode();
+    for (Object param : params) {
+      this.params.add(JsonUtil.toJsonNode(param));
     }
+    this.id = id;
+  }
 
-    public JsonRpcV1Request(String id, String method, Object... params) {
-        this.method = method;
-        this.params = JsonUtil.createArrayNode();
-        for (Object param : params) {
-            this.params.add(JsonUtil.toJsonNode(param));
-        }
-        this.id = id;
-    }
+  public String getMethod() {
+    return method;
+  }
 
-    public String getMethod() {
-        return method;
-    }
+  public ArrayNode getParams() {
+    return params;
+  }
 
-    public ArrayNode getParams() {
-        return params;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "methods=" + method
-            + ", params=" + params
-            + ", id=" + id
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "methods=" + method
+        + ", params=" + params
+        + ", id=" + id
+        + "]";
+  }
 }

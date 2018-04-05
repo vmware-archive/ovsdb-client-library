@@ -42,22 +42,22 @@ import static com.vmware.ovsdb.protocol.util.OvsdbConstant.COMMENT;
  */
 public class Comment extends Operation {
 
-    private final String comment;
+  private final String comment;
 
-    // TODO: Consider using the validation framework
-    public Comment(String comment) {
-        super(COMMENT);
-        this.comment = comment;
-    }
+  // TODO: Consider using the validation framework
+  public Comment(String comment) {
+    super(COMMENT);
+    this.comment = comment;
+  }
 
-    public String getComment() {
-        return comment;
-    }
+  public String getComment() {
+    return comment;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "comment=" + comment
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "comment=" + comment
+        + "]";
+  }
 }

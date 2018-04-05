@@ -20,6 +20,8 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.NamedUuidDeseri
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 
 /**
+ * Representation of {@literal <named-uuid>}.
+ *
  * <pre>
  * {@literal
  * <named-uuid>
@@ -46,47 +48,47 @@ import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class NamedUuid {
 
-    public String NAMED_UUID = OvsdbConstant.NAMED_UUID; // For serializing
+  public String namedUuidString = OvsdbConstant.NAMED_UUID; // For serializing
 
-    private String uuidName;
+  private String uuidName;
 
-    public NamedUuid(String uuidName) {
-        this.uuidName = uuidName;
+  public NamedUuid(String uuidName) {
+    this.uuidName = uuidName;
+  }
+
+  public String getUuidName() {
+    return uuidName;
+  }
+
+  public void setUuidName(String uuidName) {
+    this.uuidName = uuidName;
+  }
+
+  @Override
+  public int hashCode() {
+    return uuidName != null
+        ? uuidName.hashCode()
+        : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof NamedUuid)) {
+      return false;
     }
 
-    public String getUuidName() {
-        return uuidName;
-    }
+    NamedUuid namedUuid1 = (NamedUuid) other;
 
-    public void setUuidName(String uuidName) {
-        this.uuidName = uuidName;
-    }
+    return uuidName != null
+        ? uuidName.equals(namedUuid1.uuidName)
+        : namedUuid1.uuidName == null;
+  }
 
-    @Override
-    public int hashCode() {
-        return uuidName != null
-            ? uuidName.hashCode()
-            : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof NamedUuid)) {
-            return false;
-        }
-
-        NamedUuid namedUuid1 = (NamedUuid) o;
-
-        return uuidName != null
-            ? uuidName.equals(namedUuid1.uuidName)
-            : namedUuid1.uuidName == null;
-    }
-
-    @Override
-    public String toString() {
-        return uuidName;
-    }
+  @Override
+  public String toString() {
+    return uuidName;
+  }
 }

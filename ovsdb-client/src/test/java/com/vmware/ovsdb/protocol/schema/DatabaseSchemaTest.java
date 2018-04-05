@@ -16,28 +16,29 @@ package com.vmware.ovsdb.protocol.schema;
 
 import static org.junit.Assert.assertNotNull;
 
+
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
 import org.junit.Test;
 
 public class DatabaseSchemaTest {
 
-    @Test
-    public void testVtepSchema() throws IOException {
-        testDeserialization("/vtep_schema.json");
-    }
+  @Test
+  public void testVtepSchema() throws IOException {
+    testDeserialization("/vtep_schema.json");
+  }
 
-    @Test
-    public void testVswitchSchema() throws IOException {
-        testDeserialization("/vswitch_schema.json");
-    }
+  @Test
+  public void testVswitchSchema() throws IOException {
+    testDeserialization("/vswitch_schema.json");
+  }
 
-    private void testDeserialization(String schemaPath) throws IOException {
-        // No exception means success
-        DatabaseSchema dbSchema = JsonUtil.deserialize(
-            getClass().getResource(schemaPath),
-            DatabaseSchema.class
-        );
-        assertNotNull(dbSchema);
-    }
+  private void testDeserialization(String schemaPath) throws IOException {
+    // No exception means success
+    DatabaseSchema dbSchema = JsonUtil.deserialize(
+        getClass().getResource(schemaPath),
+        DatabaseSchema.class
+    );
+    assertNotNull(dbSchema);
+  }
 }

@@ -18,22 +18,23 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
+
 import java.io.IOException;
 
 public class AtomSerializer extends StdSerializer<Atom> {
 
-    public AtomSerializer() {
-        this(null);
-    }
+  public AtomSerializer() {
+    this(null);
+  }
 
-    protected AtomSerializer(Class<Atom> t) {
-        super(t);
-    }
+  protected AtomSerializer(Class<Atom> klass) {
+    super(klass);
+  }
 
-    @Override
-    public void serialize(
-        Atom atom, JsonGenerator jgen, SerializerProvider provider
-    ) throws IOException {
-        jgen.writeObject(atom.getValue());
-    }
+  @Override
+  public void serialize(
+      Atom atom, JsonGenerator jgen, SerializerProvider provider
+  ) throws IOException {
+    jgen.writeObject(atom.getValue());
+  }
 }

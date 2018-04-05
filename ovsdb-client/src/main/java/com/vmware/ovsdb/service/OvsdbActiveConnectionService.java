@@ -19,22 +19,22 @@ import io.netty.handler.ssl.SslContext;
 // TODO: Implement
 public interface OvsdbActiveConnectionService {
 
-    /**
-     * Connect to the OVSDB server on ip:port.
-     *
-     * @param ip the OVSDB server ip
-     * @param port port to which the OVSDB is listening
-     * @return an {@link OvsdbClient} object that can be used to communicate with the OVSDB server
-     */
-    OvsdbClient connect(String ip, int port);
+  /**
+   * Connect to the OVSDB server on ip:port.
+   *
+   * @param ip the OVSDB server ip
+   * @param port port to which the OVSDB is listening
+   * @return an {@link OvsdbClient} object that can be used to communicate with the OVSDB server
+   */
+  OvsdbClient connect(String ip, int port);
 
-    /**
-     * Connect to the OVSDB server on ip:port with SSL enabled.
-     *
-     * @param ip the OVSDB server ip
-     * @param port port to which the OVSDB is listening
-     * @param sslContext the SSL context
-     * @return an {@link OvsdbClient} object that can be used to communicate with the OVSDB server
-     */
-    OvsdbClient connectWithSsl(String ip, int port, SslContext sslContext);
+  /**
+   * Connect to the OVSDB server on ip:port with SSL enabled.
+   *
+   * @param ip the OVSDB server ip
+   * @param port port to which the OVSDB is listening
+   * @param sslContext the SSL context
+   * @return an {@link OvsdbClient} object that can be used to communicate with the OVSDB server
+   */
+  OvsdbClient connectWithSsl(String ip, int port, SslContext sslContext);
 }

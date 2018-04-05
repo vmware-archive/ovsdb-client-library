@@ -26,10 +26,13 @@ import com.vmware.ovsdb.protocol.operation.notation.NamedUuid;
 import com.vmware.ovsdb.protocol.operation.notation.Set;
 import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Representation of mutate operation.
+ *
  * <pre>
  * {@literal
  * The "mutate" object contains the following members:
@@ -78,121 +81,128 @@ import java.util.List;
  */
 public class Mutate extends Operation {
 
-    private final String table;
+  private final String table;
 
-    private List<Condition> where;
+  private List<Condition> where;
 
-    private List<Mutation> mutations;
+  private List<Mutation> mutations;
 
-    public Mutate(String table) {
-        this(table, new ArrayList<>(), new ArrayList<>());
-    }
+  public Mutate(String table) {
+    this(table, new ArrayList<>(), new ArrayList<>());
+  }
 
-    public Mutate(String table, List<Condition> where) {
-        this(table, where, new ArrayList<>());
-    }
+  public Mutate(String table, List<Condition> where) {
+    this(table, where, new ArrayList<>());
+  }
 
-    public Mutate(
-        String table, List<Condition> where, List<Mutation> mutations
-    ) {
-        super(MUTATE);
-        this.table = table;
-        this.where = where;
-        this.mutations = mutations;
-    }
+  /**
+   * Create a {@link Mutate} object.
+   *
+   * @param table value of the "table" field
+   * @param where value of the "where" field
+   * @param mutations value of the "mutations" field
+   */
+  public Mutate(
+      String table, List<Condition> where, List<Mutation> mutations
+  ) {
+    super(MUTATE);
+    this.table = table;
+    this.where = where;
+    this.mutations = mutations;
+  }
 
-    public Mutate where(String column, Function function, Value value) {
-        where.add(new Condition(column, function, value));
-        return this;
-    }
+  public Mutate where(String column, Function function, Value value) {
+    where.add(new Condition(column, function, value));
+    return this;
+  }
 
-    public Mutate where(String column, Function function, String string) {
-        return where(column, function, Atom.string(string));
-    }
+  public Mutate where(String column, Function function, String string) {
+    return where(column, function, Atom.string(string));
+  }
 
-    public Mutate where(String column, Function function, long integer) {
-        return where(column, function, Atom.integer(integer));
-    }
+  public Mutate where(String column, Function function, long integer) {
+    return where(column, function, Atom.integer(integer));
+  }
 
-    public Mutate where(String column, Function function, boolean bool) {
-        return where(column, function, Atom.bool(bool));
-    }
+  public Mutate where(String column, Function function, boolean bool) {
+    return where(column, function, Atom.bool(bool));
+  }
 
-    public Mutate where(String column, Function function, Uuid uuid) {
-        return where(column, function, Atom.uuid(uuid));
-    }
+  public Mutate where(String column, Function function, Uuid uuid) {
+    return where(column, function, Atom.uuid(uuid));
+  }
 
-    public Mutate where(String column, Function function, NamedUuid namedUuid) {
-        return where(column, function, Atom.namedUuid(namedUuid));
-    }
+  public Mutate where(String column, Function function, NamedUuid namedUuid) {
+    return where(column, function, Atom.namedUuid(namedUuid));
+  }
 
-    public <K, V> Mutate where(
-        String column, Function function, java.util.Map<K, V> map
-    ) {
-        return where(column, function, Map.of(map));
-    }
+  public <K, V> Mutate where(
+      String column, Function function, java.util.Map<K, V> map
+  ) {
+    return where(column, function, Map.of(map));
+  }
 
-    public <T> Mutate where(
-        String column, Function function, java.util.Set<T> set
-    ) {
-        return where(column, function, Set.of(set));
-    }
+  public <T> Mutate where(
+      String column, Function function, java.util.Set<T> set
+  ) {
+    return where(column, function, Set.of(set));
+  }
 
-    public Mutate mutation(String column, Mutator mutator, Value value) {
-        this.mutations.add(new Mutation(column, mutator, value));
-        return this;
-    }
+  public Mutate mutation(String column, Mutator mutator, Value value) {
+    this.mutations.add(new Mutation(column, mutator, value));
+    return this;
+  }
 
-    public Mutate mutation(String column, Mutator mutator, String value) {
-        return mutation(column, mutator, Atom.string(value));
-    }
+  public Mutate mutation(String column, Mutator mutator, String value) {
+    return mutation(column, mutator, Atom.string(value));
+  }
 
-    public Mutate mutation(String column, Mutator mutator, long value) {
-        return mutation(column, mutator, Atom.integer(value));
-    }
+  public Mutate mutation(String column, Mutator mutator, long value) {
+    return mutation(column, mutator, Atom.integer(value));
+  }
 
-    public Mutate mutation(String column, Mutator mutator, boolean value) {
-        return mutation(column, mutator, Atom.bool(value));
-    }
+  public Mutate mutation(String column, Mutator mutator, boolean value) {
+    return mutation(column, mutator, Atom.bool(value));
+  }
 
-    public Mutate mutation(String column, Mutator mutator, Uuid value) {
-        return mutation(column, mutator, Atom.uuid(value));
-    }
+  public Mutate mutation(String column, Mutator mutator, Uuid value) {
+    return mutation(column, mutator, Atom.uuid(value));
+  }
 
-    public Mutate mutation(String column, Mutator mutator, NamedUuid value) {
-        return mutation(column, mutator, Atom.namedUuid(value));
-    }
+  public Mutate mutation(String column, Mutator mutator, NamedUuid value) {
+    return mutation(column, mutator, Atom.namedUuid(value));
+  }
 
-    public <K, V> Mutate mutation(
-        String column, Mutator mutator, java.util.Map<K, V> map
-    ) {
-        return mutation(column, mutator, Map.of(map));
-    }
+  public <K, V> Mutate mutation(
+      String column, Mutator mutator, java.util.Map<K, V> map
+  ) {
+    return mutation(column, mutator, Map.of(map));
+  }
 
-    public <T> Mutate mutation(
-        String column, Mutator mutator, java.util.Set<T> set
-    ) {
-        return mutation(column, mutator, Set.of(set));
-    }
+  public <T> Mutate mutation(
+      String column, Mutator mutator, java.util.Set<T> set
+  ) {
+    return mutation(column, mutator, Set.of(set));
+  }
 
-    public String getTable() {
-        return table;
-    }
+  public String getTable() {
+    return table;
+  }
 
-    public List<Condition> getWhere() {
-        return where;
-    }
+  public List<Condition> getWhere() {
+    return where;
+  }
 
-    public List<Mutation> getMutations() {
-        return mutations;
-    }
+  public List<Mutation> getMutations() {
+    return mutations;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "table=" + table
-            + ", where=" + where
-            + ", mutations=" + mutations
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "table=" + table
+        + ", where=" + where
+        + ", mutations=" + mutations
+        + "]";
+  }
 }

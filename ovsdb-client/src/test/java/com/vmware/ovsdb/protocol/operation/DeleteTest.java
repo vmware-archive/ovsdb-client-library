@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
@@ -23,14 +24,14 @@ import org.junit.Test;
 
 public class DeleteTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Delete delete = new Delete("Logical_Switch")
-            .where("replication_mode", Function.EQUALS, "service_node");
-        String expectedResult
-            = "{\"op\":\"delete\",\"table\":\"Logical_Switch\","
-            + "\"where\":[[\"replication_mode\",\"==\",\"service_node\"]]}";
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Delete delete = new Delete("Logical_Switch")
+        .where("replication_mode", Function.EQUALS, "service_node");
+    String expectedResult
+        = "{\"op\":\"delete\",\"table\":\"Logical_Switch\","
+        + "\"where\":[[\"replication_mode\",\"==\",\"service_node\"]]}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(delete));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(delete));
+  }
 }

@@ -16,16 +16,17 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
 public class AssertTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Assert assrt = new Assert("myLock");
-        String expectedResult = "{\"op\":\"assert\",\"lock\":\"myLock\"}";
-        assertEquals(expectedResult, JsonUtil.serialize(assrt));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Assert assrt = new Assert("myLock");
+    String expectedResult = "{\"op\":\"assert\",\"lock\":\"myLock\"}";
+    assertEquals(expectedResult, JsonUtil.serialize(assrt));
+  }
 }

@@ -16,49 +16,50 @@ package com.vmware.ovsdb.protocol.methods;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.methods.deserializer.TableUpdateDeserializer;
+
 import java.util.Map;
 import java.util.UUID;
 
 @JsonDeserialize(using = TableUpdateDeserializer.class)
 public class TableUpdate {
 
-    private final Map<UUID, RowUpdate> rowUpdates;
+  private final Map<UUID, RowUpdate> rowUpdates;
 
-    public TableUpdate(Map<UUID, RowUpdate> rowUpdates) {
-        this.rowUpdates = rowUpdates;
+  public TableUpdate(Map<UUID, RowUpdate> rowUpdates) {
+    this.rowUpdates = rowUpdates;
+  }
+
+  public Map<UUID, RowUpdate> getRowUpdates() {
+    return rowUpdates;
+  }
+
+  @Override
+  public int hashCode() {
+    return rowUpdates != null
+        ? rowUpdates.hashCode()
+        : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof TableUpdate)) {
+      return false;
     }
 
-    public Map<UUID, RowUpdate> getRowUpdates() {
-        return rowUpdates;
-    }
+    TableUpdate that = (TableUpdate) other;
 
-    @Override
-    public int hashCode() {
-        return rowUpdates != null
-            ? rowUpdates.hashCode()
-            : 0;
-    }
+    return rowUpdates != null
+        ? rowUpdates.equals(that.rowUpdates)
+        : that.rowUpdates == null;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof TableUpdate)) {
-            return false;
-        }
-
-        TableUpdate that = (TableUpdate) o;
-
-        return rowUpdates != null
-            ? rowUpdates.equals(that.rowUpdates)
-            : that.rowUpdates == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "rowUpdates=" + rowUpdates
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "rowUpdates=" + rowUpdates
+        + "]";
+  }
 }

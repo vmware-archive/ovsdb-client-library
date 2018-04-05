@@ -17,47 +17,48 @@ package com.vmware.ovsdb.protocol.operation.result;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
+
 import java.util.List;
 
 /**
- * Result of the "insert" operation, which only contains one "uuid" field.
+ * Result of the "select" operation, which only contains one "row" field.
  */
 public class SelectResult extends OperationResult {
 
-    private List<Row> rows;
+  private List<Row> rows;
 
-    @JsonCreator
-    public SelectResult(@JsonProperty(value = "rows", required = true) List<Row> rows) {
-        this.rows = rows;
+  @JsonCreator
+  public SelectResult(@JsonProperty(value = "rows", required = true) List<Row> rows) {
+    this.rows = rows;
+  }
+
+  public List<Row> getRows() {
+    return rows;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof SelectResult)) {
+      return false;
     }
 
-    public List<Row> getRows() {
-        return rows;
-    }
+    SelectResult that = (SelectResult) other;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof SelectResult)) {
-            return false;
-        }
+    return rows != null ? rows.equals(that.rows) : that.rows == null;
+  }
 
-        SelectResult that = (SelectResult) o;
+  @Override
+  public int hashCode() {
+    return rows != null ? rows.hashCode() : 0;
+  }
 
-        return rows != null ? rows.equals(that.rows) : that.rows == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return rows != null ? rows.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "rows=" + rows
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "rows=" + rows
+        + "]";
+  }
 }

@@ -17,11 +17,14 @@ package com.vmware.ovsdb.protocol.schema;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
+ * Representation of {@literal <table-schema>}.
+ *
  * <pre>
  * {@literal
  * <table-schema>
@@ -92,102 +95,110 @@ import java.util.Set;
  */
 public class TableSchema {
 
-    private final Map<String, ColumnSchema> columns;
+  private final Map<String, ColumnSchema> columns;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long maxRows;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long maxRows;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Boolean isRoot;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Boolean isRoot;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final List<Set<String>> indexes;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final List<Set<String>> indexes;
 
-    @JsonCreator
-    public TableSchema(
-        @JsonProperty(value = "columns", required = true) Map<String,
-            ColumnSchema> columns,
-        @JsonProperty(value = "maxRows") Long maxRows,
-        @JsonProperty(value = "isRoot") Boolean isRoot,
-        @JsonProperty(value = "indexes") List<Set<String>> indexes
-    ) {
-        this.columns = columns;
-        this.maxRows = maxRows;
-        this.isRoot = isRoot;
-        this.indexes = indexes;
+  /**
+   * Create a {@link TableSchema} object.
+   *
+   * @param columns value of the "columns" filed
+   * @param maxRows value of the "maxRows" field
+   * @param isRoot value of the "isRoot" field
+   * @param indexes value of the "indexes" field
+   */
+  @JsonCreator
+  public TableSchema(
+      @JsonProperty(value = "columns", required = true) Map<String,
+          ColumnSchema> columns,
+      @JsonProperty(value = "maxRows") Long maxRows,
+      @JsonProperty(value = "isRoot") Boolean isRoot,
+      @JsonProperty(value = "indexes") List<Set<String>> indexes
+  ) {
+    this.columns = columns;
+    this.maxRows = maxRows;
+    this.isRoot = isRoot;
+    this.indexes = indexes;
+  }
+
+  public Map<String, ColumnSchema> getColumns() {
+    return columns;
+  }
+
+  public Long getMaxRows() {
+    return maxRows;
+  }
+
+  public Boolean getIsRoot() {
+    return isRoot;
+  }
+
+  public List<Set<String>> getIndexes() {
+    return indexes;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = columns != null
+        ? columns.hashCode()
+        : 0;
+    result = 31 * result + (maxRows != null
+        ? maxRows.hashCode()
+        : 0);
+    result = 31 * result + (isRoot != null
+        ? isRoot.hashCode()
+        : 0);
+    result = 31 * result + (indexes != null
+        ? indexes.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof TableSchema)) {
+      return false;
     }
 
-    public Map<String, ColumnSchema> getColumns() {
-        return columns;
+    TableSchema that = (TableSchema) other;
+
+    if (columns != null
+        ? !columns.equals(that.columns)
+        : that.columns != null) {
+      return false;
     }
-
-    public Long getMaxRows() {
-        return maxRows;
+    if (maxRows != null
+        ? !maxRows.equals(that.maxRows)
+        : that.maxRows != null) {
+      return false;
     }
-
-    public Boolean getIsRoot() {
-        return isRoot;
+    if (isRoot != null
+        ? !isRoot.equals(that.isRoot)
+        : that.isRoot != null) {
+      return false;
     }
+    return indexes != null
+        ? indexes.equals(that.indexes)
+        : that.indexes == null;
+  }
 
-    public List<Set<String>> getIndexes() {
-        return indexes;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = columns != null
-            ? columns.hashCode()
-            : 0;
-        result = 31 * result + (maxRows != null
-            ? maxRows.hashCode()
-            : 0);
-        result = 31 * result + (isRoot != null
-            ? isRoot.hashCode()
-            : 0);
-        result = 31 * result + (indexes != null
-            ? indexes.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof TableSchema)) {
-            return false;
-        }
-
-        TableSchema that = (TableSchema) o;
-
-        if (columns != null
-            ? !columns.equals(that.columns)
-            : that.columns != null) {
-            return false;
-        }
-        if (maxRows != null
-            ? !maxRows.equals(that.maxRows)
-            : that.maxRows != null) {
-            return false;
-        }
-        if (isRoot != null
-            ? !isRoot.equals(that.isRoot)
-            : that.isRoot != null) {
-            return false;
-        }
-        return indexes != null
-            ? indexes.equals(that.indexes)
-            : that.indexes == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "columns=" + columns
-            + ", maxRows=" + maxRows
-            + ", isRoot=" + isRoot
-            + ", indexes=" + indexes
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "columns=" + columns
+        + ", maxRows=" + maxRows
+        + ", isRoot=" + isRoot
+        + ", indexes=" + indexes
+        + "]";
+  }
 }

@@ -19,29 +19,27 @@ import io.netty.handler.ssl.SslContext;
 
 public interface OvsdbPassiveConnectionListener {
 
-    /**
-     * Start listening on the specified port.
-     *
-     * @param port port to listen. Usually it is 6640
-     * @param connectionCallback called when there is a connection from the OVSDB server
-     * @return true if successfully start the listener. false otherwise.
-     */
-    void startListening(int port, ConnectionCallback connectionCallback);
+  /**
+   * Start listening on the specified port.
+   *
+   * @param port port to listen. Usually it is 6640
+   * @param connectionCallback called when there is a connection from the OVSDB server
+   */
+  void startListening(int port, ConnectionCallback connectionCallback);
 
-    /**
-     * Start listening on the specified port with SSL enabled.
-     *
-     * @param port port to listen. Usually it should  be 6640
-     * @param sslContext the SSL context used for SSL connection
-     * @param connectionCallback called when there is a connection from the OVSDB server
-     * @return true if successfully start the listener. false otherwise.
-     */
-    void startListeningWithSsl(
-        int port, SslContext sslContext, ConnectionCallback connectionCallback
-    );
+  /**
+   * Start listening on the specified port with SSL enabled.
+   *
+   * @param port port to listen. Usually it should  be 6640
+   * @param sslContext the SSL context used for SSL connection
+   * @param connectionCallback called when there is a connection from the OVSDB server
+   */
+  void startListeningWithSsl(
+      int port, SslContext sslContext, ConnectionCallback connectionCallback
+  );
 
-    /**
-     * Stop the OVSDB manager.
-     */
-    void stopListening(int port);
+  /**
+   * Stop the OVSDB manager.
+   */
+  void stopListening(int port);
 }

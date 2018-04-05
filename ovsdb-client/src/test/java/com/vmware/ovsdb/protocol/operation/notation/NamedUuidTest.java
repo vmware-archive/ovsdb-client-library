@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
@@ -23,36 +24,36 @@ import org.junit.Test;
 
 public class NamedUuidTest {
 
-    private static final String uuidName = "uuid-name";
+  private static final String uuidName = "uuid-name";
 
-    private String json = "[\"named-uuid\",\"" + uuidName + "\"]";
+  private String json = "[\"named-uuid\",\"" + uuidName + "\"]";
 
-    private NamedUuid namedUuid = new NamedUuid(uuidName);
+  private NamedUuid namedUuid = new NamedUuid(uuidName);
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        assertEquals(json, JsonUtil.serialize(namedUuid));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    assertEquals(json, JsonUtil.serialize(namedUuid));
+  }
 
-    @Test
-    public void testDeserialization() throws IOException {
-        assertEquals(
-            namedUuid,
-            JsonUtil.deserialize(json, NamedUuid.class)
-        );
-    }
+  @Test
+  public void testDeserialization() throws IOException {
+    assertEquals(
+        namedUuid,
+        JsonUtil.deserialize(json, NamedUuid.class)
+    );
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidNamedUuid1() throws IOException {
-        String json = "[\"id\", \"" + uuidName + "\"]";
+  @Test(expected = IOException.class)
+  public void testInvalidNamedUuid1() throws IOException {
+    String json = "[\"id\", \"" + uuidName + "\"]";
 
-        JsonUtil.deserialize(json, NamedUuid.class);
-    }
+    JsonUtil.deserialize(json, NamedUuid.class);
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidNamedUuid2() throws IOException {
-        String json = "[\"" + uuidName + "\"]";
+  @Test(expected = IOException.class)
+  public void testInvalidNamedUuid2() throws IOException {
+    String json = "[\"" + uuidName + "\"]";
 
-        JsonUtil.deserialize(json, NamedUuid.class);
-    }
+    JsonUtil.deserialize(json, NamedUuid.class);
+  }
 }

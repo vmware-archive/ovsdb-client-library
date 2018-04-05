@@ -135,7 +135,6 @@ This is similar to JPA.
 The final goal should be uploading it to the central maven repository. See 
 [Guide to uploading artifacts to the Central Repository](https://maven.apache.org/guides/mini/guide-central-repository-upload.html)
 5. **Use Wiki for documentation.**
-6. **Add checkstyle plugin**
 
 ## Contributing
 

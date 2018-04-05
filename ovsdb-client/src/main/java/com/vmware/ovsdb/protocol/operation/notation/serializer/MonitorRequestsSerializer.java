@@ -18,23 +18,24 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.vmware.ovsdb.protocol.methods.MonitorRequests;
+
 import java.io.IOException;
 
 public class MonitorRequestsSerializer extends StdSerializer<MonitorRequests> {
 
-    public MonitorRequestsSerializer() {
-        this(null);
-    }
+  public MonitorRequestsSerializer() {
+    this(null);
+  }
 
-    protected MonitorRequestsSerializer(Class<MonitorRequests> t) {
-        super(t);
-    }
+  protected MonitorRequestsSerializer(Class<MonitorRequests> klass) {
+    super(klass);
+  }
 
-    @Override
-    public void serialize(
-        MonitorRequests monitorRequests, JsonGenerator jgen,
-        SerializerProvider provider
-    ) throws IOException {
-        jgen.writeObject(monitorRequests.getMonitorRequests());
-    }
+  @Override
+  public void serialize(
+      MonitorRequests monitorRequests, JsonGenerator jgen,
+      SerializerProvider provider
+  ) throws IOException {
+    jgen.writeObject(monitorRequests.getMonitorRequests());
+  }
 }

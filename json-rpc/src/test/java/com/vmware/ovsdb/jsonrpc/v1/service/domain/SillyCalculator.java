@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.service.domain;
 
 import com.vmware.ovsdb.jsonrpc.v1.annotation.JsonRpcServiceMethod;
@@ -23,52 +24,52 @@ import java.util.List;
  */
 public class SillyCalculator {
 
-    @JsonRpcServiceMethod
-    public int add(int a, int b) {
-        return a + b;
-    }
+  @JsonRpcServiceMethod
+  public int add(int a, int b) {
+    return a + b;
+  }
 
-    @JsonRpcServiceMethod
-    public int sub(int a, int b) {
-        return a - b;
-    }
+  @JsonRpcServiceMethod
+  public int sub(int a, int b) {
+    return a - b;
+  }
 
-    @JsonRpcServiceMethod
-    public int mul(int a, int b) {
-        return a * b;
-    }
+  @JsonRpcServiceMethod
+  public int mul(int a, int b) {
+    return a * b;
+  }
 
-    @JsonRpcServiceMethod(value = "list_methods")
-    public List<String> listMethods() {
-        return new ArrayList<>(
-            Arrays.asList(
-                "list_methods",
-                "add",
-                "sub",
-                "mul",
-                "echo",
-                "print"
-            )
-        );
-    }
+  @JsonRpcServiceMethod(value = "list_methods")
+  public List<String> listMethods() {
+    return new ArrayList<>(
+        Arrays.asList(
+            "list_methods",
+            "add",
+            "sub",
+            "mul",
+            "echo",
+            "print"
+        )
+    );
+  }
 
-    @JsonRpcServiceMethod
-    public Object[] echo(Object... objects) {
-        return objects;
-    }
+  @JsonRpcServiceMethod
+  public Object[] echo(Object... objects) {
+    return objects;
+  }
 
-    @JsonRpcServiceMethod
-    public void print(String msg, int num) {
-        System.out.println(msg + num);
-    }
+  @JsonRpcServiceMethod
+  public void print(String msg, int num) {
+    System.out.println(msg + num);
+  }
 
-    @JsonRpcServiceMethod
-    public int sum(Integer... nums) {
-        return Arrays.stream(nums).mapToInt(Integer::intValue).sum();
-    }
+  @JsonRpcServiceMethod
+  public int sum(Integer... nums) {
+    return Arrays.stream(nums).mapToInt(Integer::intValue).sum();
+  }
 
-    @JsonRpcServiceMethod(value = "error_method")
-    public void errorMethod(String msg) {
-        throw new RuntimeException(msg);
-    }
+  @JsonRpcServiceMethod(value = "error_method")
+  public void errorMethod(String msg) {
+    throw new RuntimeException(msg);
+  }
 }

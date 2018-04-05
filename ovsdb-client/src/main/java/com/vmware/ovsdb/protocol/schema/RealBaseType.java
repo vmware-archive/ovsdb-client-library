@@ -18,84 +18,94 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
 /**
- * <pre>
- * {@literal
- * Represent a <base-type> with a real <atomic-type> as it's type.
- * }
- * </pre>
+ * Represent a {@literal <base-type>} with a real {@literal <atomic-type>} as it's type.
  *
  * @see BaseType
  * @see AtomicType
  */
 public class RealBaseType extends BaseType {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Double minReal;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Double minReal;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Double maxReal;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Double maxReal;
 
-    public RealBaseType() {
-        this(null, null);
+  /**
+   * Create a {@link RealBaseType} object.
+   */
+  public RealBaseType() {
+    this(null, null);
+  }
+
+  /**
+   * Create a {@link RealBaseType} object.
+   *
+   * @param enums value of the "enums" field
+   */
+  public RealBaseType(Value enums) {
+    super(AtomicType.REAL, enums);
+    this.minReal = null;
+    this.maxReal = null;
+  }
+
+  /**
+   * Create a {@link RealBaseType} object.
+   *
+   * @param minReal value of the "minReal" field
+   * @param maxReal value of the "maxReal" field
+   */
+  public RealBaseType(Double minReal, Double maxReal) {
+    super(AtomicType.REAL);
+    this.minReal = minReal;
+    this.maxReal = maxReal;
+  }
+
+  public Double getMinReal() {
+    return minReal;
+  }
+
+  public Double getMaxReal() {
+    return maxReal;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = minReal != null
+        ? minReal.hashCode()
+        : 0;
+    result = 31 * result + (maxReal != null
+        ? maxReal.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof RealBaseType)) {
+      return false;
     }
 
-    public RealBaseType(Value enums) {
-        super(AtomicType.REAL, enums);
-        this.minReal = null;
-        this.maxReal = null;
+    RealBaseType that = (RealBaseType) other;
+
+    if (minReal != null
+        ? !minReal.equals(that.minReal)
+        : that.minReal != null) {
+      return false;
     }
+    return maxReal != null
+        ? maxReal.equals(that.maxReal)
+        : that.maxReal == null;
+  }
 
-    public RealBaseType(Double minReal, Double maxReal) {
-        super(AtomicType.REAL);
-        this.minReal = minReal;
-        this.maxReal = maxReal;
-    }
-
-    public Double getMinReal() {
-        return minReal;
-    }
-
-    public Double getMaxReal() {
-        return maxReal;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = minReal != null
-            ? minReal.hashCode()
-            : 0;
-        result = 31 * result + (maxReal != null
-            ? maxReal.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof RealBaseType)) {
-            return false;
-        }
-
-        RealBaseType that = (RealBaseType) o;
-
-        if (minReal != null
-            ? !minReal.equals(that.minReal)
-            : that.minReal != null) {
-            return false;
-        }
-        return maxReal != null
-            ? maxReal.equals(that.maxReal)
-            : that.maxReal == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "minReal=" + minReal
-            + ", maxReal=" + maxReal
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "minReal=" + minReal
+        + ", maxReal=" + maxReal
+        + "]";
+  }
 }

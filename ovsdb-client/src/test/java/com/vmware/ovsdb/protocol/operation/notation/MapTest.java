@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
@@ -24,33 +25,33 @@ import org.junit.Test;
 
 public class MapTest {
 
-    private static final String jsonString
-        = "[\"map\",[[\"key1\",\"value1\"],[\"key2\",\"value2\"]]]";
+  private static final String jsonString
+      = "[\"map\",[[\"key1\",\"value1\"],[\"key2\",\"value2\"]]]";
 
-    private static final Map<String, String> map = new Map<>(
-        ImmutableList.of(
-            new Pair<>(Atom.string("key1"), Atom.string("value1")),
-            new Pair<>(Atom.string("key2"), Atom.string("value2"))
-        )
-    );
+  private static final Map<String, String> map = new Map<>(
+      ImmutableList.of(
+          new Pair<>(Atom.string("key1"), Atom.string("value1")),
+          new Pair<>(Atom.string("key2"), Atom.string("value2"))
+      )
+  );
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        assertEquals(jsonString, JsonUtil.serialize(map));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    assertEquals(jsonString, JsonUtil.serialize(map));
+  }
 
-    @Test
-    public void testDeserialization() throws IOException {
-        assertEquals(map, JsonUtil.deserialize(jsonString, Map.class));
-    }
+  @Test
+  public void testDeserialization() throws IOException {
+    assertEquals(map, JsonUtil.deserialize(jsonString, Map.class));
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidMap1() throws IOException {
-        JsonUtil.deserialize("[[123, 456]]", Map.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidMap1() throws IOException {
+    JsonUtil.deserialize("[[123, 456]]", Map.class);
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidMap2() throws IOException {
-        JsonUtil.deserialize("[\"not-map\",[123, 456]]", Map.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidMap2() throws IOException {
+    JsonUtil.deserialize("[\"not-map\",[123, 456]]", Map.class);
+  }
 }

@@ -18,84 +18,94 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
 /**
- * <pre>
- * {@literal
- * Represent a <base-type> with a string <atomic-type> as it's type.
- * }
- * </pre>
+ * Represent a {@literal <base-type>} with a string {@literal <atomic-type>} as it's type.
  *
  * @see BaseType
  * @see AtomicType
  */
 public class StringBaseType extends BaseType {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long minLength;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long minLength;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long maxLength;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long maxLength;
 
-    public StringBaseType() {
-        this(null, null);
+  /**
+   * Create a {@link StringBaseType} object.
+   */
+  public StringBaseType() {
+    this(null, null);
+  }
+
+  /**
+   * Create a {@link StringBaseType} object.
+   *
+   * @param enums value of the "enums" field
+   */
+  public StringBaseType(Value enums) {
+    super(AtomicType.STRING, enums);
+    this.minLength = null;
+    this.maxLength = null;
+  }
+
+  /**
+   * Create a {@link StringBaseType} object.
+   *
+   * @param minLength value of the "minLength" field
+   * @param maxLength value of the "maxLength" field
+   */
+  public StringBaseType(Long minLength, Long maxLength) {
+    super(AtomicType.STRING);
+    this.minLength = minLength;
+    this.maxLength = maxLength;
+  }
+
+  public Long getMinLength() {
+    return minLength;
+  }
+
+  public Long getMaxLength() {
+    return maxLength;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = minLength != null
+        ? minLength.hashCode()
+        : 0;
+    result = 31 * result + (maxLength != null
+        ? maxLength.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof StringBaseType)) {
+      return false;
     }
 
-    public StringBaseType(Value enums) {
-        super(AtomicType.STRING, enums);
-        this.minLength = null;
-        this.maxLength = null;
+    StringBaseType that = (StringBaseType) other;
+
+    if (minLength != null
+        ? !minLength.equals(that.minLength)
+        : that.minLength != null) {
+      return false;
     }
+    return maxLength != null
+        ? maxLength.equals(that.maxLength)
+        : that.maxLength == null;
+  }
 
-    public StringBaseType(Long minLength, Long maxLength) {
-        super(AtomicType.STRING);
-        this.minLength = minLength;
-        this.maxLength = maxLength;
-    }
-
-    public Long getMinLength() {
-        return minLength;
-    }
-
-    public Long getMaxLength() {
-        return maxLength;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = minLength != null
-            ? minLength.hashCode()
-            : 0;
-        result = 31 * result + (maxLength != null
-            ? maxLength.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof StringBaseType)) {
-            return false;
-        }
-
-        StringBaseType that = (StringBaseType) o;
-
-        if (minLength != null
-            ? !minLength.equals(that.minLength)
-            : that.minLength != null) {
-            return false;
-        }
-        return maxLength != null
-            ? maxLength.equals(that.maxLength)
-            : that.maxLength == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "minLength=" + minLength
-            + ", maxLength=" + maxLength
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "minLength=" + minLength
+        + ", maxLength=" + maxLength
+        + "]";
+  }
 }

@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,6 +27,9 @@ import com.vmware.ovsdb.jsonrpc.v1.model.JsonRpcV1Response;
 import com.vmware.ovsdb.jsonrpc.v1.service.JsonRpcV1Client;
 import com.vmware.ovsdb.jsonrpc.v1.spi.JsonRpcTransporter;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,219 +39,218 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link JsonRpcV1Client} interface. It depends on a {@link
  * JsonRpcTransporter} to send the requests to the remote server. Whenever the client receives an
  * invalid response, it will close the connection by {@link JsonRpcTransporter#close()}. All
  * un-answered request will result in exception. After the connection is closed, the client cannot
- * be used anymore and all following request will result in {@link JsonRpcConnectionClosedException}.
+ * be used anymore and all following request will result in
+ * {@link JsonRpcConnectionClosedException}.
  *
- * The implementation is thread-safe.
+ * <p>The implementation is thread-safe.</p>
  */
 public class JsonRpcV1ClientImpl implements JsonRpcV1Client {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      MethodHandles.lookup().lookupClass());
 
-    private static final long DEFAULT_MAX_TIMEOUT = 300;
+  private static final long DEFAULT_MAX_TIMEOUT = 300;
 
-    private static final TimeUnit DEFAULT_MAX_TIMEOUT_UNIT = TimeUnit.SECONDS;
+  private static final TimeUnit DEFAULT_MAX_TIMEOUT_UNIT = TimeUnit.SECONDS;
 
-    private final long maxTimeout;
+  private final long maxTimeout;
 
-    private final TimeUnit maxTimeoutUnit;
+  private final TimeUnit maxTimeoutUnit;
 
-    private final JsonRpcTransporter transporter;
+  private final JsonRpcTransporter transporter;
 
-    private final ConcurrentMap<String, CallContext> callContexts
-        = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, CallContext> callContexts
+      = new ConcurrentHashMap<>();
 
-    private final AtomicBoolean isActive = new AtomicBoolean(true);
+  private final AtomicBoolean isActive = new AtomicBoolean(true);
 
-    private final ScheduledExecutorService scheduler;
+  private final ScheduledExecutorService scheduler;
 
-    /**
-     * Construct a JsonRpcV1ClientImpl object. If the user calls {@link CompletableFuture#get()}  on
-     * the {@link CompletableFuture} returned by {@link JsonRpcV1Client#call(String, String, Class,
-     * Object...)}, it is guaranteed that the get() will be returned within maxTimeout. If the user
-     * calls {@link CompletableFuture#get(long, TimeUnit)}, the timeout value should be less than or
-     * equal to maxTimeout. Or it will still return within maxTimeout.
-     *
-     * @param transporter a {@link JsonRpcTransporter} used to send outgoing requests
-     * @param scheduler a scheduler used to run any asynchronous task
-     * @param maxTimeout maximum timeout of each call
-     * @param maxTimeoutUnit the time unit of the maxTimeout parameter
-     */
-    public JsonRpcV1ClientImpl(
-        JsonRpcTransporter transporter, ScheduledExecutorService scheduler,
-        long maxTimeout, TimeUnit maxTimeoutUnit
-    ) {
-        this.transporter = transporter;
-        this.scheduler = scheduler;
-        this.maxTimeout = maxTimeout;
-        this.maxTimeoutUnit = maxTimeoutUnit;
+  /**
+   * Construct a JsonRpcV1ClientImpl object. If the user calls {@link CompletableFuture#get()}  on
+   * the {@link CompletableFuture} returned by {@link JsonRpcV1Client#call(String, String, Class,
+   * Object...)}, it is guaranteed that the get() will be returned within maxTimeout. If the user
+   * calls {@link CompletableFuture#get(long, TimeUnit)}, the timeout value should be less than or
+   * equal to maxTimeout. Or it will still return within maxTimeout.
+   *
+   * @param transporter a {@link JsonRpcTransporter} used to send outgoing requests
+   * @param scheduler a scheduler used to run any asynchronous task
+   * @param maxTimeout maximum timeout of each call
+   * @param maxTimeoutUnit the time unit of the maxTimeout parameter
+   */
+  public JsonRpcV1ClientImpl(
+      JsonRpcTransporter transporter, ScheduledExecutorService scheduler,
+      long maxTimeout, TimeUnit maxTimeoutUnit
+  ) {
+    this.transporter = transporter;
+    this.scheduler = scheduler;
+    this.maxTimeout = maxTimeout;
+    this.maxTimeoutUnit = maxTimeoutUnit;
+  }
+
+  /**
+   * Construct a JsonRpcV1ClientImpl object. The default maximum timeout for each call will be used.
+   * To specify the timeout, see {@link JsonRpcV1ClientImpl#JsonRpcV1ClientImpl(JsonRpcTransporter,
+   * ScheduledExecutorService, long, TimeUnit)}.
+   *
+   * @param transporter a {@link JsonRpcTransporter} used to send outgoing requests.
+   * @param scheduler a scheduler used to run any asynchronous task
+   */
+  public JsonRpcV1ClientImpl(JsonRpcTransporter transporter, ScheduledExecutorService scheduler) {
+    this(transporter, scheduler, DEFAULT_MAX_TIMEOUT, DEFAULT_MAX_TIMEOUT_UNIT);
+  }
+
+  @Override
+  public <T> CompletableFuture<T> call(
+      String id, String method, Class<T> returnType, Object... params
+  ) throws JsonRpcException {
+    throwExceptionIfNotActive();
+    JsonNode request = JsonUtil.toJsonNode(new JsonRpcV1Request(id, method, params));
+
+    CompletableFuture<T> completableFuture = new CompletableFuture<>();
+    CallContext<T> callContext = new CallContext<>(completableFuture, returnType);
+    if (callContexts.putIfAbsent(id, callContext) != null) {
+      LOGGER.error("Duplicate call id {} in request {}", id, request);
+      throw new JsonRpcDuplicateIdException("Duplicate call id " + id);
     }
 
-    /**
-     * Construct a JsonRpcV1ClientImpl object. The default maximum timeout for each call will be
-     * used. To specify the timeout, see {@link JsonRpcV1ClientImpl#JsonRpcV1ClientImpl(JsonRpcTransporter,
-     * ScheduledExecutorService, long, TimeUnit)}.
-     *
-     * @param transporter a {@link JsonRpcTransporter} used to send outgoing requests.
-     * @param scheduler a scheduler used to run any asynchronous task
-     */
-    public JsonRpcV1ClientImpl(JsonRpcTransporter transporter, ScheduledExecutorService scheduler) {
-        this(transporter, scheduler, DEFAULT_MAX_TIMEOUT, DEFAULT_MAX_TIMEOUT_UNIT);
+    // TODO: After upgrade to Java 9, change this to
+    // completableFuture.orTimeout(maxTimeout, maxTimeoutUnit);
+    // completableFuture.exceptionally(ex -> {
+    //    if (ex instanceof TimeoutException) {
+    //        callContexts.remove(id);
+    //    }
+    //    return null;
+    // });
+    ScheduledFuture timeoutFuture = scheduler.schedule(() -> {
+      completableFuture.completeExceptionally(
+          new TimeoutException("Timeout at " + System.currentTimeMillis()));
+      callContexts.remove(id);
+    }, maxTimeout, maxTimeoutUnit);
+
+    callContext.setTimeoutFuture(timeoutFuture);
+    try {
+      sendRequest(request);
+    } catch (JsonRpcTransportException ex) {
+      timeoutFuture.cancel(true);
+      callContexts.remove(id);
+      throw ex;
     }
 
-    @Override
-    public <T> CompletableFuture<T> call(
-        String id, String method, Class<T> returnType, Object... params
-    ) throws JsonRpcException {
-        throwExceptionIfNotActive();
-        JsonNode request = JsonUtil.toJsonNode(new JsonRpcV1Request(id, method, params));
+    return completableFuture;
+  }
 
-        CompletableFuture<T> completableFuture = new CompletableFuture<>();
-        CallContext<T> callContext = new CallContext<>(completableFuture, returnType);
-        if (callContexts.putIfAbsent(id, callContext) != null) {
-            LOGGER.error("Duplicate call id {} in request {}", id, request);
-            throw new JsonRpcDuplicateIdException("Duplicate call id " + id);
-        }
+  @Override
+  public void notify(String method, Object... params) throws JsonRpcException {
+    throwExceptionIfNotActive();
+    JsonNode request = JsonUtil.toJsonNode(new JsonRpcV1Request(null, method, params));
+    sendRequest(request);
+  }
 
-        // TODO: After upgrade to Java 9, change this to
-        // completableFuture.orTimeout(maxTimeout, maxTimeoutUnit);
-        // completableFuture.exceptionally(ex -> {
-        //    if (ex instanceof TimeoutException) {
-        //        callContexts.remove(id);
-        //    }
-        //    return null;
-        // });
-        ScheduledFuture timeoutFuture = scheduler.schedule(() -> {
-            completableFuture.completeExceptionally(
-                new TimeoutException("Timeout at " + System.currentTimeMillis()));
-            callContexts.remove(id);
-        }, maxTimeout, maxTimeoutUnit);
+  @Override
+  public void handleResponse(JsonNode responseNode) throws JsonRpcException {
+    throwExceptionIfNotActive();
+    JsonRpcV1Response jsonRpcV1Response;
+    try {
+      jsonRpcV1Response = JsonUtil.treeToValue(responseNode, JsonRpcV1Response.class);
+    } catch (JsonProcessingException ex) {
+      LOGGER.error("Invalid response {}. Closing the client.", responseNode);
+      shutdown();
+      throw new JsonRpcInvalidResponseException("Invalid response " + responseNode, ex);
+    }
+    String id = jsonRpcV1Response.getId();
+    if (id == null) {
+      // Ignore response without ID
+      LOGGER.warn("Response {} doesn't have an ID. Ignore.", jsonRpcV1Response);
+      return;
+    }
+    CallContext callContext = callContexts.remove(id);
+    if (callContext == null) {
+      // Ignore response with unknown ID
+      LOGGER.warn("Unknown response {}", jsonRpcV1Response);
+      return;
+    }
+    // Cancel the timeout future since we have received the response
+    callContext.getTimeoutFuture().cancel(true);
+    CompletableFuture completableFuture = callContext.getCompletableFuture();
 
-        callContext.setTimeoutFuture(timeoutFuture);
-        try {
-            sendRequest(request);
-        } catch (JsonRpcTransportException e) {
-            timeoutFuture.cancel(true);
-            callContexts.remove(id);
-            throw e;
-        }
+    String error = jsonRpcV1Response.getError();
+    if (error != null) {
+      completableFuture.completeExceptionally(new JsonRpcException(error));
+    } else {
+      JsonNode resultNode = jsonRpcV1Response.getResult();
+      Class<?> returnType = callContext.getReturnType();
+      try {
+        Object result = JsonUtil.treeToValue(resultNode, returnType);
+        completableFuture.complete(result);
+      } catch (JsonProcessingException ex) {
+        completableFuture.completeExceptionally(
+            new JsonRpcResultTypeMismatchException(
+                "Failed to convert result " + resultNode + " to type " + returnType, ex)
+        );
+      }
+    }
+  }
 
-        return completableFuture;
+  @Override
+  public void shutdown() {
+    if (isActive.getAndSet(false)) {
+      transporter.close();
+
+      callContexts.forEach((key, callContext) -> callContext.getCompletableFuture()
+          .completeExceptionally(
+              new JsonRpcConnectionClosedException("Connection for this client is closed.")
+          )
+      );
+      callContexts.clear();
+      LOGGER.info("The client is shutdown.");
+    }
+  }
+
+  private void throwExceptionIfNotActive() throws JsonRpcConnectionClosedException {
+    if (!isActive.get()) {
+      throw new JsonRpcConnectionClosedException("Connection for this client is closed.");
+    }
+  }
+
+  private void sendRequest(JsonNode requst) throws JsonRpcTransportException {
+    LOGGER.debug("Sending request {}", requst);
+    transporter.send(requst);
+  }
+
+  private static class CallContext<T> {
+
+    private Class<T> returnType;
+
+    private CompletableFuture<T> completableFuture = null;
+
+    private ScheduledFuture timeoutFuture = null;
+
+    CallContext(CompletableFuture<T> completableFuture, Class<T> returnType) {
+      this.completableFuture = completableFuture;
+      this.returnType = returnType;
     }
 
-    @Override
-    public void notify(String method, Object... params) throws JsonRpcException {
-        throwExceptionIfNotActive();
-        JsonNode request = JsonUtil.toJsonNode(new JsonRpcV1Request(null, method, params));
-        sendRequest(request);
+    CompletableFuture<T> getCompletableFuture() {
+      return completableFuture;
     }
 
-    @Override
-    public void handleResponse(JsonNode responseNode) throws JsonRpcException {
-        throwExceptionIfNotActive();
-        JsonRpcV1Response jsonRpcV1Response;
-        try {
-            jsonRpcV1Response = JsonUtil.treeToValue(responseNode, JsonRpcV1Response.class);
-        } catch (JsonProcessingException e) {
-            LOGGER.error("Invalid response {}. Closing the client.", responseNode);
-            shutdown();
-            throw new JsonRpcInvalidResponseException("Invalid response " + responseNode, e);
-        }
-        String id = jsonRpcV1Response.getId();
-        if (id == null) {
-            // Ignore response without ID
-            LOGGER.warn("Response {} doesn't have an ID. Ignore.", jsonRpcV1Response);
-            return;
-        }
-        CallContext callContext = callContexts.remove(id);
-        if (callContext == null) {
-            // Ignore response with unknown ID
-            LOGGER.warn("Unknown response {}", jsonRpcV1Response);
-            return;
-        }
-        // Cancel the timeout future since we have received the response
-        callContext.getTimeoutFuture().cancel(true);
-        CompletableFuture completableFuture = callContext.getCompletableFuture();
-
-        String error = jsonRpcV1Response.getError();
-        if (error != null) {
-            completableFuture.completeExceptionally(new JsonRpcException(error));
-        } else {
-            JsonNode resultNode = jsonRpcV1Response.getResult();
-            Class<?> returnType = callContext.getReturnType();
-            try {
-                Object result = JsonUtil.treeToValue(resultNode, returnType);
-                completableFuture.complete(result);
-            } catch (JsonProcessingException e) {
-                completableFuture.completeExceptionally(
-                    new JsonRpcResultTypeMismatchException(
-                        "Failed to convert result " + resultNode + " to type " + returnType, e)
-                );
-            }
-        }
+    Class<T> getReturnType() {
+      return returnType;
     }
 
-    @Override
-    public void shutdown() {
-        if (isActive.getAndSet(false)) {
-            transporter.close();
-
-            callContexts.forEach((key, callContext) -> callContext.getCompletableFuture()
-                .completeExceptionally(
-                    new JsonRpcConnectionClosedException("Connection for this client is closed.")
-                )
-            );
-            callContexts.clear();
-            LOGGER.info("The client is shutdown.");
-        }
+    ScheduledFuture getTimeoutFuture() {
+      return timeoutFuture;
     }
 
-    private void throwExceptionIfNotActive() throws JsonRpcConnectionClosedException {
-        if (!isActive.get()) {
-            throw new JsonRpcConnectionClosedException("Connection for this client is closed.");
-        }
+    void setTimeoutFuture(ScheduledFuture timeoutFuture) {
+      this.timeoutFuture = timeoutFuture;
     }
-
-    private void sendRequest(JsonNode requst) throws JsonRpcTransportException {
-        LOGGER.debug("Sending request {}", requst);
-        transporter.send(requst);
-    }
-
-    private static class CallContext<T> {
-
-        private Class<T> returnType;
-
-        private CompletableFuture<T> completableFuture = null;
-
-        private ScheduledFuture timeoutFuture = null;
-
-        CallContext(CompletableFuture<T> completableFuture, Class<T> returnType) {
-            this.completableFuture = completableFuture;
-            this.returnType = returnType;
-        }
-
-        CompletableFuture<T> getCompletableFuture() {
-            return completableFuture;
-        }
-
-        Class<T> getReturnType() {
-            return returnType;
-        }
-
-        ScheduledFuture getTimeoutFuture() {
-            return timeoutFuture;
-        }
-
-        void setTimeoutFuture(ScheduledFuture timeoutFuture) {
-            this.timeoutFuture = timeoutFuture;
-        }
-    }
+  }
 }

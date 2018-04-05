@@ -25,10 +25,13 @@ import com.vmware.ovsdb.protocol.operation.notation.Row;
 import com.vmware.ovsdb.protocol.operation.notation.Set;
 import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Representation of update operation.
+ *
  * <pre>
  * {@literal
  * The "update" object contains the following members:
@@ -63,80 +66,87 @@ import java.util.List;
  */
 public class Update extends Operation {
 
-    private final String table;
+  private final String table;
 
-    private List<Condition> where;
+  private List<Condition> where;
 
-    private Row row;
+  private Row row;
 
-    public Update(
-        String table, List<Condition> where, Row row
-    ) {
-        super(UPDATE);
-        this.table = table;
-        this.where = where;
-        this.row = row;
-    }
+  /**
+   * Create an {@link Update} object.
+   *
+   * @param table value of the "table" field
+   * @param where value of the "where" field
+   * @param row value of the "row" field
+   */
+  public Update(
+      String table, List<Condition> where, Row row
+  ) {
+    super(UPDATE);
+    this.table = table;
+    this.where = where;
+    this.row = row;
+  }
 
-    public Update(String table, Row row) {
-        this(table, new ArrayList<>(), row);
-    }
+  public Update(String table, Row row) {
+    this(table, new ArrayList<>(), row);
+  }
 
-    public Update where(String column, Function function, Value value) {
-        where.add(new Condition(column, function, value));
-        return this;
-    }
+  public Update where(String column, Function function, Value value) {
+    where.add(new Condition(column, function, value));
+    return this;
+  }
 
-    public Update where(String column, Function function, String string) {
-        return where(column, function, Atom.string(string));
-    }
+  public Update where(String column, Function function, String string) {
+    return where(column, function, Atom.string(string));
+  }
 
-    public Update where(String column, Function function, long integer) {
-        return where(column, function, Atom.integer(integer));
-    }
+  public Update where(String column, Function function, long integer) {
+    return where(column, function, Atom.integer(integer));
+  }
 
-    public Update where(String column, Function function, boolean bool) {
-        return where(column, function, Atom.bool(bool));
-    }
+  public Update where(String column, Function function, boolean bool) {
+    return where(column, function, Atom.bool(bool));
+  }
 
-    public Update where(String column, Function function, Uuid uuid) {
-        return where(column, function, Atom.uuid(uuid));
-    }
+  public Update where(String column, Function function, Uuid uuid) {
+    return where(column, function, Atom.uuid(uuid));
+  }
 
-    public Update where(String column, Function function, NamedUuid namedUuid) {
-        return where(column, function, Atom.namedUuid(namedUuid));
-    }
+  public Update where(String column, Function function, NamedUuid namedUuid) {
+    return where(column, function, Atom.namedUuid(namedUuid));
+  }
 
-    public <K, V> Update where(
-        String column, Function function, java.util.Map<K, V> map
-    ) {
-        return where(column, function, Map.of(map));
-    }
+  public <K, V> Update where(
+      String column, Function function, java.util.Map<K, V> map
+  ) {
+    return where(column, function, Map.of(map));
+  }
 
-    public <T> Update where(
-        String column, Function function, java.util.Set<T> set
-    ) {
-        return where(column, function, Set.of(set));
-    }
+  public <T> Update where(
+      String column, Function function, java.util.Set<T> set
+  ) {
+    return where(column, function, Set.of(set));
+  }
 
-    public String getTable() {
-        return table;
-    }
+  public String getTable() {
+    return table;
+  }
 
-    public List<Condition> getWhere() {
-        return where;
-    }
+  public List<Condition> getWhere() {
+    return where;
+  }
 
-    public Row getRow() {
-        return row;
-    }
+  public Row getRow() {
+    return row;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "table=" + table
-            + ", where=" + where
-            + ", row=" + row
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "table=" + table
+        + ", where=" + where
+        + ", row=" + row
+        + "]";
+  }
 }

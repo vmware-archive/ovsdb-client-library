@@ -18,9 +18,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.AtomDeserializer;
 import com.vmware.ovsdb.protocol.operation.notation.serializer.AtomSerializer;
+
 import java.util.UUID;
 
 /**
+ * Representation of {@literal <atom>}.
+ *
  * <pre>
  * {@literal
  * <atom>
@@ -33,77 +36,77 @@ import java.util.UUID;
 @JsonDeserialize(using = AtomDeserializer.class)
 public class Atom<T> extends Value {
 
-    private T value;
+  private T value;
 
-    public Atom(T value) {
-        this.value = value;
+  public Atom(T value) {
+    this.value = value;
+  }
+
+  public static Atom<String> string(String value) {
+    return new Atom<>(value);
+  }
+
+  public static Atom<Long> integer(long value) {
+    return new Atom<>(value);
+  }
+
+  public static Atom<Double> real(Double value) {
+    return new Atom<>(value);
+  }
+
+  public static Atom<Boolean> bool(boolean value) {
+    return new Atom<>(value);
+  }
+
+  public static Atom<Uuid> uuid(Uuid value) {
+    return new Atom<>(value);
+  }
+
+  public static Atom<Uuid> uuid(UUID value) {
+    return new Atom<>(new Uuid(value));
+  }
+
+  public static Atom<NamedUuid> namedUuid(NamedUuid value) {
+    return new Atom<>(value);
+  }
+
+  public static Atom<NamedUuid> namedUuid(String value) {
+    return new Atom<>(new NamedUuid(value));
+  }
+
+  public T getValue() {
+    return value;
+  }
+
+  public void setValue(T value) {
+    this.value = value;
+  }
+
+  @Override
+  public int hashCode() {
+    return value != null
+        ? value.hashCode()
+        : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Atom)) {
+      return false;
     }
 
-    public static Atom<String> string(String value) {
-        return new Atom<>(value);
-    }
+    Atom<?> atom = (Atom<?>) other;
 
-    public static Atom<Long> integer(long value) {
-        return new Atom<>(value);
-    }
+    return value != null
+        ? value.equals(atom.value)
+        : atom.value == null;
+  }
 
-    public static Atom<Double> real(Double value) {
-        return new Atom<>(value);
-    }
-
-    public static Atom<Boolean> bool(boolean value) {
-        return new Atom<>(value);
-    }
-
-    public static Atom<Uuid> uuid(Uuid value) {
-        return new Atom<>(value);
-    }
-
-    public static Atom<Uuid> uuid(UUID value) {
-        return new Atom<>(new Uuid(value));
-    }
-
-    public static Atom<NamedUuid> namedUuid(NamedUuid value) {
-        return new Atom<>(value);
-    }
-
-    public static Atom<NamedUuid> namedUuid(String value) {
-        return new Atom<>(new NamedUuid(value));
-    }
-
-    public T getValue() {
-        return value;
-    }
-
-    public void setValue(T value) {
-        this.value = value;
-    }
-
-    @Override
-    public int hashCode() {
-        return value != null
-            ? value.hashCode()
-            : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Atom)) {
-            return false;
-        }
-
-        Atom<?> atom = (Atom<?>) o;
-
-        return value != null
-            ? value.equals(atom.value)
-            : atom.value == null;
-    }
-
-    @Override
-    public String toString() {
-        return value.toString();
-    }
+  @Override
+  public String toString() {
+    return value.toString();
+  }
 }

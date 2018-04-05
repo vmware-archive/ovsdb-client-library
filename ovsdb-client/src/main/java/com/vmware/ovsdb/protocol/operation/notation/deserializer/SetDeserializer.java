@@ -24,46 +24,46 @@ import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import com.vmware.ovsdb.protocol.operation.notation.Set;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.io.IOException;
 
 public class SetDeserializer extends StdDeserializer<Set> {
 
-    protected SetDeserializer() {
-        this(null);
+  protected SetDeserializer() {
+    this(null);
+  }
+
+  protected SetDeserializer(Class<?> vc) {
+    super(vc);
+  }
+
+  @Override
+  public Set deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    JsonNode jsonNode = jp.getCodec().readTree(jp);
+    // An <atom> that represents a set with exactly one element
+    if (jsonNode.isValueNode()) {
+      JsonUtil.treeToValue(jsonNode, Atom.class);
+      return Set.of(JsonUtil.treeToValue(jsonNode, Atom.class));
+    }
+    ArrayNode arrayNode = (ArrayNode) jsonNode;
+    if (arrayNode.size() != 2) {
+      throw new IOException(
+          "<set> should be a 2-element JSON array. Found "
+              + arrayNode.size() + " elements");
     }
 
-    protected SetDeserializer(Class<?> vc) {
-        super(vc);
+    if (!OvsdbConstant.SET.equals(arrayNode.get(0).asText())) {
+      throw new IOException(
+          "First element of <set> should be \"" + OvsdbConstant.SET
+              + "\"");
     }
 
-    @Override
-    public Set deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        JsonNode jsonNode = jp.getCodec().readTree(jp);
-        // An <atom> that represents a set with exactly one element
-        if (jsonNode.isValueNode()) {
-            JsonUtil.treeToValue(jsonNode, Atom.class);
-            return Set.of(JsonUtil.treeToValue(jsonNode, Atom.class));
-        }
-        ArrayNode arrayNode = (ArrayNode) jsonNode;
-        if (arrayNode.size() != 2) {
-            throw new IOException(
-                "<set> should be a 2-element JSON array. Found "
-                    + arrayNode.size() + " elements");
-        }
-
-        if (!OvsdbConstant.SET.equals(arrayNode.get(0).asText())) {
-            throw new IOException(
-                "First element of <set> should be \"" + OvsdbConstant.SET
-                    + "\"");
-        }
-
-        java.util.Set<Atom> atoms = JsonUtil.treeToValueNoException(
-            arrayNode.get(1),
-            new TypeReference<java.util.Set<Atom>>() {
-            }
-        );
-        return new Set(atoms);
-    }
+    java.util.Set<Atom> atoms = JsonUtil.treeToValueNoException(
+        arrayNode.get(1),
+        new TypeReference<java.util.Set<Atom>>() {}
+    );
+    return new Set(atoms);
+  }
 }

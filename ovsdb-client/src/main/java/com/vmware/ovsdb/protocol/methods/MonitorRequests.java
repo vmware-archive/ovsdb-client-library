@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.methods;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vmware.ovsdb.protocol.operation.notation.serializer.MonitorRequestsSerializer;
+
 import java.util.Map;
 
 /**
@@ -25,20 +26,20 @@ import java.util.Map;
 @JsonSerialize(using = MonitorRequestsSerializer.class)
 public class MonitorRequests {
 
-    private final Map<String, MonitorRequest> monitorRequests;
+  private final Map<String, MonitorRequest> monitorRequests;
 
-    public MonitorRequests(Map<String, MonitorRequest> monitorRequests) {
-        this.monitorRequests = monitorRequests;
-    }
+  public MonitorRequests(Map<String, MonitorRequest> monitorRequests) {
+    this.monitorRequests = monitorRequests;
+  }
 
-    public Map<String, MonitorRequest> getMonitorRequests() {
-        return monitorRequests;
-    }
+  public Map<String, MonitorRequest> getMonitorRequests() {
+    return monitorRequests;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "monitorRequests=" + monitorRequests
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "monitorRequests=" + monitorRequests
+        + "]";
+  }
 }

@@ -18,88 +18,98 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
 /**
- * <pre>
- * {@literal
- * Represent a <base-type> with a integer <atomic-type> as it's type.
- * }
- * </pre>
+ * Represent a {@literal <base-type>} with a integer {@literal <atomic-type>} as it's type.
  *
  * @see BaseType
  * @see AtomicType
  */
 public class IntegerBaseType extends BaseType {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long minInteger;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long minInteger;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long maxInteger;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long maxInteger;
 
-    public IntegerBaseType() {
-        this(null, null);
+  /**
+   * Create a {@link IntegerBaseType} object.
+   */
+  public IntegerBaseType() {
+    this(null, null);
+  }
+
+  /**
+   * Create a {@link IntegerBaseType} object.
+   *
+   * @param enums value of the "enums" field
+   */
+  public IntegerBaseType(Value enums) {
+    super(AtomicType.INTEGER, enums);
+    this.minInteger = null;
+    this.maxInteger = null;
+  }
+
+  /**
+   * Create a {@link IntegerBaseType} object.
+   *
+   * @param minInteger value of the "minInteger" field
+   * @param maxInteger value of the "maxInteger" field
+   */
+  public IntegerBaseType(Long minInteger, Long maxInteger) {
+    super(AtomicType.INTEGER);
+    this.minInteger = minInteger;
+    this.maxInteger = maxInteger;
+  }
+
+  public Long getMinInteger() {
+    return minInteger;
+  }
+
+  public Long getMaxInteger() {
+    return maxInteger;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (minInteger != null
+        ? minInteger.hashCode()
+        : 0);
+    result = 31 * result + (maxInteger != null
+        ? maxInteger.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof IntegerBaseType)) {
+      return false;
+    }
+    if (!super.equals(other)) {
+      return false;
     }
 
-    public IntegerBaseType(Value enums) {
-        super(AtomicType.INTEGER, enums);
-        this.minInteger = null;
-        this.maxInteger = null;
+    IntegerBaseType that = (IntegerBaseType) other;
+
+    if (minInteger != null
+        ? !minInteger.equals(that.minInteger)
+        : that.minInteger != null) {
+      return false;
     }
+    return maxInteger != null
+        ? maxInteger.equals(that.maxInteger)
+        : that.maxInteger == null;
+  }
 
-    public IntegerBaseType(Long minInteger, Long maxInteger) {
-        super(AtomicType.INTEGER);
-        this.minInteger = minInteger;
-        this.maxInteger = maxInteger;
-    }
-
-    public Long getMinInteger() {
-        return minInteger;
-    }
-
-    public Long getMaxInteger() {
-        return maxInteger;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (minInteger != null
-            ? minInteger.hashCode()
-            : 0);
-        result = 31 * result + (maxInteger != null
-            ? maxInteger.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof IntegerBaseType)) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        IntegerBaseType that = (IntegerBaseType) o;
-
-        if (minInteger != null
-            ? !minInteger.equals(that.minInteger)
-            : that.minInteger != null) {
-            return false;
-        }
-        return maxInteger != null
-            ? maxInteger.equals(that.maxInteger)
-            : that.maxInteger == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "minInteger=" + minInteger
-            + ", maxInteger=" + maxInteger
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "minInteger=" + minInteger
+        + ", maxInteger=" + maxInteger
+        + "]";
+  }
 }

@@ -26,63 +26,71 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      MethodHandles.lookup().lookupClass());
 
-    private static final String KEY_CHANNEL_READ_IDLE_TIMEOUT_SEC = "channel.read.idle.timeout.sec";
+  private static final String KEY_CHANNEL_READ_IDLE_TIMEOUT_SEC = "channel.read.idle.timeout.sec";
 
-    private static final long DEFAULT_READ_IDLE_TIMEOUT_SEC = 30;
+  private static final long DEFAULT_READ_IDLE_TIMEOUT_SEC = 30;
 
-    private static long READ_IDLE_TIMEOUT = PropertyManager
-        .getLongProperty(KEY_CHANNEL_READ_IDLE_TIMEOUT_SEC, DEFAULT_READ_IDLE_TIMEOUT_SEC);
+  private static long READ_IDLE_TIMEOUT = PropertyManager
+      .getLongProperty(KEY_CHANNEL_READ_IDLE_TIMEOUT_SEC, DEFAULT_READ_IDLE_TIMEOUT_SEC);
 
-    private final SslContext sslContext;
+  private final SslContext sslContext;
 
-    private final ConnectionCallback connectionCallback;
+  private final ConnectionCallback connectionCallback;
 
-    private final ScheduledExecutorService executorService;
+  private final ScheduledExecutorService executorService;
 
-    public OvsdbChannelInitializer(
-        SslContext sslContext,
-        ScheduledExecutorService executorService,
-        ConnectionCallback connectionCallback
-    ) {
-        this.sslContext = sslContext;
-        this.executorService = executorService;
-        this.connectionCallback = connectionCallback;
+  /**
+   * Create a {@link OvsdbChannelInitializer} object.
+   *
+   * @param sslContext the SSL context
+   * @param executorService an {@link ScheduledExecutorService} object
+   * @param connectionCallback will be called then a new connection is established
+   */
+  public OvsdbChannelInitializer(
+      SslContext sslContext,
+      ScheduledExecutorService executorService,
+      ConnectionCallback connectionCallback
+  ) {
+    this.sslContext = sslContext;
+    this.executorService = executorService;
+    this.connectionCallback = connectionCallback;
+  }
+
+  @Override
+  protected void initChannel(SocketChannel ch) throws Exception {
+    LOGGER.info("New passive channel created: {}", ch);
+
+    ChannelPipeline pipeline = ch.pipeline();
+    pipeline.addLast(
+        "idleStateHandler",
+        new IdleStateHandler(READ_IDLE_TIMEOUT, 0, 0, TimeUnit.SECONDS)
+    );
+    if (sslContext != null) {
+      SSLEngine engine = sslContext.newEngine(ch.alloc());
+      engine.setUseClientMode(false);
+      engine.setNeedClientAuth(true);
+      pipeline.addLast("ssl", new SslHandler(engine));
     }
-
-    @Override
-    protected void initChannel(SocketChannel ch) throws Exception {
-        LOGGER.info("New passive channel created: {}", ch);
-
-        ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(
-            "idleStateHandler",
-            new IdleStateHandler(READ_IDLE_TIMEOUT, 0, 0, TimeUnit.SECONDS)
-        );
-        if (sslContext != null) {
-            SSLEngine engine = sslContext.newEngine(ch.alloc());
-            engine.setUseClientMode(false);
-            engine.setNeedClientAuth(true);
-            pipeline.addLast("ssl", new SslHandler(engine));
-        }
-        pipeline.addLast("decoder", new JsonNodeDecoder());
-        pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        pipeline.addLast("logger", new LoggingHandler(LogLevel.TRACE));
-        pipeline.addLast("heartbeatHandler", new HeartBeatHandler());
-        pipeline.addLast("ovsdbClientHandler",
-            new OvsdbClientHandler(connectionCallback, executorService));
-        pipeline.addLast("exceptionHandler", new ExceptionHandler());
-    }
+    pipeline.addLast("decoder", new JsonNodeDecoder());
+    pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
+    pipeline.addLast("logger", new LoggingHandler(LogLevel.TRACE));
+    pipeline.addLast("heartbeatHandler", new HeartBeatHandler());
+    pipeline.addLast("ovsdbClientHandler",
+        new OvsdbClientHandler(connectionCallback, executorService));
+    pipeline.addLast("exceptionHandler", new ExceptionHandler());
+  }
 
 }

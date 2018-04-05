@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.schema;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import java.io.IOException;
@@ -23,33 +24,33 @@ import org.junit.Test;
 
 public class ColumnSchemaTest {
 
-    @Test
-    public void testDeserialization() throws IOException {
-        BaseType stringType = new StringBaseType(
-            Atom.string("vxlan_over_ipv4"));
-        ColumnSchema expectedResult = new ColumnSchema(
-            new Type(stringType), null, false);
+  @Test
+  public void testDeserialization() throws IOException {
+    BaseType stringType = new StringBaseType(
+        Atom.string("vxlan_over_ipv4"));
+    ColumnSchema expectedResult = new ColumnSchema(
+        new Type(stringType), null, false);
 
-        String textSchema = "{\"type\":{\"key\":{\"type\":\"string\","
-            + "\"enum\":\"vxlan_over_ipv4\"}},\"mutable\":false}";
-        assertEquals(
-            expectedResult,
-            JsonUtil.deserialize(textSchema, ColumnSchema.class)
-        );
+    String textSchema = "{\"type\":{\"key\":{\"type\":\"string\","
+        + "\"enum\":\"vxlan_over_ipv4\"}},\"mutable\":false}";
+    assertEquals(
+        expectedResult,
+        JsonUtil.deserialize(textSchema, ColumnSchema.class)
+    );
 
-        expectedResult = new ColumnSchema(
-            new Type(new UuidBaseType("Logical_Switch", null)));
-        textSchema = "{\"type\":{\"key\":{\"type\":\"uuid\","
-            + "\"refTable\":\"Logical_Switch\"}}}";
-        assertEquals(
-            expectedResult,
-            JsonUtil.deserialize(textSchema, ColumnSchema.class)
-        );
-    }
+    expectedResult = new ColumnSchema(
+        new Type(new UuidBaseType("Logical_Switch", null)));
+    textSchema = "{\"type\":{\"key\":{\"type\":\"uuid\","
+        + "\"refTable\":\"Logical_Switch\"}}}";
+    assertEquals(
+        expectedResult,
+        JsonUtil.deserialize(textSchema, ColumnSchema.class)
+    );
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidJson() throws IOException {
-        String textSchema = "{\"mutable\":false}";
-        JsonUtil.deserialize(textSchema, ColumnSchema.class);
-    }
+  @Test(expected = IOException.class)
+  public void testInvalidJson() throws IOException {
+    String textSchema = "{\"mutable\":false}";
+    JsonUtil.deserialize(textSchema, ColumnSchema.class);
+  }
 }

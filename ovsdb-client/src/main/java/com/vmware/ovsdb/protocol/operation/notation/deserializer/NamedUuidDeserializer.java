@@ -20,36 +20,37 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.vmware.ovsdb.protocol.operation.notation.NamedUuid;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.io.IOException;
 
 public class NamedUuidDeserializer extends StdDeserializer<NamedUuid> {
 
-    protected NamedUuidDeserializer() {
-        this(null);
+  protected NamedUuidDeserializer() {
+    this(null);
+  }
+
+  protected NamedUuidDeserializer(Class<?> vc) {
+    super(vc);
+  }
+
+  @Override
+  public NamedUuid deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException {
+    ArrayNode arrayNode = jp.getCodec().readTree(jp);
+    if (arrayNode.size() != 2) {
+      throw new IOException(
+          "<named-uuid> should be a 2-element JSON array. Found "
+              + arrayNode.size() + " elements");
     }
 
-    protected NamedUuidDeserializer(Class<?> vc) {
-        super(vc);
+    if (!OvsdbConstant.NAMED_UUID.equals(arrayNode.get(0).asText())) {
+      throw new IOException(
+          "First element of <named-uuid> should be \""
+              + OvsdbConstant.NAMED_UUID + "\"");
     }
 
-    @Override
-    public NamedUuid deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException {
-        ArrayNode arrayNode = jp.getCodec().readTree(jp);
-        if (arrayNode.size() != 2) {
-            throw new IOException(
-                "<named-uuid> should be a 2-element JSON array. Found "
-                    + arrayNode.size() + " elements");
-        }
-
-        if (!OvsdbConstant.NAMED_UUID.equals(arrayNode.get(0).asText())) {
-            throw new IOException(
-                "First element of <named-uuid> should be \""
-                    + OvsdbConstant.NAMED_UUID + "\"");
-        }
-
-        String uuidName = arrayNode.get(1).asText();
-        return new NamedUuid(uuidName);
-    }
+    String uuidName = arrayNode.get(1).asText();
+    return new NamedUuid(uuidName);
+  }
 }

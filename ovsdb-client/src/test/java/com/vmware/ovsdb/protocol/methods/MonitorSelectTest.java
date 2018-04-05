@@ -16,29 +16,30 @@ package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
 public class MonitorSelectTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        String expectedResult
-            = "{\"initial\":true,\"insert\":true,\"delete\":true,"
-            + "\"modify\":true}";
-        MonitorSelect monitorSelect = new MonitorSelect(true, true, true, true);
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    String expectedResult
+        = "{\"initial\":true,\"insert\":true,\"delete\":true,"
+        + "\"modify\":true}";
+    MonitorSelect monitorSelect = new MonitorSelect(true, true, true, true);
 
-        assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
+    assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
 
-        expectedResult = "{\"initial\":false,\"insert\":true,\"delete\":true}";
-        monitorSelect = new MonitorSelect(false, true, true, null);
+    expectedResult = "{\"initial\":false,\"insert\":true,\"delete\":true}";
+    monitorSelect = new MonitorSelect(false, true, true, null);
 
-        assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
+    assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
 
-        expectedResult = "{}";
-        monitorSelect = new MonitorSelect();
+    expectedResult = "{}";
+    monitorSelect = new MonitorSelect();
 
-        assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
+  }
 }

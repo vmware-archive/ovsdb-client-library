@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * Representation of {@literal <column-schema>}.
+ *
  * <pre>
  * {@literal
  * <column-schema>
@@ -45,87 +47,97 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ColumnSchema {
 
-    private final Type type;
+  private final Type type;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Boolean ephemeral;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Boolean ephemeral;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Boolean mutable;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Boolean mutable;
 
-    public ColumnSchema(Type type) {
-        this(type, null, null);
+  /**
+   * Create a {@link ColumnSchema} object.
+   */
+  public ColumnSchema(Type type) {
+    this(type, null, null);
+  }
+
+  /**
+   * Create a {@link ColumnSchema} object.
+   *
+   * @param type value of the "type" field
+   * @param ephemeral value of the "ephemeral" field
+   * @param mutable value of the "mutable" field
+   */
+  @JsonCreator
+  public ColumnSchema(
+      @JsonProperty(value = "type", required = true) Type type,
+      @JsonProperty(value = "ephemeral") Boolean ephemeral,
+      @JsonProperty(value = "mutable") Boolean mutable
+  ) {
+    this.type = type;
+    this.ephemeral = ephemeral;
+    this.mutable = mutable;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public Boolean getEphemeral() {
+    return ephemeral;
+  }
+
+  public Boolean getMutable() {
+    return mutable;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = type != null
+        ? type.hashCode()
+        : 0;
+    result = 31 * result + (ephemeral != null
+        ? ephemeral.hashCode()
+        : 0);
+    result = 31 * result + (mutable != null
+        ? mutable.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof ColumnSchema)) {
+      return false;
     }
 
-    @JsonCreator
-    public ColumnSchema(
-        @JsonProperty(value = "type", required = true) Type type,
-        @JsonProperty(value = "ephemeral") Boolean ephemeral,
-        @JsonProperty(value = "mutable") Boolean mutable
-    ) {
-        this.type = type;
-        this.ephemeral = ephemeral;
-        this.mutable = mutable;
+    ColumnSchema that = (ColumnSchema) other;
+
+    if (type != null
+        ? !type.equals(that.type)
+        : that.type != null) {
+      return false;
     }
-
-    public Type getType() {
-        return type;
+    if (ephemeral != null
+        ? !ephemeral.equals(that.ephemeral)
+        : that.ephemeral != null) {
+      return false;
     }
+    return mutable != null
+        ? mutable.equals(that.mutable)
+        : that.mutable == null;
+  }
 
-    public Boolean getEphemeral() {
-        return ephemeral;
-    }
-
-    public Boolean getMutable() {
-        return mutable;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = type != null
-            ? type.hashCode()
-            : 0;
-        result = 31 * result + (ephemeral != null
-            ? ephemeral.hashCode()
-            : 0);
-        result = 31 * result + (mutable != null
-            ? mutable.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ColumnSchema)) {
-            return false;
-        }
-
-        ColumnSchema that = (ColumnSchema) o;
-
-        if (type != null
-            ? !type.equals(that.type)
-            : that.type != null) {
-            return false;
-        }
-        if (ephemeral != null
-            ? !ephemeral.equals(that.ephemeral)
-            : that.ephemeral != null) {
-            return false;
-        }
-        return mutable != null
-            ? mutable.equals(that.mutable)
-            : that.mutable == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "type=" + type
-            + ", ephemeral=" + ephemeral
-            + ", mutable=" + mutable
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "type=" + type
+        + ", ephemeral=" + ephemeral
+        + ", mutable=" + mutable
+        + "]";
+  }
 }

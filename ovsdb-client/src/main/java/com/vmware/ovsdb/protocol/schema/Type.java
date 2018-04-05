@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.schema.deserializer.TypeDeserializer;
 
 /**
+ * The type of a database column.
  * <pre>
  * {@literal
  * <type>
- *   The type of a database column.  Either an <atomic-type> or a JSON
- *   object that describes the type of a database column, with the
+ *   Either an <atomic-type> or a JSON object that describes the type of a database column, with the
  *   following members:
  *       "key": <base-type>                 required
  *       "value": <base-type>               optional
@@ -51,99 +51,107 @@ import com.vmware.ovsdb.protocol.schema.deserializer.TypeDeserializer;
 @JsonDeserialize(using = TypeDeserializer.class)
 public class Type {
 
-    private final BaseType key;
+  private final BaseType key;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final BaseType value;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final BaseType value;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long min;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long min;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Long max;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final Long max;
 
-    public Type(BaseType key) {
-        this(key, null, null, null);
+  public Type(BaseType key) {
+    this(key, null, null, null);
+  }
+
+  /**
+   * Create a {@link Type} object.
+   *
+   * @param key value of the "key" field
+   * @param value value of the "value" field
+   * @param min value of the "min" field
+   * @param max value of the "max" field
+   */
+  public Type(BaseType key, BaseType value, Long min, Long max) {
+    this.key = key;
+    this.value = value;
+    this.min = min;
+    this.max = max;
+  }
+
+  public BaseType getKey() {
+    return key;
+  }
+
+  public BaseType getValue() {
+    return value;
+  }
+
+  public Long getMin() {
+    return min;
+  }
+
+  public Long getMax() {
+    return max;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = key != null
+        ? key.hashCode()
+        : 0;
+    result = 31 * result + (value != null
+        ? value.hashCode()
+        : 0);
+    result = 31 * result + (min != null
+        ? min.hashCode()
+        : 0);
+    result = 31 * result + (max != null
+        ? max.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Type)) {
+      return false;
     }
 
-    public Type(BaseType key, BaseType value, Long min, Long max) {
-        this.key = key;
-        this.value = value;
-        this.min = min;
-        this.max = max;
+    Type that = (Type) other;
+
+    if (key != null
+        ? !key.equals(that.key)
+        : that.key != null) {
+      return false;
     }
-
-    public BaseType getKey() {
-        return key;
+    if (value != null
+        ? !value.equals(that.value)
+        : that.value != null) {
+      return false;
     }
-
-    public BaseType getValue() {
-        return value;
+    if (min != null
+        ? !min.equals(that.min)
+        : that.min != null) {
+      return false;
     }
+    return max != null
+        ? max.equals(that.max)
+        : that.max == null;
+  }
 
-    public Long getMin() {
-        return min;
-    }
-
-    public Long getMax() {
-        return max;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = key != null
-            ? key.hashCode()
-            : 0;
-        result = 31 * result + (value != null
-            ? value.hashCode()
-            : 0);
-        result = 31 * result + (min != null
-            ? min.hashCode()
-            : 0);
-        result = 31 * result + (max != null
-            ? max.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Type)) {
-            return false;
-        }
-
-        Type that = (Type) o;
-
-        if (key != null
-            ? !key.equals(that.key)
-            : that.key != null) {
-            return false;
-        }
-        if (value != null
-            ? !value.equals(that.value)
-            : that.value != null) {
-            return false;
-        }
-        if (min != null
-            ? !min.equals(that.min)
-            : that.min != null) {
-            return false;
-        }
-        return max != null
-            ? max.equals(that.max)
-            : that.max == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "key=" + key
-            + ", value=" + value
-            + ", min=" + min
-            + ", max=" + max
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "key=" + key
+        + ", value=" + value
+        + ", min=" + min
+        + ", max=" + max
+        + "]";
+  }
 }

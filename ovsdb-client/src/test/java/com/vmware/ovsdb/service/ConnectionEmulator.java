@@ -41,102 +41,102 @@ import org.slf4j.LoggerFactory;
  */
 class ConnectionEmulator {
 
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final SslContext sslCtx;
+  private final SslContext sslCtx;
 
-    private final Object connected = new Object();
+  private final Object connected = new Object();
 
-    private ChannelFuture channelFuture = null;
+  private ChannelFuture channelFuture = null;
 
-    private SocketChannel socketChannel = null;
+  private SocketChannel socketChannel = null;
 
-    private Consumer<String> readCallback = null;
+  private Consumer<String> readCallback = null;
 
-    ConnectionEmulator(SslContext sslCtx) {
-        this.sslCtx = sslCtx;
+  ConnectionEmulator(SslContext sslCtx) {
+    this.sslCtx = sslCtx;
+  }
+
+  ConnectionEmulator() {
+    this(null);
+  }
+
+  void registerReadCallback(Consumer<String> readCallback) {
+    this.readCallback = readCallback;
+  }
+
+  void connect(String host, int port) throws InterruptedException {
+    new Thread(() -> connectTo(host, port)).start();
+    synchronized (connected) {
+      // Wait until the channel is active
+      connected.wait();
     }
+  }
 
-    ConnectionEmulator() {
-        this(null);
+  void write(String data) {
+    socketChannel.writeAndFlush(data);
+  }
+
+  void disconnect() {
+    if (channelFuture != null) {
+      channelFuture.channel().close();
+      channelFuture = null;
     }
+  }
 
-    void registerReadCallback(Consumer<String> readCallback) {
-        this.readCallback = readCallback;
+  private void connectTo(String host, int port) {
+    EventLoopGroup group = new NioEventLoopGroup();
+    try {
+      Bootstrap b = new Bootstrap();
+      b.group(group)
+          .channel(NioSocketChannel.class)
+          .option(ChannelOption.TCP_NODELAY, true)
+          .handler(new ChannelInitializer<SocketChannel>() {
+
+            @Override
+            public void initChannel(SocketChannel ch) throws Exception {
+              ChannelPipeline p = ch.pipeline();
+              if (sslCtx != null) {
+                p.addLast(
+                    sslCtx.newHandler(ch.alloc(), host, port));
+              }
+              p.addLast(new LoggingHandler(LogLevel.INFO));
+              p.addLast(new StringDecoder());
+              p.addLast(new StringEncoder());
+              p.addLast(new ChannelInboundHandlerAdapter() {
+
+                @Override
+                public void channelActive(final ChannelHandlerContext ctx) {
+                  LOGGER.info("Channel {} is now active", ctx.channel());
+                  synchronized (connected) {
+                    // Unblock the connect call
+                    connected.notify();
+                  }
+                }
+
+                @Override
+                public void channelRead(ChannelHandlerContext ctx, Object msg)
+                    throws Exception {
+                  LOGGER.info("Read data {} from channel", msg, ctx.channel());
+                  if (readCallback != null) {
+                    readCallback.accept((String) msg);
+                  } else {
+                    ctx.fireChannelRead(msg);
+                  }
+                }
+              });
+              socketChannel = ch;
+            }
+          });
+
+      channelFuture = b.connect(host, port).sync();
+      channelFuture.channel().closeFuture().sync();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } finally {
+      // Shut down the event loop to terminate all threads.
+      group.shutdownGracefully();
     }
-
-    void connect(String host, int port) throws InterruptedException {
-        new Thread(() -> connectTo(host, port)).start();
-        synchronized (connected) {
-            // Wait until the channel is active
-            connected.wait();
-        }
-    }
-
-    void write(String data) {
-        socketChannel.writeAndFlush(data);
-    }
-
-    void disconnect() {
-        if (channelFuture != null) {
-            channelFuture.channel().close();
-            channelFuture = null;
-        }
-    }
-
-    private void connectTo(String host, int port) {
-        EventLoopGroup group = new NioEventLoopGroup();
-        try {
-            Bootstrap b = new Bootstrap();
-            b.group(group)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        if (sslCtx != null) {
-                            p.addLast(
-                                sslCtx.newHandler(ch.alloc(), host, port));
-                        }
-                        p.addLast(new LoggingHandler(LogLevel.INFO));
-                        p.addLast(new StringDecoder());
-                        p.addLast(new StringEncoder());
-                        p.addLast(new ChannelInboundHandlerAdapter() {
-
-                            @Override
-                            public void channelActive(final ChannelHandlerContext ctx) {
-                                LOGGER.info("Channel {} is now active", ctx.channel());
-                                synchronized (connected) {
-                                    // Unblock the connect call
-                                    connected.notify();
-                                }
-                            }
-
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg)
-                                throws Exception {
-                                LOGGER.info("Read data {} from channel", msg, ctx.channel());
-                                if (readCallback != null) {
-                                    readCallback.accept((String) msg);
-                                } else {
-                                    ctx.fireChannelRead(msg);
-                                }
-                            }
-                        });
-                        socketChannel = ch;
-                    }
-                });
-
-            channelFuture = b.connect(host, port).sync();
-            channelFuture.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            // Shut down the event loop to terminate all threads.
-            group.shutdownGracefully();
-        }
-    }
+  }
 }

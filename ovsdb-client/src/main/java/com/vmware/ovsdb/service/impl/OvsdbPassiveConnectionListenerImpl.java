@@ -39,88 +39,88 @@ import java.util.concurrent.ScheduledExecutorService;
 public class OvsdbPassiveConnectionListenerImpl
     implements OvsdbPassiveConnectionListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      MethodHandles.lookup().lookupClass());
 
-    // Map from port to server Channel
-    private final ConcurrentMap<Integer, Channel> serverChannelMap = new ConcurrentHashMap<>();
+  // Map from port to server Channel
+  private final ConcurrentMap<Integer, Channel> serverChannelMap = new ConcurrentHashMap<>();
 
-    // Map from port to server status (started/not started)
-    private final ConcurrentMap<Integer, Boolean> serverStatusMap = new ConcurrentHashMap<>();
+  // Map from port to server status (started/not started)
+  private final ConcurrentMap<Integer, Boolean> serverStatusMap = new ConcurrentHashMap<>();
 
-    private final ScheduledExecutorService executorService;
+  private final ScheduledExecutorService executorService;
 
-    public OvsdbPassiveConnectionListenerImpl(ScheduledExecutorService executorService) {
-        this.executorService = executorService;
+  public OvsdbPassiveConnectionListenerImpl(ScheduledExecutorService executorService) {
+    this.executorService = executorService;
+  }
+
+  @Override
+  public void startListening(
+      int port, ConnectionCallback connectionCallback
+  ) {
+    isListeningCheckWithThrow(port);
+    executorService.submit(() -> startListeningOnPort(port, null, connectionCallback));
+  }
+
+  @Override
+  public void startListeningWithSsl(
+      int port, SslContext sslContext, ConnectionCallback connectionCallback
+  ) {
+    isListeningCheckWithThrow(port);
+    executorService.submit(() -> startListeningOnPort(port, sslContext, connectionCallback));
+  }
+
+  @Override
+  public void stopListening(int port) {
+    Channel serverChannel = serverChannelMap.remove(port);
+    if (serverChannel != null) {
+      LOGGER.info("Closing server channel: {}", serverChannel);
+      serverChannel.close();
+      serverStatusMap.remove(port);
     }
+  }
 
-    @Override
-    public void startListening(
-        int port, ConnectionCallback connectionCallback
-    ) {
-        isListeningCheckWithThrow(port);
-        executorService.submit(() -> startListening(port, null, connectionCallback));
+  private void startListeningOnPort(
+      int port, final SslContext sslContext, ConnectionCallback connectionCallback
+  ) {
+    EventLoopGroup bossGroup = new NioEventLoopGroup();
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    try {
+      ServerBootstrap serverBootstrap = new ServerBootstrap();
+      serverBootstrap.group(bossGroup, workerGroup)
+          .channel(NioServerSocketChannel.class)
+          .option(ChannelOption.SO_BACKLOG, 100)
+          .handler(new LoggingHandler(LogLevel.INFO))
+          .childHandler(new OvsdbChannelInitializer(
+              sslContext,
+              executorService,
+              connectionCallback
+          ));
+
+      serverBootstrap.option(
+          ChannelOption.RCVBUF_ALLOCATOR,
+          new AdaptiveRecvByteBufAllocator(65535, 65535, 65535)
+      );
+
+      // Start the server.
+      ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+      serverChannelMap.put(port,  channelFuture.channel());
+
+      // Wait until the server socket is closed.
+      channelFuture.channel().closeFuture().sync();
+    } catch (InterruptedException ex) {
+      LOGGER.error("Netty server is interrupted while starting listener at port " + port, ex);
+    } finally {
+      // Shut down all event loops to terminate all threads.
+      bossGroup.shutdownGracefully();
+      workerGroup.shutdownGracefully();
+      LOGGER.info("Ovsdb listener at port {} stopped.", port);
     }
+  }
 
-    @Override
-    public void startListeningWithSsl(
-        int port, SslContext sslContext, ConnectionCallback connectionCallback
-    ) {
-        isListeningCheckWithThrow(port);
-        executorService.submit(() -> startListening(port, sslContext, connectionCallback));
+  private void isListeningCheckWithThrow(int port) {
+    if (serverStatusMap.putIfAbsent(port, true) != null) {
+      throw new IllegalStateException("A listener has already started at port " + port);
     }
-
-    @Override
-    public void stopListening(int port) {
-        Channel serverChannel = serverChannelMap.remove(port);
-        if (serverChannel != null) {
-            LOGGER.info("Closing server channel: {}", serverChannel);
-            serverChannel.close();
-            serverStatusMap.remove(port);
-        }
-    }
-
-    private void startListening(
-        int port, final SslContext sslContext, ConnectionCallback connectionCallback
-    ) {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, 100)
-                .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new OvsdbChannelInitializer(
-                    sslContext,
-                    executorService,
-                    connectionCallback
-                ));
-
-            serverBootstrap.option(
-                ChannelOption.RCVBUF_ALLOCATOR,
-                new AdaptiveRecvByteBufAllocator(65535, 65535, 65535)
-            );
-
-            // Start the server.
-            ChannelFuture f = serverBootstrap.bind(port).sync();
-            serverChannelMap.put(port, f.channel());
-
-            // Wait until the server socket is closed.
-            f.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            LOGGER.error("Netty server is interrupted while starting listener at port " + port, e);
-        } finally {
-            // Shut down all event loops to terminate all threads.
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-            LOGGER.info("Ovsdb listener at port {} stopped.", port);
-        }
-    }
-
-    private void isListeningCheckWithThrow(int port) {
-        if (serverStatusMap.putIfAbsent(port, true) != null) {
-            throw new IllegalStateException("A listener has already started at port " + port);
-        }
-    }
+  }
 }

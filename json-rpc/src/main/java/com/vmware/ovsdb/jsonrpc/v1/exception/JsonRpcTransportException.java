@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.exception;
 
 /**
@@ -18,19 +19,19 @@ package com.vmware.ovsdb.jsonrpc.v1.exception;
  */
 public class JsonRpcTransportException extends JsonRpcException {
 
-    public JsonRpcTransportException() {
-        super();
-    }
+  public JsonRpcTransportException() {
+    super();
+  }
 
-    public JsonRpcTransportException(String message) {
-        super(message);
-    }
+  public JsonRpcTransportException(String message) {
+    super(message);
+  }
 
-    public JsonRpcTransportException(Throwable cause) {
-        super(cause);
-    }
+  public JsonRpcTransportException(Throwable cause) {
+    super(cause);
+  }
 
-    public JsonRpcTransportException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public JsonRpcTransportException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.PairDeserializer;
 
 /**
+ * Representation of {@literal <pair>}.
+ *
  * <pre>
  * {@literal
  * <pair>
@@ -32,73 +34,73 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.PairDeserialize
 @JsonDeserialize(using = PairDeserializer.class)
 public class Pair<K, V> {
 
-    private Atom<K> key;
+  private Atom<K> key;
 
-    private Atom<V> value;
+  private Atom<V> value;
 
-    public Pair(K key, V value) {
-        this.key = new Atom<>(key);
-        this.value = new Atom<>(value);
+  public Pair(K key, V value) {
+    this.key = new Atom<>(key);
+    this.value = new Atom<>(value);
+  }
+
+  public Pair(Atom<K> key, Atom<V> value) {
+    this.key = key;
+    this.value = value;
+  }
+
+  public Atom<K> getKey() {
+    return key;
+  }
+
+  public void setKey(Atom<K> key) {
+    this.key = key;
+  }
+
+  public Atom<V> getValue() {
+    return value;
+  }
+
+  public void setValue(Atom<V> value) {
+    this.value = value;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = key != null
+        ? key.hashCode()
+        : 0;
+    result = 31 * result + (value != null
+        ? value.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Pair)) {
+      return false;
     }
 
-    public Pair(Atom<K> key, Atom<V> value) {
-        this.key = key;
-        this.value = value;
+    Pair<?, ?> pair = (Pair<?, ?>) other;
+
+    if (key != null
+        ? !key.equals(pair.key)
+        : pair.key != null) {
+      return false;
     }
+    return value != null
+        ? value.equals(pair.value)
+        : pair.value == null;
+  }
 
-    public Atom<K> getKey() {
-        return key;
-    }
-
-    public void setKey(Atom<K> key) {
-        this.key = key;
-    }
-
-    public Atom<V> getValue() {
-        return value;
-    }
-
-    public void setValue(Atom<V> value) {
-        this.value = value;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = key != null
-            ? key.hashCode()
-            : 0;
-        result = 31 * result + (value != null
-            ? value.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Pair)) {
-            return false;
-        }
-
-        Pair<?, ?> pair = (Pair<?, ?>) o;
-
-        if (key != null
-            ? !key.equals(pair.key)
-            : pair.key != null) {
-            return false;
-        }
-        return value != null
-            ? value.equals(pair.value)
-            : pair.value == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "key=" + key
-            + ", value=" + value
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "key=" + key
+        + ", value=" + value
+        + "]";
+  }
 }

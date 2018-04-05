@@ -19,56 +19,65 @@ import java.security.cert.Certificate;
 
 public class OvsdbConnectionInfo {
 
-    private final InetAddress localAddress;
+  private final InetAddress localAddress;
 
-    private final int localPort;
+  private final int localPort;
 
-    private final InetAddress remoteAddress;
+  private final InetAddress remoteAddress;
 
-    private final int remotePort;
+  private final int remotePort;
 
-    private final Certificate remoteCertificate;
+  private final Certificate remoteCertificate;
 
-    public OvsdbConnectionInfo(
-        InetAddress localAddress, int localPort,
-        InetAddress remoteAddress, int remotePort,
-        Certificate remoteCertificate
-    ) {
-        this.localAddress = localAddress;
-        this.localPort = localPort;
-        this.remoteAddress = remoteAddress;
-        this.remotePort = remotePort;
-        this.remoteCertificate = remoteCertificate;
-    }
+  /**
+   * Create a {@link OvsdbConnectionInfo} object.
+   *
+   * @param localAddress local address of the connection
+   * @param localPort local port of the connection
+   * @param remoteAddress remote address of the connection
+   * @param remotePort remove port of the connection
+   * @param remoteCertificate remote certificate
+   */
+  public OvsdbConnectionInfo(
+      InetAddress localAddress, int localPort,
+      InetAddress remoteAddress, int remotePort,
+      Certificate remoteCertificate
+  ) {
+    this.localAddress = localAddress;
+    this.localPort = localPort;
+    this.remoteAddress = remoteAddress;
+    this.remotePort = remotePort;
+    this.remoteCertificate = remoteCertificate;
+  }
 
-    public InetAddress getLocalAddress() {
-        return localAddress;
-    }
+  public InetAddress getLocalAddress() {
+    return localAddress;
+  }
 
-    public int getLocalPort() {
-        return localPort;
-    }
+  public int getLocalPort() {
+    return localPort;
+  }
 
-    public InetAddress getRemoteAddress() {
-        return remoteAddress;
-    }
+  public InetAddress getRemoteAddress() {
+    return remoteAddress;
+  }
 
-    public int getRemotePort() {
-        return remotePort;
-    }
+  public int getRemotePort() {
+    return remotePort;
+  }
 
-    public Certificate getRemoteCertificate() {
-        return remoteCertificate;
-    }
+  public Certificate getRemoteCertificate() {
+    return remoteCertificate;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "localAddress=" + localAddress
-            + ", localPort=" + localPort
-            + ", remoteAddress=" + remoteAddress
-            + ", remotePort=" + remotePort
-            + ", remoteCertificate=" + remoteCertificate
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "localAddress=" + localAddress
+        + ", localPort=" + localPort
+        + ", remoteAddress=" + remoteAddress
+        + ", remotePort=" + remotePort
+        + ", remoteCertificate=" + remoteCertificate
+        + "]";
+  }
 }

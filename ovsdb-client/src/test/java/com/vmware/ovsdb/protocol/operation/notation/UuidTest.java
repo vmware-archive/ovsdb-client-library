@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
@@ -24,38 +25,38 @@ import org.junit.Test;
 
 public class UuidTest {
 
-    private static final Uuid uuid = new Uuid(UUID.randomUUID());
+  private static final Uuid uuid = new Uuid(UUID.randomUUID());
 
-    private static final String json = "[\"uuid\",\"" + uuid.getUuid() + "\"]";
+  private static final String json = "[\"uuid\",\"" + uuid.getUuid() + "\"]";
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        assertEquals(json, JsonUtil.serialize(uuid));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    assertEquals(json, JsonUtil.serialize(uuid));
+  }
 
-    @Test
-    public void testDeserialization() throws IOException {
-        assertEquals(uuid, JsonUtil.deserialize(json, Uuid.class));
-    }
+  @Test
+  public void testDeserialization() throws IOException {
+    assertEquals(uuid, JsonUtil.deserialize(json, Uuid.class));
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidUuid1() throws IOException {
-        String json = "[\"id\", \"" + uuid + "\"]";
+  @Test(expected = IOException.class)
+  public void testInvalidUuid1() throws IOException {
+    String json = "[\"id\", \"" + uuid + "\"]";
 
-        JsonUtil.deserialize(json, Uuid.class);
-    }
+    JsonUtil.deserialize(json, Uuid.class);
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidUuid2() throws IOException {
-        String json = "[\"" + uuid + "\"]";
+  @Test(expected = IOException.class)
+  public void testInvalidUuid2() throws IOException {
+    String json = "[\"" + uuid + "\"]";
 
-        JsonUtil.deserialize(json, Uuid.class);
-    }
+    JsonUtil.deserialize(json, Uuid.class);
+  }
 
-    @Test(expected = IOException.class)
-    public void testInvalidUuid3() throws IOException {
-        String json = "[\"uuid\", \"123\"]";
+  @Test(expected = IOException.class)
+  public void testInvalidUuid3() throws IOException {
+    String json = "[\"uuid\", \"123\"]";
 
-        JsonUtil.deserialize(json, Uuid.class);
-    }
+    JsonUtil.deserialize(json, Uuid.class);
+  }
 }

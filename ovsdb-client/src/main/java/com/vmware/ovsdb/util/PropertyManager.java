@@ -14,47 +14,48 @@
 
 package com.vmware.ovsdb.util;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Properties;
-import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Properties;
+import java.util.function.Function;
+
 public class PropertyManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      MethodHandles.lookup().lookupClass());
 
-    private static final Properties properties = new Properties();
+  private static final Properties properties = new Properties();
 
-    private static final String PROPERTY_FILE_NAME = "ovsdb-client-library.properties";
+  private static final String PROPERTY_FILE_NAME = "ovsdb-client-library.properties";
 
-    static {
-        try {
-            properties.load(
-                PropertyManager.class.getClassLoader().getResourceAsStream(PROPERTY_FILE_NAME)
-            );
-        } catch (Throwable e) {
-            LOGGER.error("Failed to load properties", e);
-        }
+  static {
+    try {
+      properties.load(
+          PropertyManager.class.getClassLoader().getResourceAsStream(PROPERTY_FILE_NAME)
+      );
+    } catch (Throwable ex) {
+      LOGGER.error("Failed to load properties", ex);
     }
+  }
 
-    private static <T> T getProperty(String propertyName, T defaultValue,
-        Function<String, T> converter) {
-        String value = properties.getProperty(propertyName);
-        try {
-            return converter.apply(value);
-        } catch (Throwable e) {
-            LOGGER.error("Failed to get property: " + propertyName, e);
-        }
-        return defaultValue;
+  private static <T> T getProperty(String propertyName, T defaultValue,
+      Function<String, T> converter) {
+    String value = properties.getProperty(propertyName);
+    try {
+      return converter.apply(value);
+    } catch (Throwable ex) {
+      LOGGER.error("Failed to get property: " + propertyName, ex);
     }
+    return defaultValue;
+  }
 
-    public static int getIntProperty(String propertyName, int defaultValue) {
-        return getProperty(propertyName, defaultValue, Integer::valueOf);
-    }
+  public static int getIntProperty(String propertyName, int defaultValue) {
+    return getProperty(propertyName, defaultValue, Integer::valueOf);
+  }
 
-    public static long getLongProperty(String propertyName, long defaultValue) {
-        return getProperty(propertyName, defaultValue, Long::valueOf);
-    }
+  public static long getLongProperty(String propertyName, long defaultValue) {
+    return getProperty(propertyName, defaultValue, Long::valueOf);
+  }
 }

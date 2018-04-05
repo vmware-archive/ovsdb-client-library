@@ -17,9 +17,12 @@ package com.vmware.ovsdb.protocol.schema;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 
 /**
+ * Representation of {@literal <database-schema>}.
+ *
  * <pre>
  * {@literal
  * <database-schema>
@@ -49,100 +52,108 @@ import java.util.Map;
  */
 public class DatabaseSchema {
 
-    private final String name;
+  private final String name;
 
-    private final String version;
+  private final String version;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final String cksum;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final String cksum;
 
-    private final Map<String, TableSchema> tables;
+  private final Map<String, TableSchema> tables;
 
-    @JsonCreator
-    public DatabaseSchema(
-        @JsonProperty(value = "name", required = true) String name,
-        @JsonProperty(value = "version", required = true) String version,
-        @JsonProperty(value = "cksum") String cksum,
-        @JsonProperty(value = "tables", required = true) Map<String,
-            TableSchema> tables
-    ) {
-        this.name = name;
-        this.version = version;
-        this.cksum = cksum;
-        this.tables = tables;
+  /**
+   * Create a {@link DatabaseSchema} object.
+   *
+   * @param name value of the "name" field
+   * @param version value of the "version" field
+   * @param cksum value of the "cksum" field
+   * @param tables value of the "tables" field
+   */
+  @JsonCreator
+  public DatabaseSchema(
+      @JsonProperty(value = "name", required = true) String name,
+      @JsonProperty(value = "version", required = true) String version,
+      @JsonProperty(value = "cksum") String cksum,
+      @JsonProperty(value = "tables", required = true) Map<String,
+          TableSchema> tables
+  ) {
+    this.name = name;
+    this.version = version;
+    this.cksum = cksum;
+    this.tables = tables;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public String getCksum() {
+    return cksum;
+  }
+
+  public Map<String, TableSchema> getTables() {
+    return tables;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name != null
+        ? name.hashCode()
+        : 0;
+    result = 31 * result + (version != null
+        ? version.hashCode()
+        : 0);
+    result = 31 * result + (cksum != null
+        ? cksum.hashCode()
+        : 0);
+    result = 31 * result + (tables != null
+        ? tables.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof DatabaseSchema)) {
+      return false;
     }
 
-    public String getName() {
-        return name;
+    DatabaseSchema that = (DatabaseSchema) other;
+
+    if (name != null
+        ? !name.equals(that.name)
+        : that.name != null) {
+      return false;
     }
-
-    public String getVersion() {
-        return version;
+    if (version != null
+        ? !version.equals(that.version)
+        : that.version != null) {
+      return false;
     }
-
-    public String getCksum() {
-        return cksum;
+    if (cksum != null
+        ? !cksum.equals(that.cksum)
+        : that.cksum != null) {
+      return false;
     }
+    return tables != null
+        ? tables.equals(that.tables)
+        : that.tables == null;
+  }
 
-    public Map<String, TableSchema> getTables() {
-        return tables;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null
-            ? name.hashCode()
-            : 0;
-        result = 31 * result + (version != null
-            ? version.hashCode()
-            : 0);
-        result = 31 * result + (cksum != null
-            ? cksum.hashCode()
-            : 0);
-        result = 31 * result + (tables != null
-            ? tables.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof DatabaseSchema)) {
-            return false;
-        }
-
-        DatabaseSchema that = (DatabaseSchema) o;
-
-        if (name != null
-            ? !name.equals(that.name)
-            : that.name != null) {
-            return false;
-        }
-        if (version != null
-            ? !version.equals(that.version)
-            : that.version != null) {
-            return false;
-        }
-        if (cksum != null
-            ? !cksum.equals(that.cksum)
-            : that.cksum != null) {
-            return false;
-        }
-        return tables != null
-            ? tables.equals(that.tables)
-            : that.tables == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "name=" + name
-            + ", version=" + version
-            + ", cksum=" + cksum
-            + ", tables=" + tables
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "name=" + name
+        + ", version=" + version
+        + ", cksum=" + cksum
+        + ", tables=" + tables
+        + "]";
+  }
 }

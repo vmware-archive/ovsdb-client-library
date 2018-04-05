@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
@@ -28,27 +29,27 @@ import org.junit.Test;
 
 public class WaitTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        int timeout = 1000;
-        List<Condition> where = ImmutableList.of(
-            new Condition("name", Function.EQUALS, Atom.string("ls1"))
-        );
-        List<String> columns = ImmutableList.of("name", "description");
-        List<Row> rows = ImmutableList.of(
-            new Row().column("name", Atom.string("ls1"))
-                .column("description", Atom.string("First Logical Switch"))
-        );
-        Wait wait = new Wait(
-            "Logical_Switch", timeout, where, columns, "==", rows);
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    int timeout = 1000;
+    List<Condition> where = ImmutableList.of(
+        new Condition("name", Function.EQUALS, Atom.string("ls1"))
+    );
+    List<String> columns = ImmutableList.of("name", "description");
+    List<Row> rows = ImmutableList.of(
+        new Row().column("name", Atom.string("ls1"))
+            .column("description", Atom.string("First Logical Switch"))
+    );
+    Wait wait = new Wait(
+        "Logical_Switch", timeout, where, columns, "==", rows);
 
-        String expectedResult
-            = "{\"op\":\"wait\",\"timeout\":1000,\"table\":\"Logical_Switch\","
-            + "\"where\":[[\"name\",\"==\",\"ls1\"]],"
-            + "\"columns\":[\"name\",\"description\"],\"until\":\"==\","
-            + "\"rows\":[{\"name\":\"ls1\",\"description\":\"First Logical "
-            + "Switch\"}]}";
+    String expectedResult
+        = "{\"op\":\"wait\",\"timeout\":1000,\"table\":\"Logical_Switch\","
+        + "\"where\":[[\"name\",\"==\",\"ls1\"]],"
+        + "\"columns\":[\"name\",\"description\"],\"until\":\"==\","
+        + "\"rows\":[{\"name\":\"ls1\",\"description\":\"First Logical "
+        + "Switch\"}]}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(wait));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(wait));
+  }
 }

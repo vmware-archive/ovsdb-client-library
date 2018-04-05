@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
@@ -24,17 +25,17 @@ import org.junit.Test;
 
 public class MutateTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Mutate mutate = new Mutate("Logical_Switch")
-            .where("name", Function.EQUALS, "ls1")
-            .mutation("tunnel_key", Mutator.SUM, 20);
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Mutate mutate = new Mutate("Logical_Switch")
+        .where("name", Function.EQUALS, "ls1")
+        .mutation("tunnel_key", Mutator.SUM, 20);
 
-        String expectedResult
-            = "{\"op\":\"mutate\",\"table\":\"Logical_Switch\","
-            + "\"where\":[[\"name\",\"==\",\"ls1\"]],"
-            + "\"mutations\":[[\"tunnel_key\",\"+=\",20]]}";
+    String expectedResult
+        = "{\"op\":\"mutate\",\"table\":\"Logical_Switch\","
+        + "\"where\":[[\"name\",\"==\",\"ls1\"]],"
+        + "\"mutations\":[[\"tunnel_key\",\"+=\",20]]}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(mutate));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(mutate));
+  }
 }

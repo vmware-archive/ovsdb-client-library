@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * Represent the result of lock operation.
+ *
  * <pre>
  * {@literal
  * For a "lock" operation, the "locked" member in the response object is
@@ -30,40 +32,40 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class LockResult {
 
-    private boolean locked;
+  private boolean locked;
 
-    @JsonCreator
-    public LockResult(@JsonProperty(value = "locked", required = true) boolean locked) {
-        this.locked = locked;
+  @JsonCreator
+  public LockResult(@JsonProperty(value = "locked", required = true) boolean locked) {
+    this.locked = locked;
+  }
+
+  public boolean isLocked() {
+    return locked;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof LockResult)) {
+      return false;
     }
 
-    public boolean isLocked() {
-        return locked;
-    }
+    LockResult that = (LockResult) other;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof LockResult)) {
-            return false;
-        }
+    return locked == that.locked;
+  }
 
-        LockResult that = (LockResult) o;
+  @Override
+  public int hashCode() {
+    return (locked ? 1 : 0);
+  }
 
-        return locked == that.locked;
-    }
-
-    @Override
-    public int hashCode() {
-        return (locked ? 1 : 0);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "locked=" + locked
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "locked=" + locked
+        + "]";
+  }
 }

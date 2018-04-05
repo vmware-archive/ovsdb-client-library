@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.ConditionDeserializer;
 
 /**
+ * Representation of {@literal <condition>}.
+ *
  * <pre>
  * {@literal
  * <condition>
@@ -76,74 +78,81 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.ConditionDeseri
 @JsonDeserialize(using = ConditionDeserializer.class)
 public class Condition {
 
-    private final String column;
+  private final String column;
 
-    private final Function function;
+  private final Function function;
 
-    private final Value value;
+  private final Value value;
 
-    public Condition(String column, Function function, Value value) {
-        this.column = column;
-        this.function = function;
-        this.value = value;
+  /**
+   * Create a {@link Condition} object.
+   *
+   * @param column value of the "column" field
+   * @param function value of the "function" field
+   * @param value value of the "value" field
+   */
+  public Condition(String column, Function function, Value value) {
+    this.column = column;
+    this.function = function;
+    this.value = value;
+  }
+
+  public String getColumn() {
+    return column;
+  }
+
+  public Function getFunction() {
+    return function;
+  }
+
+  public Object getValue() {
+    return value;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = column != null
+        ? column.hashCode()
+        : 0;
+    result = 31 * result + (function != null
+        ? function.hashCode()
+        : 0);
+    result = 31 * result + (value != null
+        ? value.hashCode()
+        : 0);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Condition)) {
+      return false;
     }
 
-    public String getColumn() {
-        return column;
+    Condition condition = (Condition) other;
+
+    if (column != null
+        ? !column.equals(condition.column)
+        : condition.column != null) {
+      return false;
     }
-
-    public Function getFunction() {
-        return function;
+    if (function != condition.function) {
+      return false;
     }
+    return value != null
+        ? value.equals(condition.value)
+        : condition.value == null;
+  }
 
-    public Object getValue() {
-        return value;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = column != null
-            ? column.hashCode()
-            : 0;
-        result = 31 * result + (function != null
-            ? function.hashCode()
-            : 0);
-        result = 31 * result + (value != null
-            ? value.hashCode()
-            : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Condition)) {
-            return false;
-        }
-
-        Condition condition = (Condition) o;
-
-        if (column != null
-            ? !column.equals(condition.column)
-            : condition.column != null) {
-            return false;
-        }
-        if (function != condition.function) {
-            return false;
-        }
-        return value != null
-            ? value.equals(condition.value)
-            : condition.value == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "column=" + column
-            + ", function=" + function
-            + ", value=" + value
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "column=" + column
+        + ", function=" + function
+        + ", value=" + value
+        + "]";
+  }
 }

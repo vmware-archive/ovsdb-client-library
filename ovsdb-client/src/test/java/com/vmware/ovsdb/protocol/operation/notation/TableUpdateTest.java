@@ -16,6 +16,7 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.google.common.collect.ImmutableMap;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.methods.RowUpdate;
@@ -27,31 +28,31 @@ import org.junit.Test;
 
 public class TableUpdateTest {
 
-    @Test
-    public void testDeserialization() throws IOException {
-        Row old1 = new Row(ImmutableMap.of(
-            "name", Atom.string("ls1"),
-            "description", Atom.string("First Logical Switch"),
-            "tunnel_key", Atom.integer(5001)
-        ));
+  @Test
+  public void testDeserialization() throws IOException {
+    Row old1 = new Row(ImmutableMap.of(
+        "name", Atom.string("ls1"),
+        "description", Atom.string("First Logical Switch"),
+        "tunnel_key", Atom.integer(5001)
+    ));
 
-        Row new1 = new Row(ImmutableMap.of(
-            "name", Atom.string("ls2"),
-            "description", Atom.string("Second Logical Switch"),
-            "tunnel_key", Atom.integer(5002)
-        ));
+    Row new1 = new Row(ImmutableMap.of(
+        "name", Atom.string("ls2"),
+        "description", Atom.string("Second Logical Switch"),
+        "tunnel_key", Atom.integer(5002)
+    ));
 
-        Map<UUID, RowUpdate> rowUpdates = ImmutableMap.of(
-            UUID.randomUUID(), new RowUpdate(old1, null),
-            UUID.randomUUID(), new RowUpdate(null, new1)
-        );
-        TableUpdate expectedResult = new TableUpdate(rowUpdates);
+    Map<UUID, RowUpdate> rowUpdates = ImmutableMap.of(
+        UUID.randomUUID(), new RowUpdate(old1, null),
+        UUID.randomUUID(), new RowUpdate(null, new1)
+    );
+    TableUpdate expectedResult = new TableUpdate(rowUpdates);
 
-        String textTableUpdate = JsonUtil.serialize(rowUpdates);
+    String textTableUpdate = JsonUtil.serialize(rowUpdates);
 
-        assertEquals(
-            expectedResult,
-            JsonUtil.deserialize(textTableUpdate, TableUpdate.class)
-        );
-    }
+    assertEquals(
+        expectedResult,
+        JsonUtil.deserialize(textTableUpdate, TableUpdate.class)
+    );
+  }
 }

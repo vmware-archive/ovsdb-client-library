@@ -16,17 +16,18 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
 public class CommitTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Commit commit = new Commit(true);
-        String expectedResult = "{\"op\":\"commit\",\"durable\":true}";
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Commit commit = new Commit(true);
+    String expectedResult = "{\"op\":\"commit\",\"durable\":true}";
 
-        assertEquals(expectedResult, JsonUtil.serialize(commit));
-    }
+    assertEquals(expectedResult, JsonUtil.serialize(commit));
+  }
 }

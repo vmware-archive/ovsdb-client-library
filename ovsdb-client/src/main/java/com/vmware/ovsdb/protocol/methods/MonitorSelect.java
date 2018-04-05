@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.methods;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
+ * Representation of {@literal <monitor-select>}.
+ *
  * <pre>
  * {@literal <monitor-select>} is an object with the following members:
  *
@@ -28,70 +30,79 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 public class MonitorSelect {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean initial = null;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean initial = null;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean insert = null;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean insert = null;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean delete = null;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean delete = null;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean modify = null;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean modify = null;
 
-    public MonitorSelect() {
+  /**
+   * Create a {@link MonitorSelect} object with all fields being default values.
+   */
+  public MonitorSelect() {
 
-    }
+  }
 
-    public MonitorSelect(
-        Boolean initial, Boolean insert, Boolean delete, Boolean modify
-    ) {
-        this.initial = initial;
-        this.insert = insert;
-        this.delete = delete;
-        this.modify = modify;
-    }
+  /**
+   * Create a {@link MonitorSelect} object.
+   *
+   * @param initial value of the "initial" field
+   * @param insert value of the "insert" field
+   * @param delete value of the "delete" field
+   * @param modify value of the "modify" field
+   */
+  public MonitorSelect(Boolean initial, Boolean insert, Boolean delete, Boolean modify) {
+    this.initial = initial;
+    this.insert = insert;
+    this.delete = delete;
+    this.modify = modify;
+  }
 
-    public Boolean isInitial() {
-        return initial;
-    }
+  public Boolean isInitial() {
+    return initial;
+  }
 
-    public void setInitial(Boolean initial) {
-        this.initial = initial;
-    }
+  public void setInitial(Boolean initial) {
+    this.initial = initial;
+  }
 
-    public Boolean isInsert() {
-        return insert;
-    }
+  public Boolean isInsert() {
+    return insert;
+  }
 
-    public void setInsert(Boolean insert) {
-        this.insert = insert;
-    }
+  public void setInsert(Boolean insert) {
+    this.insert = insert;
+  }
 
-    public Boolean isDelete() {
-        return delete;
-    }
+  public Boolean isDelete() {
+    return delete;
+  }
 
-    public void setDelete(Boolean delete) {
-        this.delete = delete;
-    }
+  public void setDelete(Boolean delete) {
+    this.delete = delete;
+  }
 
-    public Boolean isModify() {
-        return modify;
-    }
+  public Boolean isModify() {
+    return modify;
+  }
 
-    public void setModify(Boolean modify) {
-        this.modify = modify;
-    }
+  public void setModify(Boolean modify) {
+    this.modify = modify;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "initial=" + initial
-            + ", insert=" + insert
-            + ", delete=" + delete
-            + ", modify=" + modify
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "initial=" + initial
+        + ", insert=" + insert
+        + ", delete=" + delete
+        + ", modify=" + modify
+        + "]";
+  }
 }

@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.exception;
 
 /**
@@ -18,19 +19,19 @@ package com.vmware.ovsdb.jsonrpc.v1.exception;
  */
 public class JsonRpcDuplicateIdException extends JsonRpcException {
 
-    public JsonRpcDuplicateIdException() {
-        super();
-    }
+  public JsonRpcDuplicateIdException() {
+    super();
+  }
 
-    public JsonRpcDuplicateIdException(String message) {
-        super(message);
-    }
+  public JsonRpcDuplicateIdException(String message) {
+    super(message);
+  }
 
-    public JsonRpcDuplicateIdException(Throwable cause) {
-        super(cause);
-    }
+  public JsonRpcDuplicateIdException(Throwable cause) {
+    super(cause);
+  }
 
-    public JsonRpcDuplicateIdException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public JsonRpcDuplicateIdException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

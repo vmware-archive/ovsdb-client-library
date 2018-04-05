@@ -38,7 +38,7 @@ import static com.vmware.ovsdb.protocol.util.OvsdbConstant.ABORT;
  */
 public class Abort extends Operation {
 
-    protected Abort() {
-        super(ABORT);
-    }
+  protected Abort() {
+    super(ABORT);
+  }
 }

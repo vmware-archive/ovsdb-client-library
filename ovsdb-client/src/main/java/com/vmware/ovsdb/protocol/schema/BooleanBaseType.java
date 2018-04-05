@@ -28,11 +28,11 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
  */
 public class BooleanBaseType extends BaseType {
 
-    public BooleanBaseType() {
-        super(AtomicType.BOOLEAN);
-    }
+  public BooleanBaseType() {
+    super(AtomicType.BOOLEAN);
+  }
 
-    public BooleanBaseType(Value enums) {
-        super(AtomicType.BOOLEAN, enums);
-    }
+  public BooleanBaseType(Value enums) {
+    super(AtomicType.BOOLEAN, enums);
+  }
 }

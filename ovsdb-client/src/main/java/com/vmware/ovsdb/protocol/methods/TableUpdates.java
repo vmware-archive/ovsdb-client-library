@@ -16,50 +16,51 @@ package com.vmware.ovsdb.protocol.methods;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.methods.deserializer.TableUpdatesDeserializer;
+
 import java.util.Map;
 
 @JsonDeserialize(using = TableUpdatesDeserializer.class)
 public class TableUpdates {
 
-    private final Map<String, TableUpdate> tableUpdates;
+  private final Map<String, TableUpdate> tableUpdates;
 
-    public TableUpdates(
-        Map<String, TableUpdate> tableUpdates
-    ) {
-        this.tableUpdates = tableUpdates;
+  public TableUpdates(
+      Map<String, TableUpdate> tableUpdates
+  ) {
+    this.tableUpdates = tableUpdates;
+  }
+
+  public Map<String, TableUpdate> getTableUpdates() {
+    return tableUpdates;
+  }
+
+  @Override
+  public int hashCode() {
+    return tableUpdates != null
+        ? tableUpdates.hashCode()
+        : 0;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof TableUpdates)) {
+      return false;
     }
 
-    public Map<String, TableUpdate> getTableUpdates() {
-        return tableUpdates;
-    }
+    TableUpdates that = (TableUpdates) other;
 
-    @Override
-    public int hashCode() {
-        return tableUpdates != null
-            ? tableUpdates.hashCode()
-            : 0;
-    }
+    return tableUpdates != null
+        ? tableUpdates.equals(that.tableUpdates)
+        : that.tableUpdates == null;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof TableUpdates)) {
-            return false;
-        }
-
-        TableUpdates that = (TableUpdates) o;
-
-        return tableUpdates != null
-            ? tableUpdates.equals(that.tableUpdates)
-            : that.tableUpdates == null;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " ["
-            + "tableUpdates=" + tableUpdates
-            + "]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " ["
+        + "tableUpdates=" + tableUpdates
+        + "]";
+  }
 }

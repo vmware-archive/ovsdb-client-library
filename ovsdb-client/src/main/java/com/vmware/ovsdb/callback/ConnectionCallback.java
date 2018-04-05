@@ -21,17 +21,17 @@ import com.vmware.ovsdb.service.OvsdbClient;
  */
 public interface ConnectionCallback {
 
-    /**
-     * Called when an OVSDB server is connected to the manager.
-     *
-     * @param ovsdbClient the {@link OvsdbClient} that can be used to communicate with the server
-     */
-    void connected(OvsdbClient ovsdbClient);
+  /**
+   * Called when an OVSDB server is connected to the manager.
+   *
+   * @param ovsdbClient the {@link OvsdbClient} that can be used to communicate with the server
+   */
+  void connected(OvsdbClient ovsdbClient);
 
-    /**
-     * Called when an OVSDB server is disconnected from the manager.
-     *
-     * @param ovsdbClient the {@link OvsdbClient} that is used to communicate with the server
-     */
-    void disconnected(OvsdbClient ovsdbClient);
+  /**
+   * Called when an OVSDB server is disconnected from the manager.
+   *
+   * @param ovsdbClient the {@link OvsdbClient} that is used to communicate with the server
+   */
+  void disconnected(OvsdbClient ovsdbClient);
 }

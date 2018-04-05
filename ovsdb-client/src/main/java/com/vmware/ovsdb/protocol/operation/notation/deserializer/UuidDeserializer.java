@@ -21,43 +21,44 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
+
 import java.io.IOException;
 import java.util.UUID;
 
 public class UuidDeserializer extends StdDeserializer<Uuid> {
 
-    protected UuidDeserializer() {
-        this(null);
+  protected UuidDeserializer() {
+    this(null);
+  }
+
+  protected UuidDeserializer(Class<?> vc) {
+    super(vc);
+  }
+
+  @Override
+  public Uuid deserialize(
+      JsonParser jp, DeserializationContext ctxt
+  ) throws IOException, JsonProcessingException {
+    ArrayNode arrayNode = jp.getCodec().readTree(jp);
+    if (arrayNode.size() != 2) {
+      throw new IOException(
+          "<uuid> should be a 2-element JSON array. Found "
+              + arrayNode.size() + " elements");
     }
 
-    protected UuidDeserializer(Class<?> vc) {
-        super(vc);
+    if (!OvsdbConstant.UUID.equals(arrayNode.get(0).asText())) {
+      throw new IOException(
+          "First element of <uuid> should be \""
+              + OvsdbConstant.UUID + "\"");
     }
 
-    @Override
-    public Uuid deserialize(
-        JsonParser jp, DeserializationContext ctxt
-    ) throws IOException, JsonProcessingException {
-        ArrayNode arrayNode = jp.getCodec().readTree(jp);
-        if (arrayNode.size() != 2) {
-            throw new IOException(
-                "<uuid> should be a 2-element JSON array. Found "
-                    + arrayNode.size() + " elements");
-        }
-
-        if (!OvsdbConstant.UUID.equals(arrayNode.get(0).asText())) {
-            throw new IOException(
-                "First element of <uuid> should be \""
-                    + OvsdbConstant.UUID + "\"");
-        }
-
-        String strUuid = arrayNode.get(1).asText();
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(strUuid);
-        } catch (IllegalArgumentException e) {
-            throw new IOException("Invalid UUID " + strUuid);
-        }
-        return new Uuid(uuid);
+    String strUuid = arrayNode.get(1).asText();
+    UUID uuid;
+    try {
+      uuid = UUID.fromString(strUuid);
+    } catch (IllegalArgumentException ex) {
+      throw new IOException("Invalid UUID " + strUuid, ex);
     }
+    return new Uuid(uuid);
+  }
 }

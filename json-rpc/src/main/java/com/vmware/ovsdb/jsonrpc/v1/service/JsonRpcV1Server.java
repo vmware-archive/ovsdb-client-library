@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 package com.vmware.ovsdb.jsonrpc.v1.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,18 +22,18 @@ import com.vmware.ovsdb.jsonrpc.v1.exception.JsonRpcException;
  */
 public interface JsonRpcV1Server {
 
-    /**
-     * Handle the request from the client.
-     *
-     * @param requestNode the request {@link JsonNode}
-     * @throws JsonRpcException if fail to handle the request
-     */
-    void handleRequest(JsonNode requestNode) throws JsonRpcException;
+  /**
+   * Handle the request from the client.
+   *
+   * @param requestNode the request {@link JsonNode}
+   * @throws JsonRpcException if fail to handle the request
+   */
+  void handleRequest(JsonNode requestNode) throws JsonRpcException;
 
-    /**
-     * Shutdown this server. After it is called, no other methods shall be called on this server any
-     * more. The request that is being handled may be affected.
-     */
-    void shutdown();
+  /**
+   * Shutdown this server. After it is called, no other methods shall be called on this server any
+   * more. The request that is being handled may be affected.
+   */
+  void shutdown();
 
 }

@@ -16,16 +16,17 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static org.junit.Assert.assertEquals;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
 public class AbortTest {
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        Abort abort = new Abort();
-        String expectedResult = "{\"op\":\"abort\"}";
-        assertEquals(expectedResult, JsonUtil.serialize(abort));
-    }
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    Abort abort = new Abort();
+    String expectedResult = "{\"op\":\"abort\"}";
+    assertEquals(expectedResult, JsonUtil.serialize(abort));
+  }
 }
