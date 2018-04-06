@@ -38,16 +38,14 @@ When the OVSDB client uses passive connection mode, it implies that the OVSDB se
 active connection mode. In other words, the client listens on certain port (6640 by default) and 
 waits for the server to connects. For more information, see [ovsdb-server(1)](http://www.openvswitch.org/support/dist-docs/ovsdb-server.1.html)
 
-Note: Currently this library only supports this mode. The active connection will be supported in near future.
-
-The following example uses hardware_vtep database on an OVSDB server. The server is started by 
-command:
+In the following example, the ovsdb-server is started by command:
 
 ```bash
-$ ovsdb-server --pidfile --log-file --remote punix:/var/run/openvswitch/db.sock --remote=db:hardware_vtep,Global,managers /etc/openvswitch/vtep.db
+$ ovsdb-server --remote=tcp:192.168.201.4:6640
 ``` 
 
-For the meaning of the params, see [ovsdb-server(1)](http://www.openvswitch.org/support/dist-docs/ovsdb-server.1.html).
+Note: You can also configure it to read connection methods from a db table. For example, the manager 
+table in hardware_vtep database.
 
 ```java
 ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);    
@@ -86,21 +84,50 @@ Note:
 See [OvsdbClient.java](ovsdb-client/src/main/java/com/vmware/ovsdb/service/OvsdbClient.java).
 * Exception handling is omitted in this example.
 
-### Active Connection (TBD)
+### Active Connection
+When the OVSDB client uses active connection mode, it implies that the OVSDB server is running on 
+passive connection mode. In other words, the server listens on certain port (6640 by default) and 
+waits for the client to connects. For more information, see [ovsdb-server(1)](http://www.openvswitch.org/support/dist-docs/ovsdb-server.1.html)
+
+In the following example, the ovsdb-server is started by command:
+
+```bash
+$ ovsdb-server --remote=ptcp:6640
+``` 
+```java
+ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);    
+OvsdbActiveConnectionConnectorImpl connector = new OvsdbActiveConnectionConnectorImpl(executorService);  // (1)
+
+CompletableFuture<OvsdbClient> ovsdbClientFuture = new CompletableFuture<>();
+ConnectionCallback connectionCallback = new ConnectionCallback() {      // (2)
+    public void connected(OvsdbClient ovsdbClient) {
+        System.out.println(ovsdbClient + " connected");
+        ovsdbClientFuture.complete(ovsdbClient);
+    }
+    public void disconnected(OvsdbClient ovsdbClient) {
+        System.out.println(ovsdbClient + " disconnected");
+    }
+};
+connector.connect("192.168.33.74", 6640, connectionCallback);       // (3)
+
+OvsdbClient ovsdbClient = ovsdbClientFuture.get(3, TimeUnit.SECONDS);   // (4)
+CompletableFuture<String[]> f = ovsdbClient.listDatabases();
+String[] dbs = f.get(3, TimeUnit.SECONDS);
+System.out.println(Arrays.toString(dbs));
+
+```
+The code is same as that of passive connection, except that this time we use a 
+`OvsdbActiveConnectionConnectorImpl` to initiate the connection.
 
 ## TODOs
-1. **Active connection needs to be implemented**. The [ovsdb-server](http://www.openvswitch.org/support/dist-docs/ovsdb-server.1.html) 
-implementation supports connections over both active and passive TCP/IP sockets. Currently this 
-library only supports passive connections, which means the user needs to listen on certain port and 
-wait for the server to connect.
-2. **ORM layer**. Currently, to perform a transaction, the user has to construct the `Row` object. 
+1. **ORM layer**. Currently, to perform a transaction, the user has to construct the `Row` object. 
 Ideally, there should be an ORM layer through which the user only needs to define the entity object 
 annotated with certain annotations. And one entity object can be used to represent one row.
 This is similar to JPA.
-3. **Integration tests with containers and CI/CD pipeline**. 
-4. **Use central maven repo**. After the first release, upload the jar to central maven repo. 
+2. **Integration tests with containers and CI/CD pipeline**. 
+3. **Use central maven repo**. After the first release, upload the jar to central maven repo. 
 See [Guide to uploading artifacts to the Central Repository](https://maven.apache.org/guides/mini/guide-central-repository-upload.html)
-5. **Use Wiki for documentation.**
+4. **Use Wiki for documentation.**
 
 ## Contributing
 

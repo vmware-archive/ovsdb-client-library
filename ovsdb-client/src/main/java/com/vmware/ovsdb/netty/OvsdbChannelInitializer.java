@@ -46,6 +46,8 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
   private static long READ_IDLE_TIMEOUT = PropertyManager
       .getLongProperty(KEY_CHANNEL_READ_IDLE_TIMEOUT_SEC, DEFAULT_READ_IDLE_TIMEOUT_SEC);
 
+  private final boolean isServerChannel;
+
   private final SslContext sslContext;
 
   private final ConnectionCallback connectionCallback;
@@ -58,20 +60,23 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
    * @param sslContext the SSL context
    * @param executorService an {@link ScheduledExecutorService} object
    * @param connectionCallback will be called then a new connection is established
+   * @param isServerChannel true if this is a server channel (i.e. used in passive connection)
    */
   public OvsdbChannelInitializer(
       SslContext sslContext,
       ScheduledExecutorService executorService,
-      ConnectionCallback connectionCallback
+      ConnectionCallback connectionCallback,
+      boolean isServerChannel
   ) {
     this.sslContext = sslContext;
     this.executorService = executorService;
     this.connectionCallback = connectionCallback;
+    this.isServerChannel = isServerChannel;
   }
 
   @Override
   protected void initChannel(SocketChannel ch) throws Exception {
-    LOGGER.info("New passive channel created: {}", ch);
+    LOGGER.info("New channel created: {}", ch);
 
     ChannelPipeline pipeline = ch.pipeline();
     pipeline.addLast(
@@ -80,8 +85,12 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
     );
     if (sslContext != null) {
       SSLEngine engine = sslContext.newEngine(ch.alloc());
-      engine.setUseClientMode(false);
-      engine.setNeedClientAuth(true);
+      if (isServerChannel) {
+        engine.setUseClientMode(false);
+        engine.setNeedClientAuth(true);
+      } else {
+        engine.setUseClientMode(true);
+      }
       pipeline.addLast("ssl", new SslHandler(engine));
     }
     pipeline.addLast("decoder", new JsonNodeDecoder());

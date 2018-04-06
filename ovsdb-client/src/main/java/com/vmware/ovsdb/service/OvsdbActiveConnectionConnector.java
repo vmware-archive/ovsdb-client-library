@@ -14,19 +14,19 @@
 
 package com.vmware.ovsdb.service;
 
+import com.vmware.ovsdb.callback.ConnectionCallback;
 import io.netty.handler.ssl.SslContext;
 
-// TODO: Implement
-public interface OvsdbActiveConnectionService {
+public interface OvsdbActiveConnectionConnector {
 
   /**
    * Connect to the OVSDB server on ip:port.
    *
    * @param ip the OVSDB server ip
    * @param port port to which the OVSDB is listening
-   * @return an {@link OvsdbClient} object that can be used to communicate with the OVSDB server
+   * @param connectionCallback called when the connection is established
    */
-  OvsdbClient connect(String ip, int port);
+  void connect(String ip, int port, ConnectionCallback connectionCallback);
 
   /**
    * Connect to the OVSDB server on ip:port with SSL enabled.
@@ -34,7 +34,9 @@ public interface OvsdbActiveConnectionService {
    * @param ip the OVSDB server ip
    * @param port port to which the OVSDB is listening
    * @param sslContext the SSL context
-   * @return an {@link OvsdbClient} object that can be used to communicate with the OVSDB server
+   * @param connectionCallback called when the connection is established
    */
-  OvsdbClient connectWithSsl(String ip, int port, SslContext sslContext);
+  void connectWithSsl(
+      String ip, int port, SslContext sslContext, ConnectionCallback connectionCallback
+  );
 }

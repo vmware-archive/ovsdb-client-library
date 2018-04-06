@@ -92,9 +92,7 @@ public class OvsdbPassiveConnectionListenerImpl
           .option(ChannelOption.SO_BACKLOG, 100)
           .handler(new LoggingHandler(LogLevel.INFO))
           .childHandler(new OvsdbChannelInitializer(
-              sslContext,
-              executorService,
-              connectionCallback
+              sslContext, executorService, connectionCallback, true
           ));
 
       serverBootstrap.option(
