@@ -1,5 +1,4 @@
 
-
 # OVSDB Client Library
 
 ## Overview
@@ -7,63 +6,32 @@ This is a schema-independent OVSDB client implementation of OVSDB Management Pro
 ([RFC 7047](https://tools.ietf.org/html/rfc7047)). All RPC methods defined in the protocol are 
 implemented.
 
-## Try it out
+## Getting Started
 
-### Prerequisites
-
-* JDK 1.8+
-* Maven 3+
-
-### Build & Use
-
-1. Build the jar.
-```bash
-mvn clean package
-```
-After this step, you will find a jar called `ovsdb-client-{version}.jar` under ovsdb-client/target/
-
-2. Use the jar.
-Currently, due to the lack of a maven repository, you will have to first build the jar and then copy 
-it to your project. Besides, you have to add other 3rd party dependencies:
+### Dependency
+Currently, only 1.0-SNAPSHOT version is available and we temporarily use github as a maven 
+repository. In order to use this library you have to add github repository and dependency to 
+the pom file:
 
 ```xml
+<repositories>
+    <repository>
+        <id>ovsdb-client-repo</id>
+        <url>https://raw.github.com/vmware/ovsdb-client-library/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
 <dependencies>
     <dependency>
-        <groupId>com.vmeare.ovsdb</groupId>
+        <groupId>com.vmware.ovsdb</groupId>
         <artifactId>ovsdb-client</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <scope>system</scope>
-        <systemPath>${project.basedir}/lib/ovsdb-client-1.0-SNAPSHOT.jar</systemPath>
-    </dependency>
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-all</artifactId>
-        <version>${netty.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${sl4j.version}</version>
     </dependency>
 </dependencies>
 ```
-
-## Getting Started
 
 ### Passive Connection
 When the OVSDB client uses passive connection mode, it implies that the OVSDB server is running on 
@@ -130,10 +98,8 @@ Ideally, there should be an ORM layer through which the user only needs to defin
 annotated with certain annotations. And one entity object can be used to represent one row.
 This is similar to JPA.
 3. **Integration tests with containers and CI/CD pipeline**. 
-4. **Have a maven repository on Github**. See [Hosting a Maven repository on github
-](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github)
-The final goal should be uploading it to the central maven repository. See 
-[Guide to uploading artifacts to the Central Repository](https://maven.apache.org/guides/mini/guide-central-repository-upload.html)
+4. **Use central maven repo**. After the first release, upload the jar to central maven repo. 
+See [Guide to uploading artifacts to the Central Repository](https://maven.apache.org/guides/mini/guide-central-repository-upload.html)
 5. **Use Wiki for documentation.**
 
 ## Contributing
