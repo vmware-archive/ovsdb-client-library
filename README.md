@@ -1,5 +1,6 @@
 
 # OVSDB Client Library
+[![Build Status](https://travis-ci.org/vmware/ovsdb-client-library.svg?branch=master)](https://travis-ci.org/vmware/ovsdb-client-library)
 
 ## Overview
 This is a schema-independent OVSDB client implementation of OVSDB Management Protocol 
