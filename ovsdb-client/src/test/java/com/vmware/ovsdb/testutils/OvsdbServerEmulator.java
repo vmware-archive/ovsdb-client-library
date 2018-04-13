@@ -12,7 +12,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.utils;
+package com.vmware.ovsdb.testutils;
 
 import static com.google.common.base.Charsets.UTF_8;
 
@@ -79,7 +79,7 @@ public abstract class OvsdbServerEmulator {
         }
         p.addLast(new SslHandler(engine));
       }
-      p.addLast(new LoggingHandler(LogLevel.DEBUG));
+      p.addLast(new LoggingHandler(LogLevel.TRACE));
       p.addLast(new JsonObjectDecoder());
       p.addLast(new StringEncoder());
       p.addLast(new OvsdbInboundHandler(connectedFuture));

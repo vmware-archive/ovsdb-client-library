@@ -1,5 +1,25 @@
+sudo: true
+
 language: java
+
+addons:
+  apt:
+    packages:
+      - net-tools
+
 jdk: oraclejdk8
-script: mvn clean verify
+
+env:
+  - DOCKER_HOST=tcp://127.0.0.1:2375
+
+services:
+  - docker
+
+before_install:
+  - docker pull hechaol/ovs:2.9.0
+
+script:
+  - mvn clean verify -Dhost.ip=$(/sbin/ifconfig docker0 | grep 'inet addr:' | cut -d':' -f2| cut -d' ' -f1)
+
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - mvn clean cobertura:cobertura-integration-test coveralls:report

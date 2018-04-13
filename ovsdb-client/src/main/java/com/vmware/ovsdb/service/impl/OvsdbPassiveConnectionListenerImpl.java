@@ -111,9 +111,11 @@ public class OvsdbPassiveConnectionListenerImpl
     ChannelFuture channelFuture = serverBootstrap.bind(port);
     channelFuture.addListener(future -> {
       if (future.isSuccess()) {
+        LOGGER.info("Listening on port {} started successfully.", port);
         serverChannelMap.put(port,  channelFuture.channel());
         completableFuture.complete(true);
       } else {
+        LOGGER.info("Failed to listen on port {}.", port);
         serverStatusMap.remove(port);
         completableFuture.complete(false);
       }
