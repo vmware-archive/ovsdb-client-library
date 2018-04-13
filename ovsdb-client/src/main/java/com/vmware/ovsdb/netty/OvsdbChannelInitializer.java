@@ -96,7 +96,7 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
       }
       pipeline.addLast("ssl", new SslHandler(engine));
     }
-    pipeline.addLast("logger", new LoggingHandler(LogLevel.DEBUG));
+    pipeline.addLast("logger", new LoggingHandler(LogLevel.TRACE));
     pipeline.addLast("decoder", new JsonNodeDecoder());
     pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
     pipeline.addLast("heartbeatHandler", new HeartBeatHandler());

@@ -17,7 +17,7 @@ package com.vmware.ovsdb.service;
 import com.vmware.ovsdb.callback.ConnectionCallback;
 import com.vmware.ovsdb.exception.OvsdbClientException;
 import com.vmware.ovsdb.service.impl.OvsdbPassiveConnectionListenerImpl;
-import com.vmware.ovsdb.utils.ActiveOvsdbServerEmulator;
+import com.vmware.ovsdb.testutils.ActiveOvsdbServerEmulator;
 import io.netty.handler.ssl.SslContext;
 import org.junit.After;
 import org.junit.Test;

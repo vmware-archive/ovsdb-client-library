@@ -23,7 +23,8 @@
     <!-- Test dependencies versions -->
     <junit.version>4.12</junit.version>
     <mockito.version>2.15.0</mockito.version>
-    <guava.version>18.0</guava.version>
+    <guava.version>23.0</guava.version>
+    <docker.client.version>8.11.2</docker.client.version>
 
     <!-- Plugin vesions -->
     <mvn.compiler.plugin.version>3.7.0</mvn.compiler.plugin.version>
@@ -33,6 +34,7 @@
     <site.mvn.plugin.version>0.11</site.mvn.plugin.version>
     <coveralls.plugin.version>4.3.0</coveralls.plugin.version>
     <cobertura.plugin.version>2.7</cobertura.plugin.version>
+    <mvn.failsafe.plugin.version>2.21.0</mvn.failsafe.plugin.version>
 
     <!-- For deploy -->
     <github.global.server>github</github.global.server>
@@ -96,6 +98,11 @@
         <artifactId>guava-testlib</artifactId>
         <version>${guava.version}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-client</artifactId>
+        <version>${docker.client.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -174,6 +181,11 @@
           <groupId>org.eluder.coveralls</groupId>
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>${coveralls.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${mvn.failsafe.plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

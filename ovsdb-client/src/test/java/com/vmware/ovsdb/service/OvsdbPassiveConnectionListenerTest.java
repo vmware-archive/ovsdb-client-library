@@ -14,7 +14,7 @@
 
 package com.vmware.ovsdb.service;
 
-import static com.vmware.ovsdb.utils.SslUtil.newSelfSignedSslContextPair;
+import static com.vmware.ovsdb.testutils.SslUtil.newSelfSignedSslContextPair;
 import static junit.framework.TestCase.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,8 +25,8 @@ import static org.mockito.Mockito.verify;
 import com.vmware.ovsdb.callback.ConnectionCallback;
 import com.vmware.ovsdb.service.impl.OvsdbPassiveConnectionListenerImpl;
 import com.vmware.ovsdb.util.PropertyManager;
-import com.vmware.ovsdb.utils.ActiveOvsdbServerEmulator;
-import com.vmware.ovsdb.utils.SslUtil.SelfSignedSslContextPair;
+import com.vmware.ovsdb.testutils.ActiveOvsdbServerEmulator;
+import com.vmware.ovsdb.testutils.SslUtil.SelfSignedSslContextPair;
 import io.netty.handler.ssl.SslContext;
 import java.util.List;
 import java.util.concurrent.Executors;

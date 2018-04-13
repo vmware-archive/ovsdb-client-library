@@ -14,13 +14,13 @@
 
 package com.vmware.ovsdb.service;
 
-import static com.vmware.ovsdb.utils.SslUtil.newSelfSignedSslContextPair;
+import static com.vmware.ovsdb.testutils.SslUtil.newSelfSignedSslContextPair;
 import static junit.framework.TestCase.assertNull;
 
 import com.vmware.ovsdb.service.impl.OvsdbActiveConnectionConnectorImpl;
 import com.vmware.ovsdb.util.PropertyManager;
-import com.vmware.ovsdb.utils.PassiveOvsdbServerEmulator;
-import com.vmware.ovsdb.utils.SslUtil.SelfSignedSslContextPair;
+import com.vmware.ovsdb.testutils.PassiveOvsdbServerEmulator;
+import com.vmware.ovsdb.testutils.SslUtil.SelfSignedSslContextPair;
 import org.junit.Test;
 
 import java.util.ArrayList;

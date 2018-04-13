@@ -12,7 +12,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.utils;
+package com.vmware.ovsdb.testutils;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
