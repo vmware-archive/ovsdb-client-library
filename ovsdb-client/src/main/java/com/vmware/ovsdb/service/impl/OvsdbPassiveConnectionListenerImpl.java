@@ -59,7 +59,7 @@ public class OvsdbPassiveConnectionListenerImpl
       int port, ConnectionCallback connectionCallback
   ) {
     isListeningCheckWithThrow(port);
-    executorService.submit(() -> startListeningOnPort(port, null, connectionCallback));
+    startListeningOnPort(port, null, connectionCallback);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class OvsdbPassiveConnectionListenerImpl
       int port, SslContext sslContext, ConnectionCallback connectionCallback
   ) {
     isListeningCheckWithThrow(port);
-    executorService.submit(() -> startListeningOnPort(port, sslContext, connectionCallback));
+    startListeningOnPort(port, sslContext, connectionCallback);
   }
 
   @Override
@@ -104,15 +104,17 @@ public class OvsdbPassiveConnectionListenerImpl
       ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
       serverChannelMap.put(port,  channelFuture.channel());
 
-      // Wait until the server socket is closed.
-      channelFuture.channel().closeFuture().sync();
+      channelFuture.channel().closeFuture().addListener(future -> {
+        // Shut down all event loops to terminate all threads.
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+        LOGGER.info("Ovsdb listener at port {} stopped.", port);
+      });
     } catch (InterruptedException ex) {
       LOGGER.error("Netty server is interrupted while starting listener at port " + port, ex);
-    } finally {
       // Shut down all event loops to terminate all threads.
       bossGroup.shutdownGracefully();
       workerGroup.shutdownGracefully();
-      LOGGER.info("Ovsdb listener at port {} stopped.", port);
     }
   }
 
