@@ -14,10 +14,21 @@
 
 package com.vmware.ovsdb.service;
 
+import io.netty.channel.Channel;
+import io.netty.handler.ssl.SslHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 public class OvsdbConnectionInfo {
+
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final InetAddress localAddress;
 
@@ -26,6 +37,8 @@ public class OvsdbConnectionInfo {
   private final InetAddress remoteAddress;
 
   private final int remotePort;
+
+  private final Certificate localCertificate;
 
   private final Certificate remoteCertificate;
 
@@ -38,15 +51,16 @@ public class OvsdbConnectionInfo {
    * @param remotePort remove port of the connection
    * @param remoteCertificate remote certificate
    */
-  public OvsdbConnectionInfo(
+  private OvsdbConnectionInfo(
       InetAddress localAddress, int localPort,
       InetAddress remoteAddress, int remotePort,
-      Certificate remoteCertificate
+      Certificate localCertificate, Certificate remoteCertificate
   ) {
     this.localAddress = localAddress;
     this.localPort = localPort;
     this.remoteAddress = remoteAddress;
     this.remotePort = remotePort;
+    this.localCertificate = localCertificate;
     this.remoteCertificate = remoteCertificate;
   }
 
@@ -66,8 +80,44 @@ public class OvsdbConnectionInfo {
     return remotePort;
   }
 
+  public Certificate getLocalCertificate() {
+    return localCertificate;
+  }
+
   public Certificate getRemoteCertificate() {
     return remoteCertificate;
+  }
+
+  /**
+   * Get the connection info from a Netty channel.
+   *
+   * @param channel the netty channel
+   * @return an {@link OvsdbConnectionInfo} object
+   */
+  public static OvsdbConnectionInfo fromChannel(Channel channel) {
+    InetSocketAddress remoteSocketAddress
+        = (InetSocketAddress) channel.remoteAddress();
+    InetAddress remoteAddress = remoteSocketAddress.getAddress();
+    int remotePort = remoteSocketAddress.getPort();
+    InetSocketAddress localSocketAddress
+        = (InetSocketAddress) channel.localAddress();
+    InetAddress localAddress = localSocketAddress.getAddress();
+    int localPort = localSocketAddress.getPort();
+
+    SslHandler sslHandler = channel.pipeline().get(SslHandler.class);
+    Certificate localCertificate = null;
+    Certificate remoteCertificate = null;
+    if (sslHandler != null) {
+      try {
+        remoteCertificate = sslHandler.engine().getSession().getPeerCertificates()[0];
+      } catch (SSLPeerUnverifiedException ex) {
+        LOGGER.error("Failed to get peer certificate of channel " + channel, ex);
+      }
+      localCertificate = sslHandler.engine().getSession().getLocalCertificates()[0];
+    }
+    return new OvsdbConnectionInfo(
+        localAddress, localPort, remoteAddress, remotePort, localCertificate, remoteCertificate
+    );
   }
 
   @Override

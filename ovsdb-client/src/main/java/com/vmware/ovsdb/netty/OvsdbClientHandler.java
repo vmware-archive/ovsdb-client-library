@@ -178,33 +178,9 @@ class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
 
     jsonRpcServer = new JsonRpcV1ServerImpl(transporter, new OvsdbRequestHandler());
 
-    ovsdbClient = new OvsdbClientImpl(getConnectionInfo(channel));
+    ovsdbClient = new OvsdbClientImpl(OvsdbConnectionInfo.fromChannel(channel));
 
     executorService.submit(() -> connectionCallback.connected(ovsdbClient));
-  }
-
-  private OvsdbConnectionInfo getConnectionInfo(Channel channel) {
-    InetSocketAddress remoteSocketAddress
-        = (InetSocketAddress) channel.remoteAddress();
-    InetAddress remoteAddress = remoteSocketAddress.getAddress();
-    int remotePort = remoteSocketAddress.getPort();
-    InetSocketAddress localSocketAddress
-        = (InetSocketAddress) channel.localAddress();
-    InetAddress localAddress = localSocketAddress.getAddress();
-    int localPort = localSocketAddress.getPort();
-
-    SslHandler sslHandler = channel.pipeline().get(SslHandler.class);
-    Certificate remoteCertificate = null;
-    if (sslHandler != null) {
-      try {
-        remoteCertificate = sslHandler.engine().getSession().getPeerCertificates()[0];
-      } catch (SSLPeerUnverifiedException ex) {
-        LOGGER.error("Failed to get peer certificate of channel " + channel, ex);
-      }
-    }
-    return new OvsdbConnectionInfo(
-        localAddress, localPort, remoteAddress, remotePort, remoteCertificate
-    );
   }
 
   private String getNextId() {
