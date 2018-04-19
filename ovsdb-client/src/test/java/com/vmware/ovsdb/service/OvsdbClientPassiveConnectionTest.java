@@ -14,14 +14,13 @@
 
 package com.vmware.ovsdb.service;
 
+import static com.vmware.ovsdb.utils.SslUtil.newSelfSignedSslContextPair;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -55,13 +54,14 @@ import com.vmware.ovsdb.protocol.operation.result.UpdateResult;
 import com.vmware.ovsdb.protocol.schema.DatabaseSchema;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 import com.vmware.ovsdb.service.impl.OvsdbPassiveConnectionListenerImpl;
+import com.vmware.ovsdb.utils.ActiveOvsdbServerEmulator;
+import com.vmware.ovsdb.utils.SslUtil.SelfSignedSslContextPair;
 import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Map;
@@ -69,14 +69,14 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.Test;
 
-public class OvsdbClientTest {
+public class OvsdbClientPassiveConnectionTest {
+
+  private static final int TEST_TIMEOUT_MILLIS = 60 * 1000; // 60 seconds
 
   private static final ScheduledExecutorService executorService = Executors
       .newScheduledThreadPool(10);
@@ -86,63 +86,93 @@ public class OvsdbClientTest {
 
   private static final String HOST = "127.0.0.1";
 
-  // Use port 6641 for testing purpose
-  private static final int PORT = 6641;
+  private static final int PORT = 6641; // Use port 6641 for testing purpose
 
-  private static ConnectionEmulator connectionEmulator;
+  private static final ActiveOvsdbServerEmulator activeOvsdbServer =
+      new ActiveOvsdbServerEmulator();
 
   private static OvsdbClient ovsdbClient;
 
   private static int id = 0;
 
-  @BeforeClass
-  public static void setUpClass() throws InterruptedException {
-    SslContext sslContext = null;
-    try {
-      SelfSignedCertificate serverCert = new SelfSignedCertificate();
-      SelfSignedCertificate clientCert = new SelfSignedCertificate();
-      sslContext = SslContextBuilder.forServer(
-          serverCert.certificate(), serverCert.privateKey())
-          .trustManager(clientCert.certificate())
-          .build();
-
-      connectionEmulator = new ConnectionEmulator(
-          SslContextBuilder.forClient()
-              .keyManager(
-                  clientCert.certificate(), clientCert.privateKey())
-              .trustManager(serverCert.certificate())
-              .build());
-    } catch (CertificateException | SSLException e) {
-      fail();
-    }
-    passiveConnectionService
-        .startListeningWithSsl(PORT, sslContext, new ConnectionCallback() {
-          @Override
-          public void connected(OvsdbClient ovsdbClient) {
-            OvsdbClientTest.ovsdbClient = ovsdbClient;
-          }
-
-          @Override
-          public void disconnected(OvsdbClient ovsdbClient) {
-            OvsdbClientTest.ovsdbClient = null;
-          }
-        });
-    // Wait for the server to start. This is not accurate. Just for testing.
-    TimeUnit.SECONDS.sleep(2);
-
-    connectionEmulator.connect(HOST, PORT);
-
-    // Wait for the emulator to connect. This is not accurate. Just for testing.
-    TimeUnit.SECONDS.sleep(2);
-  }
-
-  @AfterClass
-  public static void tearDownClass() {
+  @After
+  public void tearDownClass() {
+    activeOvsdbServer.disconnect();
     passiveConnectionService.stopListening(PORT);
   }
 
-  @Test
-  public void testListDatabases() throws OvsdbClientException {
+  private void setUp(boolean withSsl)
+      throws InterruptedException, CertificateException, SSLException {
+    CompletableFuture<OvsdbClient> connectFuture = new CompletableFuture<>();
+    CompletableFuture<OvsdbClient> disconnectFuture = new CompletableFuture<>();
+    disconnectFuture.thenAccept(disconnectClient -> {
+      assert disconnectClient == ovsdbClient;
+      ovsdbClient = null;
+    });
+    ConnectionCallback connectionCallback = new ConnectionCallback() {
+      @Override
+      public void connected(OvsdbClient ovsdbClient) {
+        connectFuture.complete(ovsdbClient);
+      }
+
+      @Override
+      public void disconnected(OvsdbClient ovsdbClient) {
+        disconnectFuture.complete(ovsdbClient);
+      }
+    };
+    if (!withSsl) {
+      passiveConnectionService.startListening(PORT, connectionCallback);
+      activeOvsdbServer.connect(HOST, PORT);
+    } else {
+      SelfSignedSslContextPair sslContextPair = newSelfSignedSslContextPair();
+      // In passive connection test, the controller is the server and the ovsdb-server is the client
+      SslContext serverSslCtx = sslContextPair.getServerSslCtx();
+      SslContext clientSslCtx = sslContextPair.getClientSslCtx();
+      passiveConnectionService.startListeningWithSsl(PORT, serverSslCtx, connectionCallback);
+      activeOvsdbServer.connectWithSsl(HOST, PORT, clientSslCtx);
+    }
+    ovsdbClient = connectFuture.join();
+  }
+
+  @Test(timeout = TEST_TIMEOUT_MILLIS)
+  public void testTcpConnection()
+      throws OvsdbClientException, InterruptedException, IOException, CertificateException {
+    setUp(false);
+    testListDatabases();
+    testGetSchema();
+    testInsertTransact();
+    testSelectTransact();
+    testUpdateTransact();
+    testMutateTransact();
+    testDeleteTransact();
+    testMultiOperationTransact();
+    testTransactErrorResult();
+    testMonitor();
+    testCancelMonitor();
+    testConnectionInfo();
+    testErrorOperation();
+  }
+
+  @Test(timeout = TEST_TIMEOUT_MILLIS)
+  public void testSslConnection()
+      throws InterruptedException, OvsdbClientException, IOException, CertificateException {
+    setUp(true);
+    testListDatabases();
+    testGetSchema();
+    testInsertTransact();
+    testSelectTransact();
+    testUpdateTransact();
+    testMutateTransact();
+    testDeleteTransact();
+    testMultiOperationTransact();
+    testTransactErrorResult();
+    testMonitor();
+    testCancelMonitor();
+    testConnectionInfo();
+    testErrorOperation();
+  }
+
+  private void testListDatabases() throws OvsdbClientException {
     String expectedRequest = getJsonRequestString(OvsdbConstant.LIST_DBS);
     setupEmulator(expectedRequest, "[\"ovs\",\"hardware_vtep\"]", null);
 
@@ -150,8 +180,7 @@ public class OvsdbClientTest {
     assertArrayEquals(new String[] {"ovs", "hardware_vtep"}, f.join());
   }
 
-  @Test
-  public void testGetSchema() throws OvsdbClientException, IOException {
+  private void testGetSchema() throws OvsdbClientException, IOException {
     URL url = getClass().getClassLoader().getResource("vtep_schema.json");
     assertNotNull(url);
 
@@ -169,8 +198,7 @@ public class OvsdbClientTest {
     assertEquals(expectedResult, f.join());
   }
 
-  @Test
-  public void testInsertTransact() throws OvsdbClientException {
+  private void testInsertTransact() throws OvsdbClientException {
     UUID uuid = UUID.randomUUID();
     Map<String, Value> columns = ImmutableMap.of(
         "name", Atom.string("ls1"),
@@ -192,8 +220,7 @@ public class OvsdbClientTest {
     assertArrayEquals(new OperationResult[] {expectedResult}, f.join());
   }
 
-  @Test
-  public void testSelectTransact() throws OvsdbClientException {
+  private void testSelectTransact() throws OvsdbClientException {
     Map<String, Value> columns = ImmutableMap.of(
         "name", Atom.string("ls1"),
         "description", Atom.string("first logical switch"),
@@ -217,8 +244,7 @@ public class OvsdbClientTest {
     assertArrayEquals(new OperationResult[] {expectedResult}, f.join());
   }
 
-  @Test
-  public void testUpdateTransact() throws OvsdbClientException {
+  private void testUpdateTransact() throws OvsdbClientException {
     Map<String, Value> columns = ImmutableMap.of(
         "name", Atom.string("ls1"),
         "description", Atom.string("first logical switch"),
@@ -238,8 +264,7 @@ public class OvsdbClientTest {
     assertArrayEquals(new OperationResult[] {expectedResult}, f.join());
   }
 
-  @Test
-  public void testMutateTransact() throws OvsdbClientException {
+  private void testMutateTransact() throws OvsdbClientException {
     Mutate mutate = new Mutate("Logical_Switch")
         .where("tunnel_key", Function.GREATER_THAN, 5000)
         .mutation("tunnel_key", Mutator.SUM, 3);
@@ -255,8 +280,7 @@ public class OvsdbClientTest {
     assertArrayEquals(new OperationResult[] {expectedResult}, f.join());
   }
 
-  @Test
-  public void testDeleteTransact() throws OvsdbClientException {
+  private void testDeleteTransact() throws OvsdbClientException {
     Delete delete = new Delete("Logical_Switch")
         .where("description", Function.INCLUDES, "something");
 
@@ -272,8 +296,7 @@ public class OvsdbClientTest {
     assertArrayEquals(new OperationResult[] {expectedResult}, f.join());
   }
 
-  @Test
-  public void testMultiOperationTransact() throws OvsdbClientException {
+  private void testMultiOperationTransact() throws OvsdbClientException {
     UUID uuid = UUID.randomUUID();
     Map<String, Value> columns = ImmutableMap.of(
         "name", Atom.string("ls1"),
@@ -309,8 +332,7 @@ public class OvsdbClientTest {
     assertArrayEquals(expectedResult, f.join());
   }
 
-  @Test
-  public void testTransactErrorResult() throws OvsdbClientException {
+  private void testTransactErrorResult() throws OvsdbClientException {
     Map<String, Value> columns = ImmutableMap.of(
         "name", Atom.string("ls1"),
         "description", Atom.string("first logical switch"),
@@ -344,8 +366,7 @@ public class OvsdbClientTest {
     assertArrayEquals(expectedResult, f.join());
   }
 
-  @Test
-  public void testMonitor() throws OvsdbClientException {
+  private void testMonitor() throws OvsdbClientException {
     String monitorId = "1";
     MonitorRequest monitorRequest = new MonitorRequest();
     MonitorRequests monitorRequests = new MonitorRequests(
@@ -414,7 +435,7 @@ public class OvsdbClientTest {
     TableUpdates expectedTableUpdates = new TableUpdates(
         ImmutableMap.of("Logical_Switch", expectedTableUpdate));
 
-    connectionEmulator.write(
+    activeOvsdbServer.write(
         "{\"method\":\"update\",\"params\":[\"" + monitorId + "\","
             + "{\"Logical_Switch\":" + "{"
             + "\"" + insertUuid + "\":{\"old\":null,"
@@ -429,9 +450,7 @@ public class OvsdbClientTest {
     verify(monitorCallback, timeout(1000).times(1)).update(expectedTableUpdates);
   }
 
-
-  @Test
-  public void testCancelMonitor() throws OvsdbClientException {
+  private void testCancelMonitor() throws OvsdbClientException {
     String monitorId = "1";
     MonitorRequest monitorRequest = new MonitorRequest();
     MonitorRequests monitorRequests = new MonitorRequests(
@@ -453,19 +472,42 @@ public class OvsdbClientTest {
     f.join();
   }
 
+  private void testConnectionInfo() {
+    OvsdbConnectionInfo ovsdbClientConnectionInfo = ovsdbClient.getConnectionInfo();
+    OvsdbConnectionInfo ovsdbServerConnectionInfo = activeOvsdbServer.getConnectionInfo();
 
-  @Test
-  public void testConnectionInfo() {
-    OvsdbConnectionInfo connectionInfo = ovsdbClient.getConnectionInfo();
-    String localIp = connectionInfo.getLocalAddress().getHostAddress();
-    assertEquals("127.0.0.1", localIp);
+    String ovsdbClientRemoteIp = ovsdbClientConnectionInfo.getRemoteAddress().getHostAddress();
+    String ovsdbServerLocalIp = ovsdbServerConnectionInfo.getLocalAddress().getHostAddress();
 
-    String remoteIp = connectionInfo.getLocalAddress().getHostAddress();
-    assertEquals("127.0.0.1", remoteIp);
+    assertEquals(ovsdbClientRemoteIp, ovsdbServerLocalIp);
+
+    String ovsdbClientLocalIp = ovsdbClientConnectionInfo.getLocalAddress().getHostAddress();
+    String ovsdbServerRemoteIp = ovsdbServerConnectionInfo.getRemoteAddress().getHostAddress();
+
+    assertEquals(ovsdbClientLocalIp, ovsdbServerRemoteIp);
+
+    int ovsdbClientRemotePort = ovsdbClientConnectionInfo.getRemotePort();
+    int ovsdbServerLocalPort = ovsdbServerConnectionInfo.getLocalPort();
+
+    assertEquals(ovsdbClientRemotePort, ovsdbServerLocalPort);
+
+    int ovsdbClientLocalPort = ovsdbClientConnectionInfo.getLocalPort();
+    int ovsdbServerRemotePort = ovsdbServerConnectionInfo.getRemotePort();
+
+    assertEquals(ovsdbClientLocalPort, ovsdbServerRemotePort);
+
+    Certificate ovsdbClientRemoteCertificate = ovsdbClientConnectionInfo.getRemoteCertificate();
+    Certificate ovsdbServerLocalCertificate = ovsdbServerConnectionInfo.getLocalCertificate();
+
+    assertEquals(ovsdbClientRemoteCertificate, ovsdbServerLocalCertificate);
+
+    Certificate ovsdbClientLocalCertificate = ovsdbClientConnectionInfo.getLocalCertificate();
+    Certificate ovsdbServerRemoteCertificate = ovsdbServerConnectionInfo.getRemoteCertificate();
+
+    assertEquals(ovsdbClientLocalCertificate, ovsdbServerRemoteCertificate);
   }
 
-  @Test
-  public void testErrorOperation() throws OvsdbClientException {
+  private void testErrorOperation() throws OvsdbClientException {
     Map<String, Value> columns = ImmutableMap.of(
         "name", Atom.string("ls1"),
         "description", Atom.string("first logical switch"),
@@ -501,9 +543,9 @@ public class OvsdbClientTest {
   private void setupEmulator(
       String request, String result, String error
   ) {
-    connectionEmulator.registerReadCallback(msg -> {
+    activeOvsdbServer.registerReadCallback(msg -> {
       if (msg.equals(request)) {
-        connectionEmulator.write(
+        activeOvsdbServer.write(
             "{\"id\":\"" + (id++) + "\", \"result\":" + result + ", "
                 + "\"error\":" + error + "}");
       }
