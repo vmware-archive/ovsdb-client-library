@@ -15,12 +15,8 @@
 package com.vmware.ovsdb.service;
 
 import static com.vmware.ovsdb.utils.SslUtil.newSelfSignedSslContextPair;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
+import static junit.framework.TestCase.assertNull;
 
-import com.vmware.ovsdb.callback.ConnectionCallback;
 import com.vmware.ovsdb.service.impl.OvsdbActiveConnectionConnectorImpl;
 import com.vmware.ovsdb.util.PropertyManager;
 import com.vmware.ovsdb.utils.PassiveOvsdbServerEmulator;
@@ -31,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -42,15 +39,13 @@ public class OvsdbActiveConnectionConnectorTest {
 
   private static final int TEST_TIMEOUT_MILLIS = 60 * 1000; // 60 seconds
 
-  private static final int VERIFY_TIMEOUT_MILLIS = 5000; // 5 seconds
-
   private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
   private final OvsdbActiveConnectionConnector activeConnectionConnector =
       new OvsdbActiveConnectionConnectorImpl(executorService);
 
   @Test(timeout = TEST_TIMEOUT_MILLIS)
-  public void testTcpConnection() {
+  public void testTcpConnection() throws InterruptedException {
     testConnectionBasic(null);
     testWriteInvalidJson(null);
     testChannelTimeout(null);
@@ -82,75 +77,59 @@ public class OvsdbActiveConnectionConnectorTest {
       }
     }
 
-    final List<ConnectionCallback> connectionCallbacks = new ArrayList<>();
-
     for (int port : ports) {
-      ConnectionCallback connectionCallback = mock(ConnectionCallback.class);
-      connectionCallbacks.add(connectionCallback);
       if (sslCtxPair == null) {
-        activeConnectionConnector.connect(HOST, port, connectionCallback);
+        activeConnectionConnector.connect(HOST, port).join();
       } else {
-        activeConnectionConnector.connectWithSsl(HOST, port,
-            sslCtxPair.getClientSslCtx(), connectionCallback);
+        activeConnectionConnector.connectWithSsl(HOST, port, sslCtxPair.getClientSslCtx()).join();
       }
-    }
-
-    for (ConnectionCallback connectionCallback : connectionCallbacks) {
-      verify(connectionCallback, timeout(VERIFY_TIMEOUT_MILLIS)).connected(any());
-    }
-
-    passiveOvsdbServers.forEach(PassiveOvsdbServerEmulator::disconnect);
-
-    for (ConnectionCallback connectionCallback : connectionCallbacks) {
-      verify(connectionCallback, timeout(VERIFY_TIMEOUT_MILLIS)).disconnected(any());
     }
 
     passiveOvsdbServers.forEach(passiveOvsdbServer -> passiveOvsdbServer.stopListening().join());
   }
 
-  private void testWriteInvalidJson(SelfSignedSslContextPair sslCtxPair) {
+  private void testWriteInvalidJson(SelfSignedSslContextPair sslCtxPair)
+      throws InterruptedException {
     final PassiveOvsdbServerEmulator passiveOvsdbServer = new PassiveOvsdbServerEmulator(PORT);
-    ConnectionCallback mockConnectionCallback = mock(ConnectionCallback.class);
     if (sslCtxPair == null) {
       passiveOvsdbServer.startListening().join();
-      activeConnectionConnector.connect(HOST, PORT, mockConnectionCallback);
+      activeConnectionConnector.connect(HOST, PORT).join();
     } else {
       passiveOvsdbServer.startListeningWithSsl(sslCtxPair.getServerSslCtx()).join();
-      activeConnectionConnector.connectWithSsl(HOST, PORT,
-          sslCtxPair.getClientSslCtx(), mockConnectionCallback);
+      activeConnectionConnector.connectWithSsl(HOST, PORT, sslCtxPair.getClientSslCtx()).join();
     }
 
-    verify(mockConnectionCallback, timeout(VERIFY_TIMEOUT_MILLIS)).connected(any());
+    while (passiveOvsdbServer.getConnectionInfo() == null) {
+      TimeUnit.MILLISECONDS.sleep(100);
+    }
 
     // Write an invalid Json to the channel. The ExceptionHandler should
     // close the channel
     passiveOvsdbServer.write("}\"msg\":\"IAmInvalidJson\"{");
-    //passiveOvsdbServer.write("{\"method\":\"echo\",\"params\":[],\"id\":\"1111\"");
 
-    verify(mockConnectionCallback, timeout(VERIFY_TIMEOUT_MILLIS)).disconnected(any());
+    while (passiveOvsdbServer.getConnectionInfo() != null) {
+      TimeUnit.MILLISECONDS.sleep(100);
+    }
 
     passiveOvsdbServer.stopListening().join();
   }
 
-  private void testChannelTimeout(SelfSignedSslContextPair sslCtxPair) {
+  private void testChannelTimeout(SelfSignedSslContextPair sslCtxPair) throws InterruptedException {
     final PassiveOvsdbServerEmulator passiveOvsdbServer = new PassiveOvsdbServerEmulator(PORT);
-    ConnectionCallback mockConnectionCallback = mock(ConnectionCallback.class);
     if (sslCtxPair == null) {
       passiveOvsdbServer.startListening().join();
-      activeConnectionConnector.connect(HOST, PORT, mockConnectionCallback);
+      activeConnectionConnector.connect(HOST, PORT).join();
     } else {
       passiveOvsdbServer.startListeningWithSsl(sslCtxPair.getServerSslCtx()).join();
       activeConnectionConnector.connectWithSsl(HOST, PORT,
-          sslCtxPair.getClientSslCtx(), mockConnectionCallback);
+          sslCtxPair.getClientSslCtx()).join();
     }
-
-    verify(mockConnectionCallback, timeout(VERIFY_TIMEOUT_MILLIS)).connected(any());
 
     long readIdleTimeout = PropertyManager.getLongProperty("channel.read.idle.timeout.sec", 5);
     int readIdleMax = PropertyManager.getIntProperty("channel.read.idle.max", 3);
     // Wait until the ovsdb manager closes the channel
-    verify(mockConnectionCallback, timeout((readIdleTimeout * readIdleMax + 2) * 1000))
-        .disconnected(any());
+    TimeUnit.SECONDS.sleep(readIdleTimeout * readIdleMax + 2);
+    assertNull(passiveOvsdbServer.getConnectionInfo());
 
     passiveOvsdbServer.stopListening().join();
   }

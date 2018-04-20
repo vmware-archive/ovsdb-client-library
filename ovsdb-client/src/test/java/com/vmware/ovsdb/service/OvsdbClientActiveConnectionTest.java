@@ -44,13 +44,13 @@ public class OvsdbClientActiveConnectionTest extends OvsdbClientTest {
   void setUp(boolean withSsl) {
     if (!withSsl) {
       passiveOvsdbServer.startListening().join();
-      activeConnector.connect(HOST, PORT, connectionCallback);
+      ovsdbClient = activeConnector.connect(HOST, PORT).join();
     } else {
       // In passive connection test, the controller is the server and the ovsdb-server is the client
       SslContext serverSslCtx = sslContextPair.getServerSslCtx();
       SslContext clientSslCtx = sslContextPair.getClientSslCtx();
-      passiveOvsdbServer.startListeningWithSsl(serverSslCtx);
-      activeConnector.connectWithSsl(HOST, PORT, clientSslCtx, connectionCallback);
+      passiveOvsdbServer.startListeningWithSsl(serverSslCtx).join();
+      ovsdbClient = activeConnector.connectWithSsl(HOST, PORT, clientSslCtx).join();
     }
   }
 

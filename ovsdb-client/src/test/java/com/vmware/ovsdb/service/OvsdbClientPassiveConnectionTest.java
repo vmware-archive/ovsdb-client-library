@@ -14,6 +14,7 @@
 
 package com.vmware.ovsdb.service;
 
+import com.vmware.ovsdb.callback.ConnectionCallback;
 import com.vmware.ovsdb.exception.OvsdbClientException;
 import com.vmware.ovsdb.service.impl.OvsdbPassiveConnectionListenerImpl;
 import com.vmware.ovsdb.utils.ActiveOvsdbServerEmulator;
@@ -22,6 +23,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public class OvsdbClientPassiveConnectionTest extends OvsdbClientTest {
 
@@ -38,21 +40,34 @@ public class OvsdbClientPassiveConnectionTest extends OvsdbClientTest {
   @After
   public void tearDown() {
     activeOvsdbServer.disconnect().join();
-    passiveListener.stopListening(PORT);
+    passiveListener.stopListening(PORT).join();
   }
 
   @Override
   void setUp(boolean withSsl) {
+    CompletableFuture<OvsdbClient> ovsdbClientFuture = new CompletableFuture<>();
+
+    final ConnectionCallback connectionCallback = new ConnectionCallback() {
+      @Override
+      public void connected(OvsdbClient ovsdbClient) {
+        ovsdbClientFuture.complete(ovsdbClient);
+      }
+
+      @Override
+      public void disconnected(OvsdbClient ovsdbClient) {
+      }
+    };
     if (!withSsl) {
-      passiveListener.startListening(PORT, connectionCallback);
+      passiveListener.startListening(PORT, connectionCallback).join();
       activeOvsdbServer.connect().join();
     } else {
       // In passive connection test, the controller is the server and the ovsdb-server is the client
       SslContext serverSslCtx = sslContextPair.getServerSslCtx();
       SslContext clientSslCtx = sslContextPair.getClientSslCtx();
-      passiveListener.startListeningWithSsl(PORT, serverSslCtx, connectionCallback);
+      passiveListener.startListeningWithSsl(PORT, serverSslCtx, connectionCallback).join();
       activeOvsdbServer.connectWithSsl(clientSslCtx).join();
     }
+    ovsdbClient = ovsdbClientFuture.join();
   }
 
   @Test(timeout = TEST_TIMEOUT_MILLIS)

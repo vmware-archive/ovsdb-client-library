@@ -15,6 +15,7 @@
 package com.vmware.ovsdb.netty;
 
 import com.vmware.ovsdb.callback.ConnectionCallback;
+import com.vmware.ovsdb.service.OvsdbClient;
 import com.vmware.ovsdb.util.PropertyManager;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLEngine;
@@ -46,32 +48,33 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
   private static long READ_IDLE_TIMEOUT = PropertyManager
       .getLongProperty(KEY_CHANNEL_READ_IDLE_TIMEOUT_SEC, DEFAULT_READ_IDLE_TIMEOUT_SEC);
 
-  private final boolean isServerChannel;
-
   private final SslContext sslContext;
 
   private final ConnectionCallback connectionCallback;
+
+  private final CompletableFuture<OvsdbClient> ovsdbClientFuture;
 
   private final ScheduledExecutorService executorService;
 
   /**
    * Create a {@link OvsdbChannelInitializer} object.
+   * This should be used in active mode.
    *
    * @param sslContext the SSL context
    * @param executorService an {@link ScheduledExecutorService} object
-   * @param connectionCallback will be called then a new connection is established
-   * @param isServerChannel true if this is a server channel (i.e. used in passive connection)
+   * @param connectionCallback will be called then a new connection is established.
+   *                           Should be null in active mode
+   * @param ovsdbClientFuture will complete when the connection is established.
+   *                          Should be null in passive mode
    */
-  public OvsdbChannelInitializer(
-      SslContext sslContext,
-      ScheduledExecutorService executorService,
-      ConnectionCallback connectionCallback,
-      boolean isServerChannel
+  private OvsdbChannelInitializer(
+      SslContext sslContext, ScheduledExecutorService executorService,
+      ConnectionCallback connectionCallback, CompletableFuture<OvsdbClient> ovsdbClientFuture
   ) {
     this.sslContext = sslContext;
     this.executorService = executorService;
     this.connectionCallback = connectionCallback;
-    this.isServerChannel = isServerChannel;
+    this.ovsdbClientFuture = ovsdbClientFuture;
   }
 
   @Override
@@ -85,7 +88,7 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
     );
     if (sslContext != null) {
       SSLEngine engine = sslContext.newEngine(ch.alloc());
-      if (isServerChannel) {
+      if (isPassiveMode()) {
         engine.setUseClientMode(false);
         engine.setNeedClientAuth(true);
       } else {
@@ -97,9 +100,48 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
     pipeline.addLast("decoder", new JsonNodeDecoder());
     pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
     pipeline.addLast("heartbeatHandler", new HeartBeatHandler());
-    pipeline.addLast("ovsdbClientHandler",
-        new OvsdbClientHandler(connectionCallback, executorService));
+    OvsdbClientHandler ovsdbClientHandler;
+    if (isPassiveMode()) {
+      ovsdbClientHandler = new OvsdbClientHandler(connectionCallback, executorService);
+    } else {
+      ovsdbClientHandler = new OvsdbClientHandler(ovsdbClientFuture, executorService);
+    }
+    pipeline.addLast("ovsdbClientHandler", ovsdbClientHandler);
     pipeline.addLast("exceptionHandler", new ExceptionHandler());
   }
 
+  /**
+   * Returns true if this is initializer is for passive connection.
+   */
+  private boolean isPassiveMode() {
+    return connectionCallback != null;
+  }
+
+  /**
+   * Create an {@link OvsdbChannelInitializer} with passive mode.
+   *
+   * @param sslContext the SSL context. Can be null if SSL is not enabled
+   * @param executorService an {@link ScheduledExecutorService} object
+   * @param connectionCallback will be called then a new connection is established
+   */
+  public static OvsdbChannelInitializer newOvsdbChannelInitializer(
+      SslContext sslContext, ScheduledExecutorService executorService,
+      ConnectionCallback connectionCallback
+  ) {
+    return new OvsdbChannelInitializer(sslContext, executorService, connectionCallback, null);
+  }
+
+  /**
+   * Create an {@link OvsdbChannelInitializer} with active mode.
+   *
+   * @param sslContext the SSL context. Can be null if SSL is not enabled
+   * @param executorService an {@link ScheduledExecutorService} object
+   * @param ovsdbClientFuture will complete when the connection is established.
+   */
+  public static OvsdbChannelInitializer newOvsdbChannelInitializer(
+      SslContext sslContext, ScheduledExecutorService executorService,
+      CompletableFuture<OvsdbClient> ovsdbClientFuture
+  ) {
+    return new OvsdbChannelInitializer(sslContext, executorService, null, ovsdbClientFuture);
+  }
 }

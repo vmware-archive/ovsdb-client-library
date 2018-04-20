@@ -50,17 +50,17 @@ public class OvsdbPassiveConnectionListenerTest {
 
   private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
-  private final OvsdbPassiveConnectionListener passiveConnectionListener =
+  private final OvsdbPassiveConnectionListener passiveListener =
       new OvsdbPassiveConnectionListenerImpl(executorService);
 
   @Test(timeout = TEST_TIMEOUT_MILLIS)
   public void testTcpConnection() throws Exception {
-    passiveConnectionListener.startListening(PORT, mockConnectionCallback);
+    passiveListener.startListening(PORT, mockConnectionCallback).join();
     testConnectionBasic(null);
     testConnectThenDisconnect(null);
     testWriteInvalidJson(null);
     testChannelTimeout(null);
-    passiveConnectionListener.stopListening(PORT);
+    passiveListener.stopListening(PORT).join();
   }
 
   @Test(timeout = TEST_TIMEOUT_MILLIS)
@@ -69,12 +69,12 @@ public class OvsdbPassiveConnectionListenerTest {
     // In passive connection test, the controller is the server and the ovsdb-server is the client
     SslContext serverSslCtx = sslContextPair.getServerSslCtx();
     SslContext clientSslCtx = sslContextPair.getClientSslCtx();
-    passiveConnectionListener.startListeningWithSsl(PORT, serverSslCtx, mockConnectionCallback);
+    passiveListener.startListeningWithSsl(PORT, serverSslCtx, mockConnectionCallback).join();
     testConnectionBasic(clientSslCtx);
     testConnectThenDisconnect(clientSslCtx);
     testWriteInvalidJson(clientSslCtx);
     testChannelTimeout(clientSslCtx);
-    passiveConnectionListener.stopListening(PORT);
+    passiveListener.stopListening(PORT).join();
   }
 
   private void testConnectionBasic(SslContext sslCtx) {
