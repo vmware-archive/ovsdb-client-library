@@ -75,7 +75,7 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
   }
 
   @Override
-  protected void initChannel(SocketChannel ch) throws Exception {
+  protected void initChannel(SocketChannel ch) {
     LOGGER.info("New channel created: {}", ch);
 
     ChannelPipeline pipeline = ch.pipeline();
@@ -93,9 +93,9 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
       }
       pipeline.addLast("ssl", new SslHandler(engine));
     }
+    pipeline.addLast("logger", new LoggingHandler(LogLevel.TRACE));
     pipeline.addLast("decoder", new JsonNodeDecoder());
     pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-    pipeline.addLast("logger", new LoggingHandler(LogLevel.TRACE));
     pipeline.addLast("heartbeatHandler", new HeartBeatHandler());
     pipeline.addLast("ovsdbClientHandler",
         new OvsdbClientHandler(connectionCallback, executorService));
