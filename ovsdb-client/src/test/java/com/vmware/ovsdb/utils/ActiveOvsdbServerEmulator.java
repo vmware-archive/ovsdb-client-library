@@ -14,163 +14,60 @@
 
 package com.vmware.ovsdb.utils;
 
-import static com.google.common.base.Charsets.UTF_8;
-
-import com.vmware.ovsdb.service.OvsdbConnectionInfo;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.json.JsonObjectDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslHandler;
-import java.lang.invoke.MethodHandles;
+
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * A netty client that can connects to any server.
+ * An ovsdb-server emulator that actively connects a controller.
  */
-public class ActiveOvsdbServerEmulator {
+public class ActiveOvsdbServerEmulator extends OvsdbServerEmulator {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private final String host;
 
-  private SocketChannel channel = null;
-
-  private Consumer<String> readCallback = null;
-
-  private OvsdbConnectionInfo connectionInfo = null;
+  private final int port;
 
   /**
-   * Register a callback that is notified when this client reads a string from the channel.
+   * Create an {@link ActiveOvsdbServerEmulator} object.
    *
-   * @param readCallback the callback
+   * @param host ip address of the controller that this ovsdb-server emulator will connect to
+   * @param port port of the controller that this ovsdb-server emulator will connect to
    */
-  public void registerReadCallback(Consumer<String> readCallback) {
-    this.readCallback = readCallback;
-    LOGGER.debug("Read callback {} registered", readCallback);
+  public ActiveOvsdbServerEmulator(String host, int port) {
+    this.host = host;
+    this.port = port;
   }
 
   /**
-   * Connect to a server on host:port. This is a synchronous call.
+   * Connect to a server on host:port. This is a asynchronous call.
    */
-  public void connect(String host, int port) throws InterruptedException {
-    connectTo(host, port, null);
+  public CompletableFuture<Boolean> connect() {
+    return doConnect(null);
   }
 
   /**
    * Connect to a server on host:port. This is a synchronous call.
    *
-   * @param host the host to connect
-   * @param port the port on the host to connect
    * @param sslCtx the {@link SslContext} for the connection
    */
-  public void connectWithSsl(String host, int port, SslContext sslCtx) throws InterruptedException {
-    connectTo(host, port, sslCtx);
+  public CompletableFuture<Boolean> connectWithSsl(SslContext sslCtx) {
+    return doConnect(sslCtx);
   }
 
-  /**
-   * Write the the connection.
-   *
-   * @param data data to write to the connection
-   */
-  public void write(String data) {
-    channel.writeAndFlush(data);
-  }
-
-  /**
-   * Disconnect from the server.
-   */
-  public void disconnect() {
-    if (channel != null) {
-      channel.close();
-      channel = null;
-    }
-  }
-
-  private void connectTo(String host, int port, SslContext sslCtx) throws InterruptedException {
+  private CompletableFuture<Boolean> doConnect(SslContext sslCtx) {
     CompletableFuture<Boolean> connectedFuture = new CompletableFuture<>();
     EventLoopGroup group = new NioEventLoopGroup();
-    try {
-      Bootstrap b = new Bootstrap();
-      b.group(group).channel(NioSocketChannel.class)
-          .option(ChannelOption.TCP_NODELAY, true)
-          .handler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            public void initChannel(SocketChannel ch) throws Exception {
-              ChannelPipeline p = ch.pipeline();
-              if (sslCtx != null) {
-                p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
-              }
-              p.addLast(new LoggingHandler(LogLevel.INFO));
-              p.addLast(new JsonObjectDecoder());
-              p.addLast(new StringEncoder());
-              p.addLast(new OvsdbInboundHandler(connectedFuture));
-              channel = ch;
-            }
-          });
-
-      b.connect(host, port).sync().channel().closeFuture()
-          .addListener(future -> group.shutdownGracefully());
-      connectedFuture.join();
-    } catch (InterruptedException e) {
-      LOGGER.error("Error: ", e);
-      group.shutdownGracefully();
-    }
-  }
-
-  private class OvsdbInboundHandler extends ChannelInboundHandlerAdapter {
-
-    private CompletableFuture<Boolean> connectedFuture;
-
-    private OvsdbInboundHandler(CompletableFuture<Boolean> connectedFuture) {
-      this.connectedFuture = connectedFuture;
-    }
-
-    @Override
-    public void channelActive(final ChannelHandlerContext ctx) {
-      LOGGER.info("Channel {} is now active", ctx.channel());
-
-      SslHandler sslHandler = ctx.pipeline().get(SslHandler.class);
-      if (sslHandler != null) {
-        sslHandler.handshakeFuture().addListener(future -> {
-          connectionInfo = OvsdbConnectionInfo.fromChannel(channel);
-          connectedFuture.complete(true);
-        });
-      } else {
-        connectionInfo = OvsdbConnectionInfo.fromChannel(channel);
-        connectedFuture.complete(true);
-      }
-    }
-
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-      ByteBuf byteBuf = (ByteBuf) msg;
-      String data = byteBuf.toString(UTF_8);
-      LOGGER.info("Read data {} from channel", data, ctx.channel());
-      if (readCallback != null) {
-        LOGGER.debug("Calling read callback {}", readCallback);
-        readCallback.accept(data);
-      } else {
-        ctx.fireChannelRead(msg);
-      }
-    }
-  }
-
-  public OvsdbConnectionInfo getConnectionInfo() {
-    return connectionInfo;
+    Bootstrap b = new Bootstrap();
+    b.group(group).channel(NioSocketChannel.class)
+        .option(ChannelOption.TCP_NODELAY, true)
+        .handler(new OvsdbChannelInitializer(sslCtx, connectedFuture, false));
+    b.connect(host, port).channel().closeFuture()
+        .addListener(future -> group.shutdownGracefully());
+    return connectedFuture;
   }
 }

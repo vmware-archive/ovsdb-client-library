@@ -84,14 +84,10 @@ public class OvsdbPassiveConnectionListenerTest {
         getActiveOvsdbServers(expectedConnectionCnt);
 
     activeOvsdbServers.forEach(activeOvsdbServer -> {
-      try {
-        if (sslCtx == null) {
-          activeOvsdbServer.connect(HOST, PORT);
-        } else {
-          activeOvsdbServer.connectWithSsl(HOST, PORT, sslCtx);
-        }
-      } catch (InterruptedException e) {
-        fail(e.getMessage());
+      if (sslCtx == null) {
+        activeOvsdbServer.connect().join();
+      } else {
+        activeOvsdbServer.connectWithSsl(sslCtx).join();
       }
     });
 
@@ -106,12 +102,12 @@ public class OvsdbPassiveConnectionListenerTest {
     getActiveOvsdbServers(expectedConnectionCnt).forEach(activeOvsdbServer -> {
       try {
         if (sslCtx == null) {
-          activeOvsdbServer.connect(HOST, PORT);
+          activeOvsdbServer.connect().join();
         } else {
-          activeOvsdbServer.connectWithSsl(HOST, PORT, sslCtx);
+          activeOvsdbServer.connectWithSsl(sslCtx).join();
         }
         TimeUnit.MILLISECONDS.sleep(100);
-        activeOvsdbServer.disconnect();
+        activeOvsdbServer.disconnect().join();
       } catch (InterruptedException e) {
         fail(e.getMessage());
       }
@@ -120,14 +116,15 @@ public class OvsdbPassiveConnectionListenerTest {
     verifyConnectDisconnectCnt(expectedConnectionCnt);
   }
 
-  private void testWriteInvalidJson(SslContext sslCtx) throws Exception {
+  private void testWriteInvalidJson(SslContext sslCtx) {
     reset(mockConnectionCallback);
     final int expectedConnectionCnt = 1;
-    final ActiveOvsdbServerEmulator activeOvsdbServerEmulator = new ActiveOvsdbServerEmulator();
+    final ActiveOvsdbServerEmulator activeOvsdbServerEmulator =
+        new ActiveOvsdbServerEmulator(HOST, PORT);
     if (sslCtx == null) {
-      activeOvsdbServerEmulator.connect(HOST, PORT);
+      activeOvsdbServerEmulator.connect().join();
     } else {
-      activeOvsdbServerEmulator.connectWithSsl(HOST, PORT, sslCtx);
+      activeOvsdbServerEmulator.connectWithSsl(sslCtx).join();
     }
 
     // Write an invalid Json to the channel. The ExceptionHandler should
@@ -140,14 +137,15 @@ public class OvsdbPassiveConnectionListenerTest {
   private void testChannelTimeout(SslContext sslCtx) throws Exception {
     reset(mockConnectionCallback);
     final int expectedConnectionCnt = 1;
-    final ActiveOvsdbServerEmulator activeOvsdbServerEmulator = new ActiveOvsdbServerEmulator();
+    final ActiveOvsdbServerEmulator activeOvsdbServerEmulator =
+        new ActiveOvsdbServerEmulator(HOST, PORT);
     if (sslCtx == null) {
-      activeOvsdbServerEmulator.connect(HOST, PORT);
+      activeOvsdbServerEmulator.connect().join();
     } else {
-      activeOvsdbServerEmulator.connectWithSsl(HOST, PORT, sslCtx);
+      activeOvsdbServerEmulator.connectWithSsl(sslCtx).join();
     }
 
-    long readIdleTimeout = PropertyManager.getLongProperty("channel.read.idle.timeout.sec", 60);
+    long readIdleTimeout = PropertyManager.getLongProperty("channel.read.idle.timeout.sec", 5);
     int readIdleMax = PropertyManager.getIntProperty("channel.read.idle.max", 3);
     // Wait until the ovsdb manager closes the channel
     TimeUnit.SECONDS.sleep(readIdleTimeout * readIdleMax + 2);
@@ -156,7 +154,7 @@ public class OvsdbPassiveConnectionListenerTest {
   }
 
   private List<ActiveOvsdbServerEmulator> getActiveOvsdbServers(int count) {
-    return IntStream.range(0, count).mapToObj(i -> new ActiveOvsdbServerEmulator())
+    return IntStream.range(0, count).mapToObj(i -> new ActiveOvsdbServerEmulator(HOST, PORT))
         .collect(Collectors.toList());
   }
 

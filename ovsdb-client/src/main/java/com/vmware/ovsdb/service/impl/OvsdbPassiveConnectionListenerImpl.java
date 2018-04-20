@@ -93,12 +93,8 @@ public class OvsdbPassiveConnectionListenerImpl
           .handler(new LoggingHandler(LogLevel.INFO))
           .childHandler(new OvsdbChannelInitializer(
               sslContext, executorService, connectionCallback, true
-          ));
-
-      serverBootstrap.option(
-          ChannelOption.RCVBUF_ALLOCATOR,
-          new AdaptiveRecvByteBufAllocator(65535, 65535, 65535)
-      );
+          )).option(ChannelOption.RCVBUF_ALLOCATOR,
+            new AdaptiveRecvByteBufAllocator(65535, 65535, 65535));
 
       // Start the server.
       ChannelFuture channelFuture = serverBootstrap.bind(port).sync();

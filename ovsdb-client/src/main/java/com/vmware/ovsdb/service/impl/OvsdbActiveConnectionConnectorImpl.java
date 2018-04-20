@@ -66,8 +66,8 @@ public class OvsdbActiveConnectionConnectorImpl implements OvsdbActiveConnection
           .handler(new OvsdbChannelInitializer(
               sslContext, executorService, connectionCallback, false
           ));
-      ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
-      channelFuture.channel().closeFuture().addListener(future -> group.shutdownGracefully());
+      bootstrap.connect(ip, port).sync().channel().closeFuture()
+          .addListener(future -> group.shutdownGracefully());
     } catch (InterruptedException ex) {
       LOGGER.error("Failed to connect to " + ip + ":" + port + " with ssl " + sslContext, ex);
       group.shutdownGracefully();

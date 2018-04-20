@@ -75,7 +75,7 @@ System.out.println(Arrays.toString(dbs));
 From above example we can see the steps of getting an `OvsdbClient` object.
 
 (1) Construct a `OvsdbPassiveConnectionListener`. The `OvsdbPassiveConnectionListenerImpl`
-takes a `ScheduledExecutorService` for asynchronous operations.
+takes a `ScheduledExecutorService` for asynchronous operations.  
 (2) Implement the `ConnectionCallback` interface and construct a callback object.  
 (3) Start listening on the port.  
 (4) Get the `OvsdbClient` object from the callback and use it for operations on the OVSDB server.
