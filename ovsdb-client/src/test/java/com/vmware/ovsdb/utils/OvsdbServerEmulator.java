@@ -16,10 +16,9 @@ package com.vmware.ovsdb.utils;
 
 import static com.google.common.base.Charsets.UTF_8;
 
-import javax.net.ssl.SSLEngine;
-
 import com.vmware.ovsdb.service.OvsdbConnectionInfo;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
@@ -31,12 +30,15 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
-import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import javax.net.ssl.SSLEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
+// TODO: Can we  reuse code in listener and connector?
 public abstract class OvsdbServerEmulator {
 
   private static final Logger LOGGER =
@@ -44,7 +46,7 @@ public abstract class OvsdbServerEmulator {
 
   private Consumer<String> readCallback = null;
 
-  private SocketChannel channel = null;
+  private Channel channel = null;
 
   private OvsdbConnectionInfo connectionInfo = null;
 
@@ -81,13 +83,12 @@ public abstract class OvsdbServerEmulator {
       p.addLast(new JsonObjectDecoder());
       p.addLast(new StringEncoder());
       p.addLast(new OvsdbInboundHandler(connectedFuture));
-      channel = ch;
     }
   }
 
   protected class OvsdbInboundHandler extends ChannelInboundHandlerAdapter {
 
-    private CompletableFuture<Boolean> connectedFuture;
+    private final CompletableFuture<Boolean> connectedFuture;
 
     OvsdbInboundHandler(CompletableFuture<Boolean> connectedFuture) {
       this.connectedFuture = connectedFuture;
@@ -96,7 +97,7 @@ public abstract class OvsdbServerEmulator {
     @Override
     public void channelActive(final ChannelHandlerContext ctx) {
       LOGGER.info("Channel {} is now active", ctx.channel());
-
+      channel = ctx.channel();
       SslHandler sslHandler = ctx.pipeline().get(SslHandler.class);
       if (sslHandler != null) {
         sslHandler.handshakeFuture().addListener(future -> {
@@ -107,6 +108,11 @@ public abstract class OvsdbServerEmulator {
         connectionInfo = OvsdbConnectionInfo.fromChannel(channel);
         connectedFuture.complete(true);
       }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+      connectionInfo = null;
     }
 
     @Override

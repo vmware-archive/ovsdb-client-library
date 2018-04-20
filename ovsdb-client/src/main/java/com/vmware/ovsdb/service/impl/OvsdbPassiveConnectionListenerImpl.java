@@ -14,8 +14,9 @@
 
 package com.vmware.ovsdb.service.impl;
 
+import static com.vmware.ovsdb.netty.OvsdbChannelInitializer.newOvsdbChannelInitializer;
+
 import com.vmware.ovsdb.callback.ConnectionCallback;
-import com.vmware.ovsdb.netty.OvsdbChannelInitializer;
 import com.vmware.ovsdb.service.OvsdbPassiveConnectionListener;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.AdaptiveRecvByteBufAllocator;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -55,63 +57,75 @@ public class OvsdbPassiveConnectionListenerImpl
   }
 
   @Override
-  public void startListening(
+  public CompletableFuture<Boolean> startListening(
       int port, ConnectionCallback connectionCallback
   ) {
-    isListeningCheckWithThrow(port);
-    startListeningOnPort(port, null, connectionCallback);
+    return startListeningOnPort(port, null, connectionCallback);
   }
 
   @Override
-  public void startListeningWithSsl(
+  public CompletableFuture<Boolean> startListeningWithSsl(
       int port, SslContext sslContext, ConnectionCallback connectionCallback
   ) {
-    isListeningCheckWithThrow(port);
-    startListeningOnPort(port, sslContext, connectionCallback);
+    return startListeningOnPort(port, sslContext, connectionCallback);
   }
 
   @Override
-  public void stopListening(int port) {
+  public CompletableFuture<Boolean> stopListening(int port) {
     Channel serverChannel = serverChannelMap.remove(port);
+    CompletableFuture<Boolean> stopFuture = new CompletableFuture<>();
     if (serverChannel != null) {
       LOGGER.info("Closing server channel: {}", serverChannel);
+      serverChannel.closeFuture().addListener(future -> {
+        if (future.isSuccess()) {
+          stopFuture.complete(true);
+        } else {
+          stopFuture.complete(false);
+        }
+        serverStatusMap.remove(port);
+      });
       serverChannel.close();
-      serverStatusMap.remove(port);
+    } else {
+      LOGGER.warn("Port {} is not listening", port);
+      stopFuture.complete(true);
     }
+    return stopFuture;
   }
 
-  private void startListeningOnPort(
+  private CompletableFuture<Boolean> startListeningOnPort(
       int port, final SslContext sslContext, ConnectionCallback connectionCallback
   ) {
+    isListeningCheckWithThrow(port);
     EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
-    try {
-      ServerBootstrap serverBootstrap = new ServerBootstrap();
-      serverBootstrap.group(bossGroup, workerGroup)
-          .channel(NioServerSocketChannel.class)
-          .option(ChannelOption.SO_BACKLOG, 100)
-          .handler(new LoggingHandler(LogLevel.INFO))
-          .childHandler(new OvsdbChannelInitializer(
-              sslContext, executorService, connectionCallback, true
-          )).option(ChannelOption.RCVBUF_ALLOCATOR,
-            new AdaptiveRecvByteBufAllocator(65535, 65535, 65535));
+    ServerBootstrap serverBootstrap = new ServerBootstrap();
+    serverBootstrap.group(bossGroup, workerGroup)
+        .channel(NioServerSocketChannel.class)
+        .option(ChannelOption.SO_BACKLOG, 100)
+        .handler(new LoggingHandler(LogLevel.INFO))
+        .childHandler(newOvsdbChannelInitializer(sslContext, executorService, connectionCallback))
+        .option(ChannelOption.RCVBUF_ALLOCATOR,
+          new AdaptiveRecvByteBufAllocator(65535, 65535, 65535));
 
-      // Start the server.
-      ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
-      serverChannelMap.put(port,  channelFuture.channel());
+    CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
+    ChannelFuture channelFuture = serverBootstrap.bind(port);
+    channelFuture.addListener(future -> {
+      if (future.isSuccess()) {
+        serverChannelMap.put(port,  channelFuture.channel());
+        completableFuture.complete(true);
+      } else {
+        serverStatusMap.remove(port);
+        completableFuture.complete(false);
+      }
+    });
 
-      channelFuture.channel().closeFuture().addListener(future -> {
-        // Shut down all event loops to terminate all threads.
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
-        LOGGER.info("Ovsdb listener at port {} stopped.", port);
-      });
-    } catch (InterruptedException ex) {
-      LOGGER.error("Netty server is interrupted while starting listener at port " + port, ex);
+    channelFuture.channel().closeFuture().addListener(future -> {
       // Shut down all event loops to terminate all threads.
       bossGroup.shutdownGracefully();
       workerGroup.shutdownGracefully();
-    }
+      LOGGER.info("Ovsdb listener at port {} stopped.", port);
+    });
+    return completableFuture;
   }
 
   private void isListeningCheckWithThrow(int port) {

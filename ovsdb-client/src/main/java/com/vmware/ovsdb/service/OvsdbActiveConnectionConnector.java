@@ -14,8 +14,9 @@
 
 package com.vmware.ovsdb.service;
 
-import com.vmware.ovsdb.callback.ConnectionCallback;
 import io.netty.handler.ssl.SslContext;
+
+import java.util.concurrent.CompletableFuture;
 
 public interface OvsdbActiveConnectionConnector {
 
@@ -24,9 +25,10 @@ public interface OvsdbActiveConnectionConnector {
    *
    * @param ip the OVSDB server ip
    * @param port port to which the OVSDB is listening
-   * @param connectionCallback called when the connection is established
+   * @return a {@link CompletableFuture} that will complete with an {@link OvsdbClient}
+   *         object when the connection is established
    */
-  void connect(String ip, int port, ConnectionCallback connectionCallback);
+  CompletableFuture<OvsdbClient> connect(String ip, int port);
 
   /**
    * Connect to the OVSDB server on ip:port with SSL enabled.
@@ -34,9 +36,8 @@ public interface OvsdbActiveConnectionConnector {
    * @param ip the OVSDB server ip
    * @param port port to which the OVSDB is listening
    * @param sslContext the SSL context
-   * @param connectionCallback called when the connection is established
+   * @return a {@link CompletableFuture} that will complete with an {@link OvsdbClient}
+   *         object when the connection is established
    */
-  void connectWithSsl(
-      String ip, int port, SslContext sslContext, ConnectionCallback connectionCallback
-  );
+  CompletableFuture<OvsdbClient> connectWithSsl(String ip, int port, SslContext sslContext);
 }

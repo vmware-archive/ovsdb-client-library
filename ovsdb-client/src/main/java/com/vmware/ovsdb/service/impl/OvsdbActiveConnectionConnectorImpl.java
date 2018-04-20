@@ -14,9 +14,10 @@
 
 package com.vmware.ovsdb.service.impl;
 
-import com.vmware.ovsdb.callback.ConnectionCallback;
-import com.vmware.ovsdb.netty.OvsdbChannelInitializer;
+import static com.vmware.ovsdb.netty.OvsdbChannelInitializer.newOvsdbChannelInitializer;
+
 import com.vmware.ovsdb.service.OvsdbActiveConnectionConnector;
+import com.vmware.ovsdb.service.OvsdbClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -24,17 +25,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 
-// TODO: Integration test for it
 public class OvsdbActiveConnectionConnectorImpl implements OvsdbActiveConnectionConnector {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      MethodHandles.lookup().lookupClass());
 
   private final ScheduledExecutorService executorService;
 
@@ -43,34 +38,26 @@ public class OvsdbActiveConnectionConnectorImpl implements OvsdbActiveConnection
   }
 
   @Override
-  public void connect(String ip, int port, ConnectionCallback connectionCallback) {
-    connectTo(ip, port, null, connectionCallback);
+  public CompletableFuture<OvsdbClient> connect(String ip, int port) {
+    return doConnect(ip, port, null);
   }
 
   @Override
-  public void connectWithSsl(
-      String ip, int port, SslContext sslContext, ConnectionCallback connectionCallback
-  ) {
-    connectTo(ip, port, sslContext, connectionCallback);
+  public CompletableFuture<OvsdbClient> connectWithSsl(String ip, int port, SslContext sslContext) {
+    return doConnect(ip, port, sslContext);
   }
 
-  private void connectTo(
-      String ip, int port, SslContext sslContext, ConnectionCallback connectionCallback
-  ) {
+  private CompletableFuture<OvsdbClient> doConnect(String ip, int port, SslContext sslContext) {
+    CompletableFuture<OvsdbClient> ovsdbClientFuture = new CompletableFuture<>();
     EventLoopGroup group = new NioEventLoopGroup();
-    try {
-      Bootstrap bootstrap = new Bootstrap();
-      bootstrap.group(group)
-          .channel(NioSocketChannel.class)
-          .option(ChannelOption.TCP_NODELAY, true)
-          .handler(new OvsdbChannelInitializer(
-              sslContext, executorService, connectionCallback, false
-          ));
-      bootstrap.connect(ip, port).sync().channel().closeFuture()
-          .addListener(future -> group.shutdownGracefully());
-    } catch (InterruptedException ex) {
-      LOGGER.error("Failed to connect to " + ip + ":" + port + " with ssl " + sslContext, ex);
-      group.shutdownGracefully();
-    }
+    Bootstrap bootstrap = new Bootstrap();
+    bootstrap.group(group)
+        .channel(NioSocketChannel.class)
+        .option(ChannelOption.TCP_NODELAY, true)
+        .handler(newOvsdbChannelInitializer(sslContext, executorService, ovsdbClientFuture));
+    ChannelFuture channelFuture = bootstrap.connect(ip, port);
+    channelFuture.channel().closeFuture()
+        .addListener(future -> group.shutdownGracefully());
+    return ovsdbClientFuture;
   }
 }

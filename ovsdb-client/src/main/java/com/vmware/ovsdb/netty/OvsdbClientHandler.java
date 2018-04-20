@@ -47,9 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,7 +55,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.net.ssl.SSLPeerUnverifiedException;
 
 // TODO: Move the OVSDB logic out of this handler if possible
 class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
@@ -74,6 +70,8 @@ class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
 
   private final ConnectionCallback connectionCallback;
 
+  private final CompletableFuture<OvsdbClient> ovsdbClientFuture;
+
   private final ScheduledExecutorService executorService;
 
   private final ConcurrentMap<String, MonitorCallback> monitorCallbacks = new ConcurrentHashMap<>();
@@ -86,9 +84,37 @@ class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
 
   private OvsdbClient ovsdbClient;
 
+  /**
+   * Create an {@link OvsdbClientHandler} with a connection callback.
+   * This should be called in passive mode.
+   *
+   * @param connectionCallback will be called when there is a new connection
+   * @param executorService a {@link ScheduledExecutorService} used for asynchronous operations
+   */
   OvsdbClientHandler(
       ConnectionCallback connectionCallback, ScheduledExecutorService executorService
   ) {
+    this(null, connectionCallback, executorService);
+  }
+
+  /**
+   * Create an {@link OvsdbClientHandler} with a {@link CompletableFuture}.
+   * This should be called in active mode.
+   *
+   * @param ovsdbClientFuture will complete with an {@link OvsdbClient} after the connection is done
+   * @param executorService a {@link ScheduledExecutorService} used for asynchronous operations
+   */
+  OvsdbClientHandler(
+      CompletableFuture<OvsdbClient> ovsdbClientFuture, ScheduledExecutorService executorService
+  ) {
+    this(ovsdbClientFuture, null, executorService);
+  }
+
+  private OvsdbClientHandler(
+      CompletableFuture<OvsdbClient> ovsdbClientFuture, ConnectionCallback connectionCallback,
+      ScheduledExecutorService executorService
+  ) {
+    this.ovsdbClientFuture = ovsdbClientFuture;
     this.connectionCallback = connectionCallback;
     this.executorService = executorService;
   }
@@ -108,13 +134,15 @@ class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+  public void channelInactive(ChannelHandlerContext ctx) {
     LOGGER.info("Channel {} is now inactive", ctx.channel());
-    executorService.submit(() -> connectionCallback.disconnected(ovsdbClient));
+    if (connectionCallback != null) {
+      executorService.submit(() -> connectionCallback.disconnected(ovsdbClient));
+    }
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
     JsonNode jsonNode = (JsonNode) msg;
     if (isRequestOrNotification(jsonNode)) {
       executorService.submit(() -> {
@@ -180,7 +208,11 @@ class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
 
     ovsdbClient = new OvsdbClientImpl(OvsdbConnectionInfo.fromChannel(channel));
 
-    executorService.submit(() -> connectionCallback.connected(ovsdbClient));
+    if (connectionCallback != null) {
+      executorService.submit(() -> connectionCallback.connected(ovsdbClient));
+    } else {
+      ovsdbClientFuture.complete(ovsdbClient);
+    }
   }
 
   private String getNextId() {

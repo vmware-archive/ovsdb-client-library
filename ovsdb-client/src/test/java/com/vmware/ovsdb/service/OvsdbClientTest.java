@@ -88,32 +88,12 @@ abstract class OvsdbClientTest {
 
   private static final AtomicInteger id = new AtomicInteger(0);
 
-  private final CompletableFuture<OvsdbClient> connectFuture = new CompletableFuture<>();
-
-  private final CompletableFuture<OvsdbClient> disconnectFuture = new CompletableFuture<>();
-
-  final ConnectionCallback connectionCallback = new ConnectionCallback() {
-    @Override
-    public void connected(OvsdbClient ovsdbClient) {
-      connectFuture.complete(ovsdbClient);
-    }
-
-    @Override
-    public void disconnected(OvsdbClient ovsdbClient) {
-      disconnectFuture.complete(ovsdbClient);
-    }
-  };
-
   SelfSignedSslContextPair sslContextPair;
 
-  private OvsdbClient ovsdbClient;
+  OvsdbClient ovsdbClient;
 
   OvsdbClientTest(OvsdbServerEmulator ovsdbServerEmulator) {
     this.ovsdbServerEmulator = ovsdbServerEmulator;
-    disconnectFuture.thenAccept(disconnectClient -> {
-      assertEquals(disconnectClient, ovsdbClient);
-      ovsdbClient = null;
-    });
     try {
       sslContextPair = newSelfSignedSslContextPair();
     } catch (CertificateException | SSLException e) {
@@ -124,7 +104,6 @@ abstract class OvsdbClientTest {
   abstract void setUp(boolean withSsl);
 
   private void testAll() throws IOException, OvsdbClientException {
-    ovsdbClient = connectFuture.join();
     testListDatabases();
     testGetSchema();
     testInsertTransact();
