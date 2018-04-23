@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Result of the "select" operation, which only contains one "row" field.
@@ -44,15 +45,13 @@ public class SelectResult extends OperationResult {
     if (!(other instanceof SelectResult)) {
       return false;
     }
-
     SelectResult that = (SelectResult) other;
-
-    return rows != null ? rows.equals(that.rows) : that.rows == null;
+    return Objects.equals(rows, that.getRows());
   }
 
   @Override
   public int hashCode() {
-    return rows != null ? rows.hashCode() : 0;
+    return Objects.hash(rows);
   }
 
   @Override

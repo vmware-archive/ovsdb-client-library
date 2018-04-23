@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 
+import java.util.Objects;
+
 /**
  * Result of the "insert" operation, which only contains one "uuid" field.
  */
@@ -44,15 +46,14 @@ public class InsertResult extends OperationResult {
     if (!(other instanceof InsertResult)) {
       return false;
     }
-
     InsertResult that = (InsertResult) other;
-
-    return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
+    return Objects.equals(uuid, that.getUuid());
   }
 
   @Override
   public int hashCode() {
-    return uuid != null ? uuid.hashCode() : 0;
+
+    return Objects.hash(uuid);
   }
 
   @Override
