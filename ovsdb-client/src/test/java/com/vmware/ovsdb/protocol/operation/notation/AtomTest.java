@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
 import java.util.UUID;
@@ -53,82 +54,49 @@ public class AtomTest {
   @Test
   public void testSerialization() throws JsonProcessingException {
     // <string>
-    assertEquals(
-        "\"" + string + "\"",
-        JsonUtil.serialize(atomString)
-    );
+    assertEquals("\"" + string + "\"", JsonUtil.serialize(atomString));
 
     // <integer>
-    assertEquals(
-        integer.toString(),
-        JsonUtil.serialize(atomInteger)
-    );
+    assertEquals(integer.toString(), JsonUtil.serialize(atomInteger));
 
     // <real>
-    assertEquals(
-        real.toString(),
-        JsonUtil.serialize(atomReal)
-    );
+    assertEquals(real.toString(), JsonUtil.serialize(atomReal));
 
     // <boolean>
-    assertEquals(
-        bool.toString(),
-        JsonUtil.serialize(atomBoolean)
-    );
+    assertEquals(bool.toString(), JsonUtil.serialize(atomBoolean));
 
     // <uuid>
-    assertEquals(
-        "[\"uuid\",\"" + uuid.getUuid() + "\"]",
-        JsonUtil.serialize(atomUuid)
-    );
+    assertEquals("[\"uuid\",\"" + uuid.getUuid() + "\"]", JsonUtil.serialize(atomUuid));
 
     // <named-uuid>
     assertEquals(
-        "[\"named-uuid\",\"" + namedUuid.getUuidName() + "\"]",
-        JsonUtil.serialize(atomNamedUuid)
+        "[\"named-uuid\",\"" + namedUuid.getUuidName() + "\"]", JsonUtil.serialize(atomNamedUuid)
     );
   }
 
   @Test
   public void testDeserialization() throws IOException {
     // <string>
-    assertEquals(
-        atomString,
-        JsonUtil.deserialize('\"' + string + '\"', Atom.class)
-    );
+    assertEquals(atomString, JsonUtil.deserialize('\"' + string + '\"', Atom.class));
 
     // <integer>
-    assertEquals(
-        atomInteger,
-        JsonUtil.deserialize(integer.toString(), Atom.class)
-    );
+    assertEquals(atomInteger, JsonUtil.deserialize(integer.toString(), Atom.class));
 
     // <real>
-    assertEquals(
-        atomReal,
-        JsonUtil.deserialize(real.toString(), Atom.class)
-    );
+    assertEquals(atomReal, JsonUtil.deserialize(real.toString(), Atom.class));
 
     // <bool>
-    assertEquals(
-        atomBoolean,
-        JsonUtil.deserialize(bool.toString(), Atom.class)
-    );
+    assertEquals(atomBoolean, JsonUtil.deserialize(bool.toString(), Atom.class));
 
     // <uuid>
     assertEquals(
-        atomUuid,
-        JsonUtil.deserialize(
-            "[\"uuid\",\"" + uuid.getUuid() + "\"]", Atom.class)
+        atomUuid, JsonUtil.deserialize("[\"uuid\",\"" + uuid.getUuid() + "\"]", Atom.class)
     );
 
     // <named-uuid>
     assertEquals(
         atomNamedUuid,
-        JsonUtil.deserialize(
-            "[\"named-uuid\",\"" + namedUuid.getUuidName() + "\"]",
-            Atom.class
-        )
+        JsonUtil.deserialize("[\"named-uuid\",\"" + namedUuid.getUuidName() + "\"]", Atom.class)
     );
   }
 
@@ -137,4 +105,20 @@ public class AtomTest {
     JsonUtil.deserialize("[\"set\",[]]", Atom.class);
   }
 
+  @Test
+  public void testEquals() {
+    UUID uuid = UUID.randomUUID();
+    new EqualsTester()
+        .addEqualityGroup(Atom.string("string"), new Atom<>("string"))
+        .addEqualityGroup(Atom.integer(42), new Atom<>(42L))
+        .addEqualityGroup(Atom.real(4.2), new Atom<>(4.2))
+        .addEqualityGroup(Atom.bool(true), new Atom<>(true))
+        .addEqualityGroup(Atom.uuid(Uuid.of(uuid)), Atom.uuid(uuid), new Atom<>(new Uuid(uuid)))
+        .addEqualityGroup(
+            Atom.namedUuid("named-uuid"),
+            Atom.namedUuid(new NamedUuid("named-uuid")),
+            new Atom<>(new NamedUuid("named-uuid"))
+        )
+        .testEquals();
+  }
 }

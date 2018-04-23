@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.methods.deserializer.TableUpdateDeserializer;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @JsonDeserialize(using = TableUpdateDeserializer.class)
@@ -34,13 +35,6 @@ public class TableUpdate {
   }
 
   @Override
-  public int hashCode() {
-    return rowUpdates != null
-        ? rowUpdates.hashCode()
-        : 0;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -48,12 +42,13 @@ public class TableUpdate {
     if (!(other instanceof TableUpdate)) {
       return false;
     }
-
     TableUpdate that = (TableUpdate) other;
+    return Objects.equals(rowUpdates, that.getRowUpdates());
+  }
 
-    return rowUpdates != null
-        ? rowUpdates.equals(that.rowUpdates)
-        : that.rowUpdates == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(rowUpdates);
   }
 
   @Override

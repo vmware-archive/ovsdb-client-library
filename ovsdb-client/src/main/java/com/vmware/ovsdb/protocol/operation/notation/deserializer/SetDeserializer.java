@@ -55,6 +55,10 @@ public class SetDeserializer extends StdDeserializer<Set> {
     }
 
     if (!OvsdbConstant.SET.equals(arrayNode.get(0).asText())) {
+      // This may be a <uuid>
+      if (OvsdbConstant.UUID.equals(arrayNode.get(0).asText())) {
+        return Set.of(JsonUtil.treeToValue(jsonNode, Atom.class));
+      }
       throw new IOException(
           "First element of <set> should be \"" + OvsdbConstant.SET
               + "\"");

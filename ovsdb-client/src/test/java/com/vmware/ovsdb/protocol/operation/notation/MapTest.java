@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
 import org.junit.Test;
@@ -53,5 +55,12 @@ public class MapTest {
   @Test(expected = IOException.class)
   public void testInvalidMap2() throws IOException {
     JsonUtil.deserialize("[\"not-map\",[123, 456]]", Map.class);
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(map, Map.of(ImmutableMap.of("key1", "value1", "key2", "value2")))
+        .testEquals();
   }
 }

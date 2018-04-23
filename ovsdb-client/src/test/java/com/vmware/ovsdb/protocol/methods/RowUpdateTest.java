@@ -12,16 +12,21 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.protocol.operation.notation;
+package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.methods.RowUpdate;
 import java.io.IOException;
 import java.util.Map;
+
+import com.vmware.ovsdb.protocol.operation.notation.Atom;
+import com.vmware.ovsdb.protocol.operation.notation.Row;
+import com.vmware.ovsdb.protocol.operation.notation.Value;
 import org.junit.Test;
 
 public class RowUpdateTest {
@@ -76,6 +81,22 @@ public class RowUpdateTest {
         expectedResult,
         JsonUtil.deserialize(textRowUpdate, RowUpdate.class)
     );
+
+  }
+
+  @Test
+  public void testEquals() {
+    Row oldRow1 = new Row().stringColumn("name", "old_name");
+    Row oldRow2 = new Row(ImmutableMap.of("name", Atom.string("old_name")));
+
+    Row newRow1 = new Row().stringColumn("name", "new_name");
+    Row newRow2 = new Row(ImmutableMap.of("name", Atom.string("new_name")));
+
+    new EqualsTester()
+        .addEqualityGroup(new RowUpdate(), new RowUpdate(null, null))
+        .addEqualityGroup(new RowUpdate(oldRow1, null), new RowUpdate().setOld(oldRow2))
+        .addEqualityGroup(new RowUpdate(null, newRow1), new RowUpdate().setNew(newRow2))
+        .testEquals();
 
   }
 }

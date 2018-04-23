@@ -17,6 +17,7 @@ package com.vmware.ovsdb.protocol.methods;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Representation of {@literal <monitor-request>}.
@@ -31,16 +32,34 @@ import java.util.List;
 public class MonitorRequest {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private List<String> columns;
+  private final List<String> columns;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private MonitorSelect select;
+  private final MonitorSelect select;
 
   /**
    * Create an {@link MonitorRequest} object with all fields being default values.
    */
   public MonitorRequest() {
+    this(null, null);
+  }
 
+  /**
+   * Create an {@link MonitorRequest} object with select being default value.
+   *
+   * @param columns value of the "columns" field
+   */
+  public MonitorRequest(List<String> columns) {
+    this(columns, null);
+  }
+
+  /**
+   * Create an {@link MonitorRequest} object with columns being default value.
+   *
+   * @param select value of the "select" field
+   */
+  public MonitorRequest(MonitorSelect select) {
+    this(null, select);
   }
 
   /**
@@ -58,16 +77,26 @@ public class MonitorRequest {
     return columns;
   }
 
-  public void setColumns(List<String> columns) {
-    this.columns = columns;
-  }
-
   public MonitorSelect getSelect() {
     return select;
   }
 
-  public void setSelect(MonitorSelect select) {
-    this.select = select;
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof MonitorRequest)) {
+      return false;
+    }
+    MonitorRequest that = (MonitorRequest) other;
+    return Objects.equals(columns, that.getColumns())
+        && Objects.equals(select, that.getSelect());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(columns, select);
   }
 
   @Override

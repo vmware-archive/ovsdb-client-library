@@ -27,8 +27,8 @@ public class InsertTest {
 
   @Test
   public void testSerialization() throws JsonProcessingException {
-    Row row = new Row().column("name", Atom.string("ls1"))
-        .column("description", Atom.string("first logical switch"));
+    Row row = new Row().stringColumn("name", "ls1")
+        .stringColumn("description", "first logical switch");
     Insert insert = new Insert("Logical_Switch", row).withId("insert_ls1");
 
     String expectedResult

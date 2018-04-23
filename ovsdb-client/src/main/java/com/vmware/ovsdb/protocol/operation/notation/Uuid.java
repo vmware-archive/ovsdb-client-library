@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.UuidDeserializer;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -26,12 +27,9 @@ import java.util.UUID;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class Uuid {
 
-  public String uuidString = OvsdbConstant.UUID; // For serializing
+  public final String uuidString = OvsdbConstant.UUID; // For serializing
 
-  private UUID uuid;
-
-  public Uuid() {
-  }
+  private final UUID uuid;
 
   public Uuid(UUID uuid) {
     this.uuid = uuid;
@@ -45,17 +43,6 @@ public class Uuid {
     return uuid;
   }
 
-  public void setUuid(UUID uuid) {
-    this.uuid = uuid;
-  }
-
-  @Override
-  public int hashCode() {
-    return uuid != null
-        ? uuid.hashCode()
-        : 0;
-  }
-
   @Override
   public boolean equals(Object other) {
     if (this == other) {
@@ -64,12 +51,13 @@ public class Uuid {
     if (!(other instanceof Uuid)) {
       return false;
     }
+    Uuid that = (Uuid) other;
+    return Objects.equals(uuid, that.getUuid());
+  }
 
-    Uuid uuid1 = (Uuid) other;
-
-    return uuid != null
-        ? uuid.equals(uuid1.uuid)
-        : uuid1.uuid == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(uuidString, uuid);
   }
 
   @Override

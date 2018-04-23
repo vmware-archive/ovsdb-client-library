@@ -19,10 +19,6 @@ package com.vmware.ovsdb.jsonrpc.v1.exception;
  */
 public class JsonRpcTransportException extends JsonRpcException {
 
-  public JsonRpcTransportException() {
-    super();
-  }
-
   public JsonRpcTransportException(String message) {
     super(message);
   }
@@ -31,7 +27,4 @@ public class JsonRpcTransportException extends JsonRpcException {
     super(cause);
   }
 
-  public JsonRpcTransportException(String message, Throwable cause) {
-    super(message, cause);
-  }
 }

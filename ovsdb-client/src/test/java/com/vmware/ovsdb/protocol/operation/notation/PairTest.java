@@ -16,10 +16,12 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
+import java.util.UUID;
+
 import org.junit.Test;
 
 public class PairTest {
@@ -50,5 +52,15 @@ public class PairTest {
   public void testInvalidPair2() throws IOException {
     String jsonString = "[\"string\"]";
     JsonUtil.deserialize(jsonString, Pair.class);
+  }
+
+  @Test
+  public void testEquals() {
+    UUID uuid = UUID.randomUUID();
+    new EqualsTester()
+        .addEqualityGroup(
+            new Pair<>(Atom.string("uuid"), Atom.uuid(uuid)),
+            new Pair<>(new Atom<>("uuid"), new Atom<>(Uuid.of(uuid)))
+        ).testEquals();
   }
 }

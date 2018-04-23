@@ -14,6 +14,7 @@
 
 package com.vmware.ovsdb.service;
 
+import static com.vmware.ovsdb.protocol.util.OvsdbConstant.LOCK;
 import static com.vmware.ovsdb.utils.SslUtil.newSelfSignedSslContextPair;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.vmware.ovsdb.callback.ConnectionCallback;
+import com.vmware.ovsdb.callback.LockCallback;
 import com.vmware.ovsdb.callback.MonitorCallback;
 import com.vmware.ovsdb.exception.OvsdbClientException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
@@ -497,6 +499,16 @@ abstract class OvsdbClientTest {
     OperationResult[] expectedResult = new OperationResult[3];
     expectedResult[0] = new ErrorResult("resources exhausted", null);
     assertArrayEquals(expectedResult, f.join());
+  }
+
+  private void testLock() throws OvsdbClientException {
+    String lockId1 = "lock-1";
+    LockCallback lockCallback = mock(LockCallback.class);
+    String expectedRequest = getJsonRequestString(LOCK, lockId1);
+
+    setupOvsdbEmulator(expectedRequest, "{\"locked\":true}", null);
+
+    ovsdbClient.lock(lockId1, lockCallback).join();
   }
 
   private void setupOvsdbEmulator(

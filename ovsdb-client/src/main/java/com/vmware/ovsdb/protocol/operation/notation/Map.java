@@ -20,6 +20,7 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.MapDeserializer
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(using = MapDeserializer.class)
 public class Map<K, V> extends Value {
 
-  public String mapString = OvsdbConstant.MAP; // For serializing
+  public final String mapString = OvsdbConstant.MAP; // For serializing
 
   private List<Pair<K, V>> pairs;
 
@@ -71,15 +72,6 @@ public class Map<K, V> extends Value {
     return pairs;
   }
 
-  public void setPairs(List<Pair<K, V>> pairs) {
-    this.pairs = pairs;
-  }
-
-  @Override
-  public int hashCode() {
-    return pairs != null ? pairs.hashCode() : 0;
-  }
-
   @Override
   public boolean equals(Object other) {
     if (this == other) {
@@ -88,12 +80,13 @@ public class Map<K, V> extends Value {
     if (!(other instanceof Map)) {
       return false;
     }
+    Map<?, ?> that = (Map<?, ?>) other;
+    return Objects.equals(pairs, that.getPairs());
+  }
 
-    Map<?, ?> map = (Map<?, ?>) other;
-
-    return pairs != null
-        ? pairs.equals(map.pairs)
-        : map.pairs == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(mapString, pairs);
   }
 
   @Override

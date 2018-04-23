@@ -12,20 +12,22 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.protocol.operation.notation;
+package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
-
 import com.google.common.collect.ImmutableMap;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
-import com.vmware.ovsdb.protocol.methods.RowUpdate;
-import com.vmware.ovsdb.protocol.methods.TableUpdate;
-import com.vmware.ovsdb.protocol.methods.TableUpdates;
+import com.vmware.ovsdb.protocol.operation.notation.Atom;
+import com.vmware.ovsdb.protocol.operation.notation.Row;
+import com.vmware.ovsdb.protocol.operation.notation.Set;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
-import org.junit.Test;
 
 public class TableUpdatesTest {
 
@@ -80,5 +82,22 @@ public class TableUpdatesTest {
         expectedResult,
         JsonUtil.deserialize(textTableUpdates, TableUpdates.class)
     );
+  }
+
+  @Test
+  public void testEquals() {
+    Map<String, TableUpdate> tableUpdateMap1 = ImmutableMap.of(
+        "Physical_Switch", new TableUpdate(
+            ImmutableMap.of(
+                UUID.randomUUID(), new RowUpdate().setOld(new Row().stringColumn("name", "ps1"))
+            )
+        )
+    );
+    TableUpdates tableUpdates1 = new TableUpdates(tableUpdateMap1);
+
+    Map<String, TableUpdate> tableUpdateMap2 = new TreeMap<>(tableUpdateMap1);
+    TableUpdates tableUpdates2 = new TableUpdates(tableUpdateMap2);
+
+    new EqualsTester().addEqualityGroup(tableUpdates1, tableUpdates2).testEquals();
   }
 }

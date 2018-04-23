@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.methods;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
 
+import java.util.Objects;
+
 public class RowUpdate {
 
   private Row oldRow;
@@ -36,27 +38,18 @@ public class RowUpdate {
     return oldRow;
   }
 
-  public void setOld(Row oldRow) {
+  public RowUpdate setOld(Row oldRow) {
     this.oldRow = oldRow;
+    return this;
   }
 
   public Row getNew() {
     return newRow;
   }
 
-  public void setNew(Row newRow) {
+  public RowUpdate setNew(Row newRow) {
     this.newRow = newRow;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = oldRow != null
-        ? oldRow.hashCode()
-        : 0;
-    result = 31 * result + (newRow != null
-        ? newRow.hashCode()
-        : 0);
-    return result;
+    return this;
   }
 
   @Override
@@ -67,17 +60,14 @@ public class RowUpdate {
     if (!(other instanceof RowUpdate)) {
       return false;
     }
-
     RowUpdate rowUpdate = (RowUpdate) other;
+    return Objects.equals(oldRow, rowUpdate.getOld())
+        && Objects.equals(newRow, rowUpdate.getNew());
+  }
 
-    if (oldRow != null
-        ? !oldRow.equals(rowUpdate.oldRow)
-        : rowUpdate.oldRow != null) {
-      return false;
-    }
-    return newRow != null
-        ? newRow.equals(rowUpdate.newRow)
-        : rowUpdate.newRow == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(oldRow, newRow);
   }
 
   @Override

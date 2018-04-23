@@ -16,10 +16,6 @@ package com.vmware.ovsdb.exception;
 
 public class OvsdbClientException extends Exception {
 
-  public OvsdbClientException() {
-    super();
-  }
-
   public OvsdbClientException(String message) {
     super(message);
   }
@@ -28,7 +24,4 @@ public class OvsdbClientException extends Exception {
     super(cause);
   }
 
-  public OvsdbClientException(String message, Throwable cause) {
-    super(message, cause);
-  }
 }

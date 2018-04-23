@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.ConditionDeserializer;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <condition>}.
  *
@@ -110,20 +112,6 @@ public class Condition {
   }
 
   @Override
-  public int hashCode() {
-    int result = column != null
-        ? column.hashCode()
-        : 0;
-    result = 31 * result + (function != null
-        ? function.hashCode()
-        : 0);
-    result = 31 * result + (value != null
-        ? value.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -131,20 +119,15 @@ public class Condition {
     if (!(other instanceof Condition)) {
       return false;
     }
-
     Condition condition = (Condition) other;
+    return Objects.equals(column, condition.getColumn())
+        && function == condition.getFunction()
+        && Objects.equals(value, condition.getValue());
+  }
 
-    if (column != null
-        ? !column.equals(condition.column)
-        : condition.column != null) {
-      return false;
-    }
-    if (function != condition.function) {
-      return false;
-    }
-    return value != null
-        ? value.equals(condition.value)
-        : condition.value == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(column, function, value);
   }
 
   @Override

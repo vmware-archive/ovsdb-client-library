@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.AtomDeserializer;
 import com.vmware.ovsdb.protocol.operation.notation.serializer.AtomSerializer;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -78,17 +79,6 @@ public class Atom<T> extends Value {
     return value;
   }
 
-  public void setValue(T value) {
-    this.value = value;
-  }
-
-  @Override
-  public int hashCode() {
-    return value != null
-        ? value.hashCode()
-        : 0;
-  }
-
   @Override
   public boolean equals(Object other) {
     if (this == other) {
@@ -97,12 +87,13 @@ public class Atom<T> extends Value {
     if (!(other instanceof Atom)) {
       return false;
     }
-
     Atom<?> atom = (Atom<?>) other;
+    return Objects.equals(value, atom.getValue());
+  }
 
-    return value != null
-        ? value.equals(atom.value)
-        : atom.value == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
   }
 
   @Override

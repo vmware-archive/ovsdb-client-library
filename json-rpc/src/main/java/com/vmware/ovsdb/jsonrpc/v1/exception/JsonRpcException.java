@@ -19,10 +19,6 @@ package com.vmware.ovsdb.jsonrpc.v1.exception;
  */
 public class JsonRpcException extends Exception {
 
-  public JsonRpcException() {
-    super();
-  }
-
   public JsonRpcException(String message) {
     super(message);
   }

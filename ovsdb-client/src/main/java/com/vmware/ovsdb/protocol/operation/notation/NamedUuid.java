@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.NamedUuidDeserializer;
 import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <named-uuid>}.
  *
@@ -48,9 +50,9 @@ import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class NamedUuid {
 
-  public String namedUuidString = OvsdbConstant.NAMED_UUID; // For serializing
+  public final String namedUuidString = OvsdbConstant.NAMED_UUID; // For serializing
 
-  private String uuidName;
+  private final String uuidName;
 
   public NamedUuid(String uuidName) {
     this.uuidName = uuidName;
@@ -58,17 +60,6 @@ public class NamedUuid {
 
   public String getUuidName() {
     return uuidName;
-  }
-
-  public void setUuidName(String uuidName) {
-    this.uuidName = uuidName;
-  }
-
-  @Override
-  public int hashCode() {
-    return uuidName != null
-        ? uuidName.hashCode()
-        : 0;
   }
 
   @Override
@@ -79,12 +70,13 @@ public class NamedUuid {
     if (!(other instanceof NamedUuid)) {
       return false;
     }
+    NamedUuid that = (NamedUuid) other;
+    return Objects.equals(uuidName, that.uuidName);
+  }
 
-    NamedUuid namedUuid1 = (NamedUuid) other;
-
-    return uuidName != null
-        ? uuidName.equals(namedUuid1.uuidName)
-        : namedUuid1.uuidName == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(namedUuidString, uuidName);
   }
 
   @Override

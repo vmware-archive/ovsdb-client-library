@@ -19,19 +19,8 @@ package com.vmware.ovsdb.jsonrpc.v1.exception;
  */
 public class JsonRpcConnectionClosedException extends JsonRpcException {
 
-  public JsonRpcConnectionClosedException() {
-    super();
-  }
-
   public JsonRpcConnectionClosedException(String message) {
     super(message);
   }
 
-  public JsonRpcConnectionClosedException(Throwable cause) {
-    super(cause);
-  }
-
-  public JsonRpcConnectionClosedException(String message, Throwable cause) {
-    super(message, cause);
-  }
 }

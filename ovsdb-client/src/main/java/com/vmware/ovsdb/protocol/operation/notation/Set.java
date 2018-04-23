@@ -21,6 +21,7 @@ import com.vmware.ovsdb.protocol.util.OvsdbConstant;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -46,9 +47,9 @@ import java.util.stream.Collectors;
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class Set extends Value {
 
-  public String setString = OvsdbConstant.SET; // For serializing
+  public final String setString = OvsdbConstant.SET; // For serializing
 
-  private java.util.Set<Atom> set;
+  private final java.util.Set<Atom> set;
 
   public Set() {
     this(new HashSet<>());
@@ -76,33 +77,11 @@ public class Set extends Value {
     if (set == null) {
       return null;
     }
-    return new Set(
-        set.stream().map(Atom::new).collect(
-            Collectors.toSet())
-    );
+    return new Set(set.stream().map(Atom::new).collect(Collectors.toSet()));
   }
 
   public java.util.Set<Atom> getSet() {
     return set;
-  }
-
-  public void setSet(java.util.Set<Atom> set) {
-    this.set = set;
-  }
-
-  public void addValue(Atom value) {
-    set.add(value);
-  }
-
-  public void removeValue(Atom value) {
-    set.remove(value);
-  }
-
-  @Override
-  public int hashCode() {
-    return set != null
-        ? set.hashCode()
-        : 0;
   }
 
   @Override
@@ -113,12 +92,14 @@ public class Set extends Value {
     if (!(other instanceof Set)) {
       return false;
     }
+    Set that = (Set) other;
+    return Objects.equals(set, that.getSet());
+  }
 
-    Set uuid1 = (Set) other;
+  @Override
+  public int hashCode() {
 
-    return set != null
-        ? set.equals(uuid1.set)
-        : uuid1.set == null;
+    return Objects.hash(setString, set);
   }
 
   @Override

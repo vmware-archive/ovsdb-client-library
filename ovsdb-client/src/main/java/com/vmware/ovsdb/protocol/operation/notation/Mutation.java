@@ -16,6 +16,8 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <mutation>}.
  *
@@ -116,6 +118,25 @@ public class Mutation {
 
   public Value getValue() {
     return value;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Mutation)) {
+      return false;
+    }
+    Mutation mutation = (Mutation) other;
+    return Objects.equals(column, mutation.getColumn())
+        && mutator == mutation.getMutator()
+        && Objects.equals(value, mutation.getValue());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(column, mutator, value);
   }
 
   @Override

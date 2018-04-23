@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
 import org.junit.Test;
@@ -55,5 +56,12 @@ public class NamedUuidTest {
     String json = "[\"" + uuidName + "\"]";
 
     JsonUtil.deserialize(json, NamedUuid.class);
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(new NamedUuid("uuid-name"), new NamedUuid("uuid-name"))
+        .testEquals();
   }
 }
