@@ -37,8 +37,8 @@ public class WaitTest {
     );
     List<String> columns = ImmutableList.of("name", "description");
     List<Row> rows = ImmutableList.of(
-        new Row().column("name", Atom.string("ls1"))
-            .column("description", Atom.string("First Logical Switch"))
+        new Row().stringColumn("name", "ls1")
+            .stringColumn("description", "First Logical Switch")
     );
     Wait wait = new Wait(
         "Logical_Switch", timeout, where, columns, "==", rows);

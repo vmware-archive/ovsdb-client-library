@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
 import org.junit.Test;
@@ -54,5 +55,13 @@ public class ConditionTest {
   @Test(expected = IOException.class)
   public void testInvalidCondition1() throws IOException {
     JsonUtil.deserialize("[\"name\"]", Condition.class);
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(new Condition("name", Function.EQUALS, Atom.string("name1")),
+            new Condition("name", Function.EQUALS, new Atom<>("name1")))
+        .testEquals();
   }
 }

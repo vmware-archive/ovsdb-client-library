@@ -12,16 +12,16 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.protocol.operation.result;
+package com.vmware.ovsdb.protocol.methods;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
-import com.vmware.ovsdb.protocol.methods.LockResult;
-import java.io.IOException;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class LockResultTest {
 
@@ -42,5 +42,13 @@ public class LockResultTest {
   public void testInvalidResult() throws IOException {
     String json = "{\"locked\":t}";
     JsonUtil.deserialize(json, LockResult.class);
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(new LockResult(true), new LockResult(true))
+        .addEqualityGroup(new LockResult(false), new LockResult(false))
+        .testEquals();
   }
 }

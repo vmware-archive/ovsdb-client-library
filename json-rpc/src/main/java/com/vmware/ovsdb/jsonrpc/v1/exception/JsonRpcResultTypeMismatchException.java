@@ -19,18 +19,6 @@ package com.vmware.ovsdb.jsonrpc.v1.exception;
  */
 public class JsonRpcResultTypeMismatchException extends JsonRpcException {
 
-  public JsonRpcResultTypeMismatchException() {
-    super();
-  }
-
-  public JsonRpcResultTypeMismatchException(String message) {
-    super(message);
-  }
-
-  public JsonRpcResultTypeMismatchException(Throwable cause) {
-    super(cause);
-  }
-
   public JsonRpcResultTypeMismatchException(String message, Throwable cause) {
     super(message, cause);
   }

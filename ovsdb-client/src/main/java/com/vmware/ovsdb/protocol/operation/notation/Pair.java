@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.deserializer.PairDeserializer;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <pair>}.
  *
@@ -34,14 +36,9 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.PairDeserialize
 @JsonDeserialize(using = PairDeserializer.class)
 public class Pair<K, V> {
 
-  private Atom<K> key;
+  private final Atom<K> key;
 
-  private Atom<V> value;
-
-  public Pair(K key, V value) {
-    this.key = new Atom<>(key);
-    this.value = new Atom<>(value);
-  }
+  private final Atom<V> value;
 
   public Pair(Atom<K> key, Atom<V> value) {
     this.key = key;
@@ -52,27 +49,8 @@ public class Pair<K, V> {
     return key;
   }
 
-  public void setKey(Atom<K> key) {
-    this.key = key;
-  }
-
   public Atom<V> getValue() {
     return value;
-  }
-
-  public void setValue(Atom<V> value) {
-    this.value = value;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = key != null
-        ? key.hashCode()
-        : 0;
-    result = 31 * result + (value != null
-        ? value.hashCode()
-        : 0);
-    return result;
   }
 
   @Override
@@ -83,17 +61,14 @@ public class Pair<K, V> {
     if (!(other instanceof Pair)) {
       return false;
     }
+    Pair<?, ?> that = (Pair<?, ?>) other;
+    return Objects.equals(key, that.getKey())
+        && Objects.equals(value, that.getValue());
+  }
 
-    Pair<?, ?> pair = (Pair<?, ?>) other;
-
-    if (key != null
-        ? !key.equals(pair.key)
-        : pair.key != null) {
-      return false;
-    }
-    return value != null
-        ? value.equals(pair.value)
-        : pair.value == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(key, value);
   }
 
   @Override

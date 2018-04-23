@@ -16,54 +16,70 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
+import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
-import java.io.IOException;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class RowTest {
 
+  private final UUID uuid = UUID.randomUUID();
+
+  private final Row row = new Row()
+      .stringColumn("string_column", "A string")
+      .integerColumn("integer_column", 42L)
+      .boolColumn("bool_column", true)
+      .uuidColumn("uuid_column", uuid)
+      .namedUuidColumn("named-uuid", "uuid-name")
+      .mapColumn("map_column", ImmutableMap.of("key", "value"))
+      .setColumn("set_column", ImmutableSet.of("value1", "value2"));
+
+  private final String jsonString = "{\"string_column\":\"A string\","
+      + "\"integer_column\":42,\"bool_column\":true,\"uuid_column\":[\"uuid\",\"" + uuid + "\"],"
+      + "\"named-uuid\":[\"named-uuid\",\"uuid-name\"],"
+      + "\"map_column\":[\"map\",[[\"key\",\"value\"]]],"
+      + "\"set_column\":[\"set\",[\"value1\",\"value2\"]]}";
+
   @Test
   public void testSerialization() throws JsonProcessingException {
-    String expectedResult
-        = "{\"name\":\"ls1\",\"description\":\"First Logical Switch\","
-        + "\"tunnel_key\":5001}";
-
-    Row row = new Row().column("name", Atom.string("ls1"))
-        .column("description", Atom.string("First Logical Switch"))
-        .column("tunnel_key", Atom.integer(5001));
-
-    assertEquals(expectedResult, JsonUtil.serialize(row));
-
-    row = new Row(ImmutableMap.of(
-        "name", Atom.string("ls1"),
-        "description", Atom.string("First Logical Switch"),
-        "tunnel_key", Atom.integer(5001)
-    ));
-
-    assertEquals(expectedResult, JsonUtil.serialize(row));
+    // Note: the serialized row may not preserve the order
+    String serializedRow = JsonUtil.serialize(row);
+    assertTrue(serializedRow.contains("\"string_column\":\"A string\""));
+    assertTrue(serializedRow.contains("\"integer_column\":42"));
+    assertTrue(serializedRow.contains("\"bool_column\":true"));
+    assertTrue(serializedRow.contains("\"uuid_column\":[\"uuid\",\"" + uuid + "\"]"));
+    assertTrue(serializedRow.contains("\"named-uuid\":[\"named-uuid\",\"uuid-name\"]"));
+    assertTrue(serializedRow.contains("\"map_column\":[\"map\",[[\"key\",\"value\"]]]"));
+    assertTrue(serializedRow.contains("\"set_column\":[\"set\",[\"value2\",\"value1\"]]"));
   }
 
   @Test
   public void testDeserialization() throws IOException {
-    Row expectedResult = new Row().column("name", Atom.string("ls1"))
-        .column("description", Atom.string("First Logical Switch"))
-        .column("tunnel_key", Atom.integer(5001));
+    Row deserialized = JsonUtil.deserialize(jsonString, Row.class);
+    assertEquals(row, deserialized);
 
-    String textRow = JsonUtil.serialize(expectedResult.getColumns());
-
-    assertEquals(
-        expectedResult, JsonUtil.deserialize(textRow, Row.class));
+    assertEquals("A string", deserialized.getStringColumn("string_column"));
+    assertEquals(new Long(42), deserialized.getIntegerColumn("integer_column"));
+    assertEquals(Boolean.TRUE, deserialized.getBooleanColumn("bool_column"));
+    assertEquals(new Uuid(uuid), deserialized.getUuidColumn("uuid_column"));
+    assertEquals(ImmutableMap.of("key", "value"), deserialized.getMapColumn("map_column"));
+    assertEquals(ImmutableSet.of("value1", "value2"), deserialized.getSetColumn("set_column"));
   }
 
   @Test
   public void testDeserialization2() throws IOException {
     Row expectedResult = new Row()
         .stringColumn("name", "ls1")
-        .mapColumn("vlan_stats", null);
+        .mapColumn("vlan_stats", null)
+        .setColumn("set_column", null);
 
     String textRow = JsonUtil.serialize(expectedResult.getColumns());
 
@@ -71,5 +87,20 @@ public class RowTest {
 
     assertEquals("ls1", row.getStringColumn("name"));
     assertNull(row.getMapColumn("vlan_stats"));
+    assertNull(row.getSetColumn("set_column"));
+  }
+
+  @Test
+  public void testEquals() {
+    java.util.Map<String, Value> columns = new HashMap<>();
+    columns.put("string_column", Atom.string("A string"));
+    columns.put("integer_column", Atom.integer(42));
+    columns.put("bool_column", Atom.bool(true));
+    columns.put("uuid_column", Atom.uuid(uuid));
+    columns.put("named-uuid", Atom.namedUuid("uuid-name"));
+    columns.put("map_column", Map.of(ImmutableMap.of("key", "value")));
+    columns.put("set_column", Set.of("value1", "value2"));
+
+    new EqualsTester().addEqualityGroup(row, new Row(columns)).testEquals();
   }
 }

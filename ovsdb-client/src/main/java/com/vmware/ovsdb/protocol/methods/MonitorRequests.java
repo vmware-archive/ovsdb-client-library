@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vmware.ovsdb.protocol.operation.notation.serializer.MonitorRequestsSerializer;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The {@literal <monitor-requests>} object maps the name of the table to be monitored to an array
@@ -34,6 +35,23 @@ public class MonitorRequests {
 
   public Map<String, MonitorRequest> getMonitorRequests() {
     return monitorRequests;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof MonitorRequests)) {
+      return false;
+    }
+    MonitorRequests that = (MonitorRequests) other;
+    return Objects.equals(monitorRequests, that.getMonitorRequests());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(monitorRequests);
   }
 
   @Override

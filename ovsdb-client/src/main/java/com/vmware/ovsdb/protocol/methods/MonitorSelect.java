@@ -16,6 +16,8 @@ package com.vmware.ovsdb.protocol.methods;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <monitor-select>}.
  *
@@ -64,36 +66,60 @@ public class MonitorSelect {
     this.modify = modify;
   }
 
-  public Boolean isInitial() {
+  public Boolean getInitial() {
     return initial;
   }
 
-  public void setInitial(Boolean initial) {
+  public MonitorSelect setInitial(Boolean initial) {
     this.initial = initial;
+    return this;
   }
 
-  public Boolean isInsert() {
+  public Boolean getInsert() {
     return insert;
   }
 
-  public void setInsert(Boolean insert) {
+  public MonitorSelect setInsert(Boolean insert) {
     this.insert = insert;
+    return this;
   }
 
-  public Boolean isDelete() {
+  public Boolean getDelete() {
     return delete;
   }
 
-  public void setDelete(Boolean delete) {
+  public MonitorSelect setDelete(Boolean delete) {
     this.delete = delete;
+    return this;
   }
 
-  public Boolean isModify() {
+  public Boolean getModify() {
     return modify;
   }
 
-  public void setModify(Boolean modify) {
+  public MonitorSelect setModify(Boolean modify) {
     this.modify = modify;
+    return this;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof MonitorSelect)) {
+      return false;
+    }
+    MonitorSelect that = (MonitorSelect) other;
+    return Objects.equals(initial, that.getInitial())
+        && Objects.equals(insert, that.getInsert())
+        && Objects.equals(delete, that.getDelete())
+        && Objects.equals(modify, that.getModify());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(initial, insert, delete, modify);
   }
 
   @Override

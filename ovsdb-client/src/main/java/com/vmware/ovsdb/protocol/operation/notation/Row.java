@@ -20,6 +20,8 @@ import com.vmware.ovsdb.protocol.operation.notation.deserializer.RowDeserializer
 import com.vmware.ovsdb.protocol.operation.notation.serializer.RowSerializer;
 
 import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -52,11 +54,7 @@ public class Row {
     return columns;
   }
 
-  public void setColumns(java.util.Map<String, Value> columns) {
-    this.columns = columns;
-  }
-
-  public Row column(String name, Value value) {
+  private Row column(String name, Value value) {
     columns.put(name, value);
     return this;
   }
@@ -73,7 +71,7 @@ public class Row {
     return column(name, Atom.bool(bool));
   }
 
-  public Row uuidColumn(String name, Uuid uuid) {
+  public Row uuidColumn(String name, UUID uuid) {
     return column(name, Atom.uuid(uuid));
   }
 
@@ -110,7 +108,7 @@ public class Row {
    * @param name column name
    * @return the value from the column
    */
-  public Long getNumberColumn(String name) {
+  public Long getIntegerColumn(String name) {
     return getAtomColumn(name);
   }
 
@@ -167,13 +165,6 @@ public class Row {
   }
 
   @Override
-  public int hashCode() {
-    return columns != null
-        ? columns.hashCode()
-        : 0;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -181,12 +172,13 @@ public class Row {
     if (!(other instanceof Row)) {
       return false;
     }
+    Row that = (Row) other;
+    return Objects.equals(columns, that.getColumns());
+  }
 
-    Row row = (Row) other;
-
-    return columns != null
-        ? columns.equals(row.columns)
-        : row.columns == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(columns);
   }
 
   @Override

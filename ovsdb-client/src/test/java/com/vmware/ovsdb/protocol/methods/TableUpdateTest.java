@@ -12,19 +12,21 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.protocol.operation.notation;
+package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
-
 import com.google.common.collect.ImmutableMap;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
-import com.vmware.ovsdb.protocol.methods.RowUpdate;
-import com.vmware.ovsdb.protocol.methods.TableUpdate;
+import com.vmware.ovsdb.protocol.operation.notation.Atom;
+import com.vmware.ovsdb.protocol.operation.notation.Row;
+import org.junit.Test;
+
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.junit.Test;
 
 public class TableUpdateTest {
 
@@ -54,5 +56,22 @@ public class TableUpdateTest {
         expectedResult,
         JsonUtil.deserialize(textTableUpdate, TableUpdate.class)
     );
+  }
+
+  @Test
+  public void testEquals() {
+    UUID uuid = UUID.randomUUID();
+    RowUpdate rowUpdate1 = new RowUpdate(
+        null, new Row(ImmutableMap.of("name", Atom.string("ps1")))
+    );
+    Map<UUID, RowUpdate> rowUpdates1 = ImmutableMap.of(uuid, rowUpdate1);
+
+    RowUpdate rowUpdate2 = new RowUpdate().setNew(new Row().stringColumn("name", "ps1"));
+    Map<UUID, RowUpdate> rowUpdates2= new HashMap<>();
+    rowUpdates2.put(uuid, rowUpdate2);
+
+    new EqualsTester()
+        .addEqualityGroup(new TableUpdate(rowUpdates1), new TableUpdate(rowUpdates2))
+        .testEquals();
   }
 }

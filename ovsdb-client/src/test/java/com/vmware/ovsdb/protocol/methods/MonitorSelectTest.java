@@ -18,8 +18,12 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MonitorSelectTest {
 
@@ -41,5 +45,25 @@ public class MonitorSelectTest {
     monitorSelect = new MonitorSelect();
 
     assertEquals(expectedResult, JsonUtil.serialize(monitorSelect));
+  }
+
+  @Test
+  public void testEquals() {
+    EqualsTester equalsTester = new EqualsTester();
+    Boolean[] booleans = {null, true, false};
+    for (Boolean initial : booleans) {
+      for (Boolean insert : booleans) {
+        for (Boolean delete : booleans) {
+          for (Boolean modify : booleans) {
+            equalsTester.addEqualityGroup(
+                new MonitorSelect(initial, insert, delete, modify),
+                new MonitorSelect().setInitial(initial).setInsert(insert)
+                    .setDelete(delete).setModify(modify)
+            );
+          }
+        }
+      }
+    }
+    equalsTester.testEquals();
   }
 }

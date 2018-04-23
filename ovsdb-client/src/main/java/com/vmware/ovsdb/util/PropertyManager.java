@@ -28,7 +28,7 @@ public class PropertyManager {
 
   private static final Properties properties = new Properties();
 
-  private static final String PROPERTY_FILE_NAME = "ovsdb-client-library.properties";
+  private static final String PROPERTY_FILE_NAME = "ovsdb-client.properties";
 
   static {
     try {

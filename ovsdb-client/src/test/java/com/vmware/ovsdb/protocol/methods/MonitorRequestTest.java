@@ -16,11 +16,15 @@ package com.vmware.ovsdb.protocol.methods;
 
 import static org.junit.Assert.assertEquals;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MonitorRequestTest {
 
@@ -30,11 +34,13 @@ public class MonitorRequestTest {
     MonitorRequest monitorRequest = new MonitorRequest();
     assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
 
+    // Empty columns and select
     expectedResult = "{\"columns\":[],\"select\":{}}";
     monitorRequest = new MonitorRequest(
         ImmutableList.of(), new MonitorSelect());
     assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
 
+    // Non-empty columns and select
     expectedResult
         = "{\"columns\":[\"name\",\"description\"],"
         + "\"select\":{\"initial\":true}}";
@@ -43,5 +49,34 @@ public class MonitorRequestTest {
         new MonitorSelect(true, null, null, null)
     );
     assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
+
+    // No columns field
+    expectedResult
+        = "{\"select\":{\"initial\":true}}";
+    monitorRequest = new MonitorRequest(new MonitorSelect().setInitial(true));
+    assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
+
+    // No select field
+    expectedResult
+        = "{\"columns\":[\"name\",\"description\"]}";
+    monitorRequest = new MonitorRequest(
+        ImmutableList.of("name", "description")
+    );
+    assertEquals(expectedResult, JsonUtil.serialize(monitorRequest));
+  }
+
+  @Test
+  public void testEquals() {
+    List<String> columns1 = ImmutableList.of("column1", "column2");
+    List<String> columns2 = Stream.of("column1", "column2").collect(Collectors.toList());
+    MonitorSelect monitorSelect1 = new MonitorSelect().setInitial(true).setInsert(false);
+    MonitorSelect monitorSelect2 = new MonitorSelect(true, false, null, null);
+
+    new EqualsTester()
+        .addEqualityGroup(new MonitorRequest(), new MonitorRequest(null, null))
+        .addEqualityGroup(new MonitorRequest(columns1), new MonitorRequest(columns2, null))
+        .addEqualityGroup(new MonitorRequest(columns1, monitorSelect1),
+            new MonitorRequest(columns2, monitorSelect2))
+        .testEquals();
   }
 }

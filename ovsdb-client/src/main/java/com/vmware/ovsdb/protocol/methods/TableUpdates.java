@@ -18,27 +18,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.methods.deserializer.TableUpdatesDeserializer;
 
 import java.util.Map;
+import java.util.Objects;
 
 @JsonDeserialize(using = TableUpdatesDeserializer.class)
 public class TableUpdates {
 
   private final Map<String, TableUpdate> tableUpdates;
 
-  public TableUpdates(
-      Map<String, TableUpdate> tableUpdates
-  ) {
+  public TableUpdates(Map<String, TableUpdate> tableUpdates) {
     this.tableUpdates = tableUpdates;
   }
 
   public Map<String, TableUpdate> getTableUpdates() {
     return tableUpdates;
-  }
-
-  @Override
-  public int hashCode() {
-    return tableUpdates != null
-        ? tableUpdates.hashCode()
-        : 0;
   }
 
   @Override
@@ -49,12 +41,13 @@ public class TableUpdates {
     if (!(other instanceof TableUpdates)) {
       return false;
     }
-
     TableUpdates that = (TableUpdates) other;
+    return Objects.equals(tableUpdates, that.getTableUpdates());
+  }
 
-    return tableUpdates != null
-        ? tableUpdates.equals(that.tableUpdates)
-        : that.tableUpdates == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(tableUpdates);
   }
 
   @Override

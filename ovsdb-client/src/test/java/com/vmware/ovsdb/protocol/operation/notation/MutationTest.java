@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
@@ -38,5 +39,14 @@ public class MutationTest {
 
     assertEquals(
         expectedString, JsonUtil.serialize(mutation));
+  }
+
+  @Test
+  public void testMutation() {
+    new EqualsTester()
+        .addEqualityGroup(
+            new Mutation("physical_locators", Mutator.INSERT, Atom.string("10.1.1.1")),
+            new Mutation("physical_locators", Mutator.INSERT, new Atom<>("10.1.1.1"))
+        ).testEquals();
   }
 }
