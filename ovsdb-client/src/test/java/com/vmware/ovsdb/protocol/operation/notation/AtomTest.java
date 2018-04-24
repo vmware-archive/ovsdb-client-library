@@ -16,13 +16,13 @@ package com.vmware.ovsdb.protocol.operation.notation;
 
 import static org.junit.Assert.assertEquals;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.util.UUID;
-import org.junit.Test;
 
 public class AtomTest {
 

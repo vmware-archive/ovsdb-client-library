@@ -18,37 +18,80 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
+import com.vmware.ovsdb.protocol.operation.notation.Atom;
+import com.vmware.ovsdb.protocol.operation.notation.Condition;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
+import com.vmware.ovsdb.protocol.operation.notation.Map;
+import com.vmware.ovsdb.protocol.operation.notation.NamedUuid;
+import com.vmware.ovsdb.protocol.operation.notation.Pair;
+import com.vmware.ovsdb.protocol.operation.notation.Set;
+import com.vmware.ovsdb.protocol.operation.notation.Uuid;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SelectTest {
 
+  private final UUID uuid = UUID.randomUUID();
+
+  private final String tableName = "tableName";
+
+  private final Select select = new Select(tableName)
+      .where("string_column", Function.INCLUDES, "A string")
+      .where("integer_column", Function.LESS_THAN, 42)
+      .where("bool_column", Function.EQUALS, true)
+      .where("uuid_column", Function.NOT_EQUALS, Uuid.of(uuid))
+      .where("named-uuid_column", Function.EXCLUDES, new NamedUuid("uuid-name"))
+      .where("map_column", Function.GREATER_THAN_OR_EQUALS, ImmutableMap.of("key", "value"))
+      .where("set_column", Function.LESS_THAN_OR_EQUALS, ImmutableSet.of("value1", "value2"))
+      .columns("column1", "column2");
+
   @Test
   public void testSerialization1() throws JsonProcessingException {
-    Select select = new Select("Logical_Switch")
-        .where("name", Function.INCLUDES, "ls")
-        .where("tunnel_key", Function.GREATER_THAN, 5001L)
-        .columns("_uuid", "name", "other_config");
-    String expectedResult
-        = "{\"op\":\"select\",\"table\":\"Logical_Switch\","
-        + "\"where\":[[\"name\",\"includes\",\"ls\"],"
-        + "[\"tunnel_key\",\">\",5001]],"
-        + "\"columns\":[\"_uuid\",\"name\",\"other_config\"]}";
+    String expectedResult = "{\"op\":\"select\",\"table\":\"" + tableName + "\","
+        + "\"where\":[[\"string_column\",\"includes\",\"A string\"],"
+        + "[\"integer_column\",\"<\",42],"
+        + "[\"bool_column\",\"==\",true],"
+        + "[\"uuid_column\",\"!=\",[\"uuid\",\"" + uuid + "\"]],"
+        + "[\"named-uuid_column\",\"excludes\",[\"named-uuid\",\"uuid-name\"]],"
+        + "[\"map_column\",\">=\",[\"map\",[[\"key\",\"value\"]]]],"
+        + "[\"set_column\",\"<=\",[\"set\",[\"value2\",\"value1\"]]]"
+        + "],\"columns\":[\"column1\",\"column2\"]"
+        + "}";
 
     assertEquals(expectedResult, JsonUtil.serialize(select));
   }
 
   @Test
-  public void testSerialization2() throws JsonProcessingException {
-    Select select = new Select("Logical_Switch")
-        .where("name", Function.INCLUDES, "ls")
-        .where("tunnel_key", Function.GREATER_THAN, 5001L);
-    String expectedResult
-        = "{\"op\":\"select\",\"table\":\"Logical_Switch\","
-        + "\"where\":[[\"name\",\"includes\",\"ls\"],"
-        + "[\"tunnel_key\",\">\",5001]]}";
-
-    assertEquals(expectedResult, JsonUtil.serialize(select));
+  public void testEquals() {
+    List<Condition> conditions = Stream.of(
+        new Condition("string_column", Function.INCLUDES, Atom.string("A string")),
+        new Condition("integer_column", Function.LESS_THAN, Atom.integer(42)),
+        new Condition("bool_column", Function.EQUALS, Atom.bool(true)),
+        new Condition("uuid_column", Function.NOT_EQUALS, Atom.uuid(uuid)),
+        new Condition("named-uuid_column", Function.EXCLUDES, Atom.namedUuid("uuid-name")),
+        new Condition("map_column", Function.GREATER_THAN_OR_EQUALS,
+            new Map<>(ImmutableList.of(new Pair<>(Atom.string("key"), Atom.string("value"))))
+        ),
+        new Condition("set_column", Function.LESS_THAN_OR_EQUALS,
+            new Set(ImmutableSet.of(Atom.string("value1"), Atom.string("value2")))
+        )
+    ).collect(Collectors.toList());
+    new EqualsTester()
+        .addEqualityGroup(
+            new Select(tableName, conditions, null), new Select(tableName, conditions)
+        )
+        .addEqualityGroup(
+            select, new Select(tableName, conditions, ImmutableList.of("column1", "column2"))
+        )
+        .testEquals();
   }
 }

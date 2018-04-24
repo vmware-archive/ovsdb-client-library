@@ -37,7 +37,7 @@ public class RowTest {
       .stringColumn("string_column", "A string")
       .integerColumn("integer_column", 42L)
       .boolColumn("bool_column", true)
-      .uuidColumn("uuid_column", uuid)
+      .uuidColumn("uuid_column", Uuid.of(uuid))
       .namedUuidColumn("named-uuid", "uuid-name")
       .mapColumn("map_column", ImmutableMap.of("key", "value"))
       .setColumn("set_column", ImmutableSet.of("value1", "value2"));

@@ -12,7 +12,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-package com.vmware.ovsdb.protocol.operation.notation.serializer;
+package com.vmware.ovsdb.protocol.methods.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

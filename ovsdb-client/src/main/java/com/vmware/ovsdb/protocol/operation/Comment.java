@@ -16,6 +16,8 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.COMMENT;
 
+import java.util.Objects;
+
 /**
  * <pre>
  * {@literal
@@ -52,6 +54,23 @@ public class Comment extends Operation {
 
   public String getComment() {
     return comment;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Comment)) {
+      return false;
+    }
+    Comment that = (Comment) other;
+    return Objects.equals(comment, that.getComment());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(comment);
   }
 
   @Override

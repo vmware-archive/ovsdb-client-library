@@ -16,6 +16,8 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.COMMIT;
 
+import java.util.Objects;
+
 /**
  * <pre>
  * {@literal
@@ -50,6 +52,24 @@ public class Commit extends Operation {
 
   public boolean isDurable() {
     return durable;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Commit)) {
+      return false;
+    }
+    Commit that = (Commit) other;
+    return durable == that.isDurable();
+  }
+
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(durable);
   }
 
   @Override

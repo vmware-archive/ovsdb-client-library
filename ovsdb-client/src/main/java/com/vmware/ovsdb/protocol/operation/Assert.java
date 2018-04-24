@@ -16,6 +16,8 @@ package com.vmware.ovsdb.protocol.operation;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.ASSERT;
 
+import java.util.Objects;
+
 /**
  * <pre>
  * {@literal
@@ -47,6 +49,23 @@ public class Assert extends Operation {
 
   public String getLock() {
     return lock;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Assert)) {
+      return false;
+    }
+    Assert that = (Assert) other;
+    return Objects.equals(lock, that.getLock());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(lock);
   }
 
   @Override

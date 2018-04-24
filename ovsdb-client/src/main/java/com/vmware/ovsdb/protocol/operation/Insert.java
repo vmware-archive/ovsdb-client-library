@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
 
+import java.util.Objects;
+
 /**
  * Representation ofo insert operation.
  *
@@ -99,7 +101,7 @@ public class Insert extends Operation {
     this.uuidName = uuidName;
   }
 
-  public Insert withId(String uuidName) {
+  public Insert withUuidName(String uuidName) {
     this.uuidName = uuidName;
     return this;
   }
@@ -114,6 +116,26 @@ public class Insert extends Operation {
 
   public String getUuidName() {
     return uuidName;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Insert)) {
+      return false;
+    }
+    Insert that = (Insert) other;
+    return Objects.equals(table, that.getTable())
+        && Objects.equals(row, that.getRow())
+        && Objects.equals(uuidName, that.getUuidName());
+  }
+
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(table, row, uuidName);
   }
 
   @Override
