@@ -44,6 +44,7 @@ class JsonNodeDecoder extends JsonObjectDecoder {
 
       LOGGER.debug("Received message {} from channel {}", textJson, ctx.channel());
       out.add(JsonUtil.readTree(textJson));
+      json.release();
     }
   }
 }
