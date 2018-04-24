@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.operation.result;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * This is used for "update", "mutate" and "delete" operation result. It contains only one "count"
  * field.
@@ -42,15 +44,13 @@ public class UpdateResult extends OperationResult {
     if (!(other instanceof UpdateResult)) {
       return false;
     }
-
     UpdateResult that = (UpdateResult) other;
-
-    return count == that.count;
+    return count == that.getCount();
   }
 
   @Override
   public int hashCode() {
-    return (int) (count ^ (count >>> 32));
+    return Objects.hash(count);
   }
 
   @Override

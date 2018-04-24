@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.operation.result;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <error>}.
  *
@@ -86,20 +88,14 @@ public class ErrorResult extends OperationResult {
     if (!(other instanceof ErrorResult)) {
       return false;
     }
-
     ErrorResult that = (ErrorResult) other;
-
-    if (error != null ? !error.equals(that.error) : that.error != null) {
-      return false;
-    }
-    return details != null ? details.equals(that.details) : that.details == null;
+    return Objects.equals(error, that.getError())
+        && Objects.equals(details, that.getDetails());
   }
 
   @Override
   public int hashCode() {
-    int result = error != null ? error.hashCode() : 0;
-    result = 31 * result + (details != null ? details.hashCode() : 0);
-    return result;
+    return Objects.hash(error, details);
   }
 
   @Override
