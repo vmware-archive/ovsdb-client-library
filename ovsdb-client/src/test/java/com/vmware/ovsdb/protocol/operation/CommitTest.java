@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
@@ -29,5 +30,13 @@ public class CommitTest {
     String expectedResult = "{\"op\":\"commit\",\"durable\":true}";
 
     assertEquals(expectedResult, JsonUtil.serialize(commit));
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(new Commit(false), new Commit(false))
+        .addEqualityGroup(new Commit(true), new Commit(true))
+        .testEquals();
   }
 }

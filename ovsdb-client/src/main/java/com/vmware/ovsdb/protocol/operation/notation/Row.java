@@ -71,7 +71,7 @@ public class Row {
     return column(name, Atom.bool(bool));
   }
 
-  public Row uuidColumn(String name, UUID uuid) {
+  public Row uuidColumn(String name, Uuid uuid) {
     return column(name, Atom.uuid(uuid));
   }
 

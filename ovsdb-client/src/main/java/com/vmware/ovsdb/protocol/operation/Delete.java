@@ -27,6 +27,8 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Representation of delete operation.
@@ -114,6 +116,25 @@ public class Delete extends Operation {
 
   public List<Condition> getWhere() {
     return where;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Delete)) {
+      return false;
+    }
+    Delete that = (Delete) other;
+    return Objects.equals(table, that.getTable())
+        && Objects.equals(where, that.getWhere());
+  }
+
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(table, where);
   }
 
   @Override

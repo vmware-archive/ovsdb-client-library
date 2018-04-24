@@ -32,6 +32,7 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Representation of select operation.
@@ -156,6 +157,25 @@ public class Select extends Operation {
 
   public List<String> getColumns() {
     return columns;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Select)) {
+      return false;
+    }
+    Select that = (Select) other;
+    return Objects.equals(table, that.getTable())
+        && Objects.equals(where, that.getWhere())
+        && Objects.equals(columns, that.getColumns());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(table, where, columns);
   }
 
   @Override

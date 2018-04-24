@@ -15,7 +15,7 @@
 package com.vmware.ovsdb.protocol.methods;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vmware.ovsdb.protocol.operation.notation.serializer.MonitorRequestsSerializer;
+import com.vmware.ovsdb.protocol.methods.serializer.MonitorRequestsSerializer;
 
 import java.util.Map;
 import java.util.Objects;

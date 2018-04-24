@@ -28,6 +28,7 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Representation of update operation.
@@ -79,9 +80,7 @@ public class Update extends Operation {
    * @param where value of the "where" field
    * @param row value of the "row" field
    */
-  public Update(
-      String table, List<Condition> where, Row row
-  ) {
+  public Update(String table, List<Condition> where, Row row) {
     super(UPDATE);
     this.table = table;
     this.where = where;
@@ -139,6 +138,25 @@ public class Update extends Operation {
 
   public Row getRow() {
     return row;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Update)) {
+      return false;
+    }
+    Update that = (Update) other;
+    return Objects.equals(table, that.getTable())
+        && Objects.equals(where, that.getWhere())
+        && Objects.equals(row, that.getRow());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(table, where, row);
   }
 
   @Override

@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
@@ -28,5 +29,10 @@ public class AssertTest {
     Assert assrt = new Assert("myLock");
     String expectedResult = "{\"op\":\"assert\",\"lock\":\"myLock\"}";
     assertEquals(expectedResult, JsonUtil.serialize(assrt));
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester().addEqualityGroup(new Assert("lock"), new Assert("lock")).testEquals();
   }
 }

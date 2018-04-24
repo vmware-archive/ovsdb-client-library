@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import org.junit.Test;
 
@@ -30,5 +31,12 @@ public class CommentTest {
         = "{\"op\":\"comment\",\"comment\":\"Transaction from me\"}";
 
     assertEquals(expectedResult, JsonUtil.serialize(comment));
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(new Comment("comment"), new Comment("comment"))
+        .testEquals();
   }
 }

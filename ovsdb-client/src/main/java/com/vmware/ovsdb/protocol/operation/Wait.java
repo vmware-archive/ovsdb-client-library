@@ -17,10 +17,12 @@ package com.vmware.ovsdb.protocol.operation;
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.WAIT;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.vmware.ovsdb.protocol.operation.notation.Condition;
 import com.vmware.ovsdb.protocol.operation.notation.Row;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Representation of wait> operation.
@@ -70,6 +72,22 @@ import java.util.List;
  */
 public class Wait extends Operation {
 
+  public enum Until {
+    EQUAL("=="),
+    NOTEQUAL("!=");
+
+    private String name;
+
+    Until(String name) {
+      this.name = name;
+    }
+
+    @JsonValue
+    public String toString() {
+      return name;
+    }
+  }
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private final Integer timeout;
 
@@ -79,13 +97,13 @@ public class Wait extends Operation {
 
   private final List<String> columns;
 
-  private final String until;
+  private final Until until;
 
   private final List<Row> rows;
 
   public Wait(
       String table, List<Condition> where,
-      List<String> columns, String until, List<Row> rows
+      List<String> columns, Until until, List<Row> rows
   ) {
     this(table, null, where, columns, until, rows);
   }
@@ -101,7 +119,7 @@ public class Wait extends Operation {
    */
   public Wait(
       String table, Integer timeout, List<Condition> where,
-      List<String> columns, String until, List<Row> rows
+      List<String> columns, Until until, List<Row> rows
   ) {
     super(WAIT);
     this.table = table;
@@ -128,12 +146,34 @@ public class Wait extends Operation {
     return columns;
   }
 
-  public String getUntil() {
+  public Until getUntil() {
     return until;
   }
 
   public List<Row> getRows() {
     return rows;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Wait)) {
+      return false;
+    }
+    Wait that = (Wait) other;
+    return Objects.equals(timeout, that.getTimeout())
+        && Objects.equals(table, that.getTable())
+        && Objects.equals(where, that.getWhere())
+        && Objects.equals(columns, that.getColumns())
+        && until == that.getUntil()
+        && Objects.equals(rows, that.getRows());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(timeout, table, where, columns, until, rows);
   }
 
   @Override

@@ -29,6 +29,7 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Representation of mutate operation.
@@ -91,10 +92,6 @@ public class Mutate extends Operation {
     this(table, new ArrayList<>(), new ArrayList<>());
   }
 
-  public Mutate(String table, List<Condition> where) {
-    this(table, where, new ArrayList<>());
-  }
-
   /**
    * Create a {@link Mutate} object.
    *
@@ -148,7 +145,7 @@ public class Mutate extends Operation {
     return where(column, function, Set.of(set));
   }
 
-  public Mutate mutation(String column, Mutator mutator, Value value) {
+  private Mutate mutation(String column, Mutator mutator, Value value) {
     this.mutations.add(new Mutation(column, mutator, value));
     return this;
   }
@@ -195,6 +192,26 @@ public class Mutate extends Operation {
 
   public List<Mutation> getMutations() {
     return mutations;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Mutate)) {
+      return false;
+    }
+    Mutate that = (Mutate) other;
+    return Objects.equals(table, that.getTable())
+        && Objects.equals(where, that.getWhere())
+        && Objects.equals(mutations, that.getMutations());
+  }
+
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(table, where, mutations);
   }
 
   @Override
