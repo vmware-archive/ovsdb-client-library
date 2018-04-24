@@ -1,7 +1,7 @@
 
 # OVSDB Client Library
 [![Build Status](https://travis-ci.org/vmware/ovsdb-client-library.svg?branch=master)](https://travis-ci.org/vmware/ovsdb-client-library)
-[![Coverage Status](https://coveralls.io/repos/github/vmware/ovsdb-client-library/badge.svg?branch=master)](https://coveralls.io/github/vmware/ovsdb-client-library?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/vmware/ovsdb-client-library/badge.svg?branch=master&service=github)](https://coveralls.io/github/vmware/ovsdb-client-library?branch=master)
 
 ## Overview
 This is a schema-independent OVSDB client implementation of OVSDB Management Protocol 
