@@ -15,8 +15,10 @@
 package com.vmware.ovsdb.protocol.schema;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import java.io.IOException;
@@ -52,5 +54,14 @@ public class ColumnSchemaTest {
   public void testInvalidJson() throws IOException {
     String textSchema = "{\"mutable\":false}";
     JsonUtil.deserialize(textSchema, ColumnSchema.class);
+  }
+
+  @Test
+  public void testEquals() {
+    Type type = mock(Type.class);
+    new EqualsTester()
+        .addEqualityGroup(new ColumnSchema(type), new ColumnSchema(type, null, null))
+        .addEqualityGroup(new ColumnSchema(type, true, false), new ColumnSchema(type, true, false))
+        .testEquals();
   }
 }

@@ -15,10 +15,14 @@
 package com.vmware.ovsdb.protocol.schema;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
+
+import com.vmware.ovsdb.protocol.operation.notation.Map;
 import org.junit.Test;
 
 public class DatabaseSchemaTest {
@@ -40,5 +44,18 @@ public class DatabaseSchemaTest {
         DatabaseSchema.class
     );
     assertNotNull(dbSchema);
+  }
+
+  @Test
+  public void testEquals() throws IOException {
+    new EqualsTester()
+        .addEqualityGroup(
+            JsonUtil.deserialize(
+                getClass().getResource("/vswitch_schema.json"), DatabaseSchema.class
+            ),
+            JsonUtil.deserialize(
+                getClass().getResource("/vswitch_schema.json"), DatabaseSchema.class
+            )
+        ).testEquals();
   }
 }
