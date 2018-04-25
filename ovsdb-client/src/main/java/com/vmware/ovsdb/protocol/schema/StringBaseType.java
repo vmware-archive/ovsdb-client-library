@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.schema;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
+import java.util.Objects;
+
 /**
  * Represent a {@literal <base-type>} with a string {@literal <atomic-type>} as it's type.
  *
@@ -70,17 +72,6 @@ public class StringBaseType extends BaseType {
   }
 
   @Override
-  public int hashCode() {
-    int result = minLength != null
-        ? minLength.hashCode()
-        : 0;
-    result = 31 * result + (maxLength != null
-        ? maxLength.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -88,17 +79,17 @@ public class StringBaseType extends BaseType {
     if (!(other instanceof StringBaseType)) {
       return false;
     }
-
-    StringBaseType that = (StringBaseType) other;
-
-    if (minLength != null
-        ? !minLength.equals(that.minLength)
-        : that.minLength != null) {
+    if (!super.equals(other)) {
       return false;
     }
-    return maxLength != null
-        ? maxLength.equals(that.maxLength)
-        : that.maxLength == null;
+    StringBaseType that = (StringBaseType) other;
+    return Objects.equals(minLength, that.getMinLength())
+        && Objects.equals(maxLength, that.getMaxLength());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minLength, maxLength);
   }
 
   @Override

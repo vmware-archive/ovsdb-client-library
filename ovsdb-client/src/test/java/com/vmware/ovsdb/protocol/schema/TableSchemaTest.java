@@ -15,14 +15,19 @@
 package com.vmware.ovsdb.protocol.schema;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.testing.EqualsTester;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.junit.Test;
 
 public class TableSchemaTest {
@@ -109,5 +114,16 @@ public class TableSchemaTest {
   public void testInvalidJson() throws IOException {
     String invalidTableSchema = "{\"isRoot\":true, \"maxRows\":1}";
     JsonUtil.deserialize(invalidTableSchema, TableSchema.class);
+  }
+
+  @Test
+  public void testEquals() {
+    Map<String, ColumnSchema> columns = mock(Map.class);
+    List<Set<String>> indexes = mock(List.class);
+    new EqualsTester()
+        .addEqualityGroup(
+            new TableSchema(columns, 12L, true, indexes),
+            new TableSchema(columns, 12L, true, indexes)
+        ).testEquals();
   }
 }

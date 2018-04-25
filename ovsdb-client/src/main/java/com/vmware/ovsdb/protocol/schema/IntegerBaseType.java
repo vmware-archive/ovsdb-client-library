@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.schema;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
+import java.util.Objects;
+
 /**
  * Represent a {@literal <base-type>} with a integer {@literal <atomic-type>} as it's type.
  *
@@ -41,7 +43,7 @@ public class IntegerBaseType extends BaseType {
   /**
    * Create a {@link IntegerBaseType} object.
    *
-   * @param enums value of the "enums" field
+   * @param enums value of the "enum" field
    */
   public IntegerBaseType(Value enums) {
     super(AtomicType.INTEGER, enums);
@@ -70,18 +72,6 @@ public class IntegerBaseType extends BaseType {
   }
 
   @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (minInteger != null
-        ? minInteger.hashCode()
-        : 0);
-    result = 31 * result + (maxInteger != null
-        ? maxInteger.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -92,17 +82,14 @@ public class IntegerBaseType extends BaseType {
     if (!super.equals(other)) {
       return false;
     }
-
     IntegerBaseType that = (IntegerBaseType) other;
+    return Objects.equals(minInteger, that.getMinInteger())
+        && Objects.equals(maxInteger, that.getMaxInteger());
+  }
 
-    if (minInteger != null
-        ? !minInteger.equals(that.minInteger)
-        : that.minInteger != null) {
-      return false;
-    }
-    return maxInteger != null
-        ? maxInteger.equals(that.maxInteger)
-        : that.maxInteger == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minInteger, maxInteger);
   }
 
   @Override

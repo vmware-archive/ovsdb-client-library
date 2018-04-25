@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <column-schema>}.
  *
@@ -92,20 +94,10 @@ public class ColumnSchema {
     return mutable;
   }
 
-  @Override
-  public int hashCode() {
-    int result = type != null
-        ? type.hashCode()
-        : 0;
-    result = 31 * result + (ephemeral != null
-        ? ephemeral.hashCode()
-        : 0);
-    result = 31 * result + (mutable != null
-        ? mutable.hashCode()
-        : 0);
-    return result;
-  }
-
+  // TODO: Should we be aware of the default value?
+  // For e.g., if one <column-schema> doest not have "ephemeral"
+  // and the other has false as "ephemeral", are they equal?
+  // Same for all other notations.
   @Override
   public boolean equals(Object other) {
     if (this == other) {
@@ -114,22 +106,15 @@ public class ColumnSchema {
     if (!(other instanceof ColumnSchema)) {
       return false;
     }
-
     ColumnSchema that = (ColumnSchema) other;
+    return Objects.equals(type, that.getType())
+        && Objects.equals(ephemeral, that.getEphemeral())
+        && Objects.equals(mutable, that.getMutable());
+  }
 
-    if (type != null
-        ? !type.equals(that.type)
-        : that.type != null) {
-      return false;
-    }
-    if (ephemeral != null
-        ? !ephemeral.equals(that.ephemeral)
-        : that.ephemeral != null) {
-      return false;
-    }
-    return mutable != null
-        ? mutable.equals(that.mutable)
-        : that.mutable == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, ephemeral, mutable);
   }
 
   @Override

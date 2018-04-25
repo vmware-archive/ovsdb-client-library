@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.schema;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
+import java.util.Objects;
+
 /**
  * Represent a {@literal <base-type>} with a real {@literal <atomic-type>} as it's type.
  *
@@ -70,17 +72,6 @@ public class RealBaseType extends BaseType {
   }
 
   @Override
-  public int hashCode() {
-    int result = minReal != null
-        ? minReal.hashCode()
-        : 0;
-    result = 31 * result + (maxReal != null
-        ? maxReal.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -88,17 +79,17 @@ public class RealBaseType extends BaseType {
     if (!(other instanceof RealBaseType)) {
       return false;
     }
-
-    RealBaseType that = (RealBaseType) other;
-
-    if (minReal != null
-        ? !minReal.equals(that.minReal)
-        : that.minReal != null) {
+    if (!super.equals(other)) {
       return false;
     }
-    return maxReal != null
-        ? maxReal.equals(that.maxReal)
-        : that.maxReal == null;
+    RealBaseType that = (RealBaseType) other;
+    return Objects.equals(minReal, that.getMinReal())
+        && Objects.equals(maxReal, that.getMaxReal());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), minReal, maxReal);
   }
 
   @Override
