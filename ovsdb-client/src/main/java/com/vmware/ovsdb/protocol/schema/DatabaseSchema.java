@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Representation of {@literal <database-schema>}.
@@ -74,8 +75,7 @@ public class DatabaseSchema {
       @JsonProperty(value = "name", required = true) String name,
       @JsonProperty(value = "version", required = true) String version,
       @JsonProperty(value = "cksum") String cksum,
-      @JsonProperty(value = "tables", required = true) Map<String,
-          TableSchema> tables
+      @JsonProperty(value = "tables", required = true) Map<String, TableSchema> tables
   ) {
     this.name = name;
     this.version = version;
@@ -100,23 +100,6 @@ public class DatabaseSchema {
   }
 
   @Override
-  public int hashCode() {
-    int result = name != null
-        ? name.hashCode()
-        : 0;
-    result = 31 * result + (version != null
-        ? version.hashCode()
-        : 0);
-    result = 31 * result + (cksum != null
-        ? cksum.hashCode()
-        : 0);
-    result = 31 * result + (tables != null
-        ? tables.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -124,27 +107,16 @@ public class DatabaseSchema {
     if (!(other instanceof DatabaseSchema)) {
       return false;
     }
-
     DatabaseSchema that = (DatabaseSchema) other;
+    return Objects.equals(name, that.getName())
+        && Objects.equals(version, that.getVersion())
+        && Objects.equals(cksum, that.getCksum())
+        && Objects.equals(tables, that.getTables());
+  }
 
-    if (name != null
-        ? !name.equals(that.name)
-        : that.name != null) {
-      return false;
-    }
-    if (version != null
-        ? !version.equals(that.version)
-        : that.version != null) {
-      return false;
-    }
-    if (cksum != null
-        ? !cksum.equals(that.cksum)
-        : that.cksum != null) {
-      return false;
-    }
-    return tables != null
-        ? tables.equals(that.tables)
-        : that.tables == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, version, cksum, tables);
   }
 
   @Override

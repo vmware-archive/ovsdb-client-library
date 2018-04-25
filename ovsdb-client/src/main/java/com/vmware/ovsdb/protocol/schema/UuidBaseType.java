@@ -17,6 +17,8 @@ package com.vmware.ovsdb.protocol.schema;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 
+import java.util.Objects;
+
 /**
  * Represent a {@literal <base-type>} with a uuid {@literal <atomic-type>} as it's type.
  *
@@ -70,17 +72,6 @@ public class UuidBaseType extends BaseType {
   }
 
   @Override
-  public int hashCode() {
-    int result = refTable != null
-        ? refTable.hashCode()
-        : 0;
-    result = 31 * result + (refType != null
-        ? refType.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -88,17 +79,17 @@ public class UuidBaseType extends BaseType {
     if (!(other instanceof UuidBaseType)) {
       return false;
     }
-
-    UuidBaseType that = (UuidBaseType) other;
-
-    if (refTable != null
-        ? !refTable.equals(that.refTable)
-        : that.refTable != null) {
+    if (!super.equals(other)) {
       return false;
     }
-    return refType != null
-        ? refType.equals(that.refType)
-        : that.refType == null;
+    UuidBaseType that = (UuidBaseType) other;
+    return Objects.equals(refTable, that.getRefTable())
+        && Objects.equals(refType, that.getRefType());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), refTable, refType);
   }
 
   @Override

@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.schema.deserializer.TypeDeserializer;
 
+import java.util.Objects;
+
 /**
  * The type of a database column.
  * <pre>
@@ -98,23 +100,6 @@ public class Type {
   }
 
   @Override
-  public int hashCode() {
-    int result = key != null
-        ? key.hashCode()
-        : 0;
-    result = 31 * result + (value != null
-        ? value.hashCode()
-        : 0);
-    result = 31 * result + (min != null
-        ? min.hashCode()
-        : 0);
-    result = 31 * result + (max != null
-        ? max.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -122,27 +107,16 @@ public class Type {
     if (!(other instanceof Type)) {
       return false;
     }
-
     Type that = (Type) other;
+    return Objects.equals(key, that.getKey())
+        && Objects.equals(value, that.getValue())
+        && Objects.equals(min, that.getMin())
+        && Objects.equals(max, that.getMax());
+  }
 
-    if (key != null
-        ? !key.equals(that.key)
-        : that.key != null) {
-      return false;
-    }
-    if (value != null
-        ? !value.equals(that.value)
-        : that.value != null) {
-      return false;
-    }
-    if (min != null
-        ? !min.equals(that.min)
-        : that.min != null) {
-      return false;
-    }
-    return max != null
-        ? max.equals(that.max)
-        : that.max == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(key, value, min, max);
   }
 
   @Override

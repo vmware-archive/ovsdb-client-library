@@ -21,8 +21,11 @@ import static com.vmware.ovsdb.protocol.schema.Constants.JSON_STRING;
 import static com.vmware.ovsdb.protocol.schema.Constants.JSON_UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 
+import com.google.common.testing.EqualsTester;
+import com.sun.org.apache.bcel.internal.generic.BASTORE;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import java.io.IOException;
 import org.junit.Test;
@@ -112,8 +115,7 @@ public class TypeTest {
     key = new IntegerBaseType(1L, 100L);
     value = new StringBaseType(10L, 20L);
     expectedType = new Type(key, value, 1L, Long.MAX_VALUE);
-    textType
-        = "{\"key\":{\"type\":\"integer\",\"minInteger\":1, "
+    textType = "{\"key\":{\"type\":\"integer\",\"minInteger\":1, "
         + "\"maxInteger\":100}, \"value\":{\"type\":\"string\","
         + "\"minLength\":10, \"maxLength\":20},\"min\":1, "
         + "\"max\":\"unlimited\"}";
@@ -131,7 +133,26 @@ public class TypeTest {
     } catch (IOException e) {
       errorMessage = e.getMessage();
     }
-    assertTrue(
-        errorMessage.contains("\"key\" field is missing from <type>"));
+    assertTrue(errorMessage.contains("\"key\" field is missing from <type>"));
+  }
+
+  @Test(expected = IOException.class)
+  public void testInvalidMax() throws IOException {
+    String invalidJson = "{\"key\":{\"type\":\"integer\",\"minInteger\":1, "
+        + "\"maxInteger\":100}, \"value\":{\"type\":\"string\","
+        + "\"minLength\":10, \"maxLength\":20},\"min\":1, "
+        + "\"max\":\"limited\"}";
+    JsonUtil.deserialize(invalidJson, Type.class);
+  }
+
+  @Test
+  public void testEquals() {
+    BaseType key = mock(BaseType.class);
+    BaseType value = mock(BaseType.class);
+    new EqualsTester()
+        .addEqualityGroup(new Type(key), new Type(key, null, null, null))
+        .addEqualityGroup(new Type(key, value, null, null), new Type(key, value, null, null))
+        .addEqualityGroup(new Type(key, value, 12L, 34L), new Type(key, value, 12L, 34L))
+        .testEquals();
   }
 }
