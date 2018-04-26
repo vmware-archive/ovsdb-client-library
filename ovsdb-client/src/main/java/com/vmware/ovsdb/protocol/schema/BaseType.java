@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vmware.ovsdb.protocol.operation.notation.Value;
 import com.vmware.ovsdb.protocol.schema.deserializer.BaseTypeDeserializer;
 
+import java.util.Objects;
+
 /**
  * Representation of {@literal <base-type>}.
  *
@@ -140,15 +142,6 @@ public abstract class BaseType {
   }
 
   @Override
-  public int hashCode() {
-    int result = type.hashCode();
-    result = 31 * result + (enums != null
-        ? enums.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -156,14 +149,13 @@ public abstract class BaseType {
     if (!(other instanceof BaseType)) {
       return false;
     }
+    BaseType that = (BaseType) other;
+    return type == that.type
+        && Objects.equals(enums, that.enums);
+  }
 
-    BaseType baseType = (BaseType) other;
-
-    if (type != baseType.type) {
-      return false;
-    }
-    return enums != null
-        ? enums.equals(baseType.enums)
-        : baseType.enums == null;
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, enums);
   }
 }

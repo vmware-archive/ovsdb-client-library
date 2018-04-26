@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -145,23 +146,6 @@ public class TableSchema {
   }
 
   @Override
-  public int hashCode() {
-    int result = columns != null
-        ? columns.hashCode()
-        : 0;
-    result = 31 * result + (maxRows != null
-        ? maxRows.hashCode()
-        : 0);
-    result = 31 * result + (isRoot != null
-        ? isRoot.hashCode()
-        : 0);
-    result = 31 * result + (indexes != null
-        ? indexes.hashCode()
-        : 0);
-    return result;
-  }
-
-  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -169,27 +153,17 @@ public class TableSchema {
     if (!(other instanceof TableSchema)) {
       return false;
     }
-
     TableSchema that = (TableSchema) other;
+    return Objects.equals(columns, that.getColumns())
+        && Objects.equals(maxRows, that.getMaxRows())
+        && Objects.equals(isRoot, that.getIsRoot())
+        && Objects.equals(indexes, that.getIndexes());
+  }
 
-    if (columns != null
-        ? !columns.equals(that.columns)
-        : that.columns != null) {
-      return false;
-    }
-    if (maxRows != null
-        ? !maxRows.equals(that.maxRows)
-        : that.maxRows != null) {
-      return false;
-    }
-    if (isRoot != null
-        ? !isRoot.equals(that.isRoot)
-        : that.isRoot != null) {
-      return false;
-    }
-    return indexes != null
-        ? indexes.equals(that.indexes)
-        : that.indexes == null;
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(columns, maxRows, isRoot, indexes);
   }
 
   @Override

@@ -79,9 +79,8 @@ public class BaseTypeDeserializer extends StdDeserializer<BaseType> {
       case STRING:
         return deserializeStringType(jsonNode);
       case UUID:
-        return deserializeUuidType(jsonNode);
       default:
-        throw new IOException("Unknown <atomic-type>: " + atomicType);
+        return deserializeUuidType(jsonNode);
     }
   }
 
