@@ -39,8 +39,8 @@ class HeartBeatHandler extends ChannelDuplexHandler {
   private static final int DEFAULT_READ_IDLE_MAX = 3;
 
   // At most 3 heartbeat should be sent before closing the channel
-  private static final int MAX_READ_IDLE_BEFORE_CLOSE = PropertyManager
-      .getIntProperty(KEY_CHANNEL_READ_IDLE_MAX, DEFAULT_READ_IDLE_MAX);
+  private static final int MAX_READ_IDLE_BEFORE_CLOSE =
+      PropertyManager.getIntProperty(KEY_CHANNEL_READ_IDLE_MAX, DEFAULT_READ_IDLE_MAX);
 
   private static final String HEARTBEAT_PREFIX = "heartbeat-";
 
@@ -49,8 +49,7 @@ class HeartBeatHandler extends ChannelDuplexHandler {
   private int readIdleCount = 0;
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg)
-      throws Exception {
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
     readIdleCount = 0;
     // Don't send heartbeat response to user
     if (!isHeartbeatResponse((JsonNode) msg)) {
@@ -61,8 +60,7 @@ class HeartBeatHandler extends ChannelDuplexHandler {
   }
 
   @Override
-  public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
-      throws Exception {
+  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
     if (evt instanceof IdleStateEvent) {
       ++readIdleCount;
       LOGGER.warn(

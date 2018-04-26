@@ -149,12 +149,9 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
           && parameters[lastIndex].isVarArgs()
           && actualParamSize >= lastIndex) {
 
-        if (actualParamSize >= lastIndex) {
-          Class<?> type = parameters[lastIndex].getType()
-              .getComponentType();
-
-          actualParams[lastIndex] = buildVarargParam(
-              paramsNode, lastIndex, type);
+        if (actualParamSize > lastIndex) {
+          Class<?> type = parameters[lastIndex].getType().getComponentType();
+          actualParams[lastIndex] = buildVarargParam(paramsNode, lastIndex, type);
         }
         // We have handled the last param, no need to handle it later
         --methodParamSize;

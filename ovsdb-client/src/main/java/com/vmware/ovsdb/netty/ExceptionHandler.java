@@ -27,8 +27,7 @@ class ExceptionHandler extends ChannelDuplexHandler {
       .getLogger(MethodHandles.lookup().lookupClass());
 
   @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-      throws Exception {
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     LOGGER.error("Channel " + ctx.channel() + " encountered exception. Closing.", cause);
     ctx.close();
   }

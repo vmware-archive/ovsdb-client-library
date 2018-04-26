@@ -97,9 +97,11 @@ public interface OvsdbClient {
    * Send a steal request to OVSDB server.
    *
    * @param lockId id of the lock to steal
+   * @param lockCallback will be called when the lock is stolen
    * @return a {@link CompletableFuture} from which the steal result can be retrieved
    */
-  CompletableFuture<LockResult> steal(String lockId) throws OvsdbClientException;
+  CompletableFuture<LockResult> steal(String lockId, LockCallback lockCallback)
+      throws OvsdbClientException;
 
   /**
    * Send a unlock request to OVSDB server.

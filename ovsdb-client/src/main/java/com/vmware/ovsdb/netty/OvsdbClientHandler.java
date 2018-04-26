@@ -277,21 +277,24 @@ class OvsdbClientHandler extends ChannelInboundHandlerAdapter {
       });
     }
 
-    // TODO: Write tests for the following 3 operations.
     @Override
     public CompletableFuture<LockResult> lock(String lockId, LockCallback lockCallback)
         throws OvsdbClientException {
-      CompletableFuture<LockResult> completableFuture = callMethod(
-          OvsdbConstant.LOCK, LockResult.class, lockId);
-      return completableFuture.thenApply(lockResult -> {
-        lockCallbacks.put(lockId, lockCallback);
-        return lockResult;
-      });
+      return callMethod(OvsdbConstant.LOCK, LockResult.class, lockId)
+          .thenApply(lockResult -> {
+            lockCallbacks.put(lockId, lockCallback);
+            return lockResult;
+          });
     }
 
     @Override
-    public CompletableFuture<LockResult> steal(String lockId) throws OvsdbClientException {
-      return callMethod(OvsdbConstant.LOCK, LockResult.class, lockId);
+    public CompletableFuture<LockResult> steal(String lockId, LockCallback lockCallback)
+        throws OvsdbClientException {
+      return callMethod(OvsdbConstant.STEAL, LockResult.class, lockId)
+          .thenApply(lockResult -> {
+            lockCallbacks.put(lockId, lockCallback);
+            return lockResult;
+          });
     }
 
     @Override
