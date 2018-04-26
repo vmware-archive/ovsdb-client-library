@@ -71,7 +71,7 @@ class HeartBeatHandler extends ChannelDuplexHandler {
         ctx.close();
       } else {
         String heartbeatMsg = getHeartbeatMsg();
-        LOGGER.info("Sending heartbeat {} to channel {}", heartbeatMsg, ctx.channel());
+        LOGGER.debug("Sending heartbeat {} to channel {}", heartbeatMsg, ctx.channel());
         ctx.writeAndFlush(heartbeatMsg);
       }
     } else {
