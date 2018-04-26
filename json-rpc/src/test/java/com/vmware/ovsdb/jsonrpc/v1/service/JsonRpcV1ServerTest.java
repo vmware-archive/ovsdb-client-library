@@ -200,7 +200,7 @@ public class JsonRpcV1ServerTest {
   @Test(expected = JsonRpcTransportException.class)
   public void testTransporterException() throws JsonRpcException {
     JsonNode requestNode = getRequestNode(testName.getMethodName(), "method");
-    doThrow(new JsonRpcTransportException("Test exception")).when(mockTransporter).send(any());
+    doThrow(new JsonRpcTransportException(mock(Throwable.class))).when(mockTransporter).send(any());
     jsonRpcServer.handleRequest(requestNode);
   }
 

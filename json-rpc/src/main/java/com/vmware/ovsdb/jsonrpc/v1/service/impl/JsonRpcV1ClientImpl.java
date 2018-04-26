@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Calendar;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -130,7 +131,8 @@ public class JsonRpcV1ClientImpl implements JsonRpcV1Client {
     // });
     ScheduledFuture timeoutFuture = scheduler.schedule(() -> {
       completableFuture.completeExceptionally(
-          new TimeoutException("Timeout at " + System.currentTimeMillis()));
+          new TimeoutException("Request " + id
+              + " timeout at " + Calendar.getInstance().getTime()));
       callContexts.remove(id);
     }, maxTimeout, maxTimeoutUnit);
 

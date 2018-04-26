@@ -15,22 +15,26 @@
 package com.vmware.ovsdb.service;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.LOCK;
+import static com.vmware.ovsdb.protocol.util.OvsdbConstant.STEAL;
+import static com.vmware.ovsdb.protocol.util.OvsdbConstant.UNLOCK;
 import static com.vmware.ovsdb.utils.SslUtil.newSelfSignedSslContextPair;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.vmware.ovsdb.callback.ConnectionCallback;
 import com.vmware.ovsdb.callback.LockCallback;
 import com.vmware.ovsdb.callback.MonitorCallback;
 import com.vmware.ovsdb.exception.OvsdbClientException;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
+import com.vmware.ovsdb.protocol.methods.LockResult;
 import com.vmware.ovsdb.protocol.methods.MonitorRequest;
 import com.vmware.ovsdb.protocol.methods.MonitorRequests;
 import com.vmware.ovsdb.protocol.methods.RowUpdate;
@@ -119,6 +123,7 @@ abstract class OvsdbClientTest {
     testCancelMonitor();
     testConnectionInfo();
     testErrorOperation();
+    testLock();
   }
 
   void testTcpConnection()
@@ -502,13 +507,55 @@ abstract class OvsdbClientTest {
   }
 
   private void testLock() throws OvsdbClientException {
+    int VERIFY_TIMEOUT_MILLIS = 5000;
+
+    // Get lock-1
     String lockId1 = "lock-1";
-    LockCallback lockCallback = mock(LockCallback.class);
-    String expectedRequest = getJsonRequestString(LOCK, lockId1);
+    LockCallback lockCallback1 = mock(LockCallback.class);
+    String expectedRequest1 = getJsonRequestString(LOCK, lockId1);
 
-    setupOvsdbEmulator(expectedRequest, "{\"locked\":true}", null);
+    setupOvsdbEmulator(expectedRequest1, "{\"locked\":true}", null);
 
-    ovsdbClient.lock(lockId1, lockCallback).join();
+    LockResult lockResult1 = ovsdbClient.lock(lockId1, lockCallback1).join();
+    assertTrue(lockResult1.isLocked());
+
+    // Doest not get lock-2
+    String lockId2 = "lock-2";
+    LockCallback lockCallback2 = mock(LockCallback.class);
+    String expectedRequest2 = getJsonRequestString(LOCK, lockId2);
+
+    setupOvsdbEmulator(expectedRequest2, "{\"locked\":false}", null);
+    LockResult lockResult2 = ovsdbClient.lock(lockId2, lockCallback2).join();
+    assertFalse(lockResult2.isLocked());
+
+    // After a while, get locked notification for lock-2
+    ovsdbServerEmulator.write("{\"method\":\"locked\", "
+        + "\"params\":[\"" + lockId2 + "\"], \"id\":null}");
+
+    verify(lockCallback2, timeout(VERIFY_TIMEOUT_MILLIS)).locked();
+
+    // Unlock lock-1
+    String expectedRequest3 = getJsonRequestString(UNLOCK, lockId1);
+    setupOvsdbEmulator(expectedRequest3, "{}", null);
+    ovsdbClient.unlock(lockId1).join();
+
+    // Steal lock-3
+    String lockId3 = "lock-3";
+    String expectedRequest4 = getJsonRequestString(STEAL, lockId3);
+    LockCallback lockCallback3 = mock(LockCallback.class);
+    setupOvsdbEmulator(expectedRequest4, "{\"locked\":true}", null);
+    LockResult stealResult = ovsdbClient.steal(lockId3, lockCallback3).join();
+    assertTrue(stealResult.isLocked());
+
+    // lock-2 is stolen
+    ovsdbServerEmulator.write("{\"method\":\"stolen\", "
+        + "\"params\":[\"" + lockId2 + "\"], \"id\":null}");
+    verify(lockCallback2, timeout(VERIFY_TIMEOUT_MILLIS)).stolen();
+
+    // lock-3 is stolen
+    ovsdbServerEmulator.write("{\"method\":\"stolen\", "
+        + "\"params\":[\"" + lockId3 + "\"], \"id\":null}");
+    verify(lockCallback3, timeout(VERIFY_TIMEOUT_MILLIS)).stolen();
   }
 
   private void setupOvsdbEmulator(
