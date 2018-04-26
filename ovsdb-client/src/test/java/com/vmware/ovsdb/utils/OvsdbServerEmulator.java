@@ -79,7 +79,7 @@ public abstract class OvsdbServerEmulator {
         }
         p.addLast(new SslHandler(engine));
       }
-      p.addLast(new LoggingHandler(LogLevel.INFO));
+      p.addLast(new LoggingHandler(LogLevel.DEBUG));
       p.addLast(new JsonObjectDecoder());
       p.addLast(new StringEncoder());
       p.addLast(new OvsdbInboundHandler(connectedFuture));
@@ -119,7 +119,7 @@ public abstract class OvsdbServerEmulator {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
       ByteBuf byteBuf = (ByteBuf) msg;
       String data = byteBuf.toString(UTF_8);
-      LOGGER.info("Read data {} from channel", data, ctx.channel());
+      LOGGER.debug("Read data {} from channel", data, ctx.channel());
       if (readCallback != null) {
         LOGGER.debug("Calling read callback {}", readCallback);
         readCallback.accept(data);

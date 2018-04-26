@@ -103,10 +103,10 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
     String error = null;
     try {
       Object[] params = toMethodParams(request.getParams(), methodHandle);
-      LOGGER.info("Calling {}({})", method, params);
+      LOGGER.debug("Calling {}({})", method, params);
       result = methodHandle.invoke(requestHandler, params);
     } catch (Throwable ex) {
-      LOGGER.info("Invocation of methods " + method + " throws exception", ex);
+      LOGGER.error("Invocation of methods " + method + " throws exception", ex);
       error = ex.getCause() == null
           ? ex.getMessage()
           : ex.getCause().getMessage();
@@ -129,7 +129,7 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
   private void sendResponse(String id, Object result, String error) throws JsonRpcException {
     JsonRpcV1Response response = new JsonRpcV1Response(result, error, id);
     JsonNode responseNode = JsonUtil.toJsonNode(response);
-    LOGGER.info("Sending response: {}", responseNode);
+    LOGGER.debug("Sending response: {}", responseNode);
     transporter.send(responseNode);
   }
 

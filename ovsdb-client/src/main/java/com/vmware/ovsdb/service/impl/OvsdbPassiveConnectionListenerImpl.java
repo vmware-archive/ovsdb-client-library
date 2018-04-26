@@ -102,7 +102,7 @@ public class OvsdbPassiveConnectionListenerImpl
     serverBootstrap.group(bossGroup, workerGroup)
         .channel(NioServerSocketChannel.class)
         .option(ChannelOption.SO_BACKLOG, 100)
-        .handler(new LoggingHandler(LogLevel.INFO))
+        .handler(new LoggingHandler(LogLevel.DEBUG))
         .childHandler(newOvsdbChannelInitializer(sslContext, executorService, connectionCallback))
         .option(ChannelOption.RCVBUF_ALLOCATOR,
           new AdaptiveRecvByteBufAllocator(65535, 65535, 65535));
