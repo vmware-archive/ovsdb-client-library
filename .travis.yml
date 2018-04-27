@@ -17,9 +17,10 @@ services:
 
 before_install:
   - docker pull hechaol/ovs:2.9.0
+  - export HOST_IP=$(/sbin/ifconfig docker0 | grep 'inet addr:' | cut -d':' -f2| cut -d' ' -f1)
 
 script:
-  - mvn clean verify -Dhost.ip=$(/sbin/ifconfig docker0 | grep 'inet addr:' | cut -d':' -f2| cut -d' ' -f1)
+  - mvn clean verify -Dhost.ip=$HOST_IP
 
 after_success:
-  - mvn clean cobertura:cobertura-integration-test coveralls:report
+  - mvn clean cobertura:cobertura-integration-test coveralls:report -Dhost.ip=$HOST_IP

@@ -228,7 +228,19 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
         <configuration>
-          <format>xml</format>
+          <check>
+            <branchRate>90</branchRate>
+            <lineRate>90</lineRate>
+            <haltOnFailure>true</haltOnFailure>
+            <totalBranchRate>90</totalBranchRate>
+            <totalLineRate>90</totalLineRate>
+            <packageLineRate>90</packageLineRate>
+            <packageBranchRate>90</packageBranchRate>
+          </check>
+          <formats>
+            <format>html</format>
+            <format>xml</format>
+          </formats>
           <maxmem>256m</maxmem>
           <!-- aggregated reports for multi-module projects -->
           <aggregate>true</aggregate>
