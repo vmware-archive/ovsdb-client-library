@@ -123,6 +123,7 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
    * @param sslContext the SSL context. Can be null if SSL is not enabled
    * @param executorService an {@link ScheduledExecutorService} object
    * @param connectionCallback will be called then a new connection is established
+   * @return an {@link OvsdbChannelInitializer} object
    */
   public static OvsdbChannelInitializer newOvsdbChannelInitializer(
       SslContext sslContext, ScheduledExecutorService executorService,
@@ -137,6 +138,7 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
    * @param sslContext the SSL context. Can be null if SSL is not enabled
    * @param executorService an {@link ScheduledExecutorService} object
    * @param ovsdbClientFuture will complete when the connection is established.
+   * @return an {@link OvsdbChannelInitializer} object
    */
   public static OvsdbChannelInitializer newOvsdbChannelInitializer(
       SslContext sslContext, ScheduledExecutorService executorService,

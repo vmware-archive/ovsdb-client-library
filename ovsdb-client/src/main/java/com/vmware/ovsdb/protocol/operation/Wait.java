@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Representation of wait> operation.
+ * Representation of wait operation.
  *
  * <pre>
  * {@literal
@@ -115,6 +115,7 @@ public class Wait extends Operation {
    * @param timeout value of the "timeout" field
    * @param where value of the "where" field
    * @param columns value of the "columns" field
+   * @param until value of the "until" field
    * @param rows value of the "rows" field
    */
   public Wait(

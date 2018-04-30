@@ -116,6 +116,7 @@ public abstract class BaseType {
    * Create a {@link BaseType} with given {@link AtomicType} object.
    *
    * @param atomicType an {@link AtomicType} object to build the {@link BaseType}
+   * @return a {@link BaseType} object
    */
   public static BaseType atomicType(AtomicType atomicType) {
     BaseType baseType = null;

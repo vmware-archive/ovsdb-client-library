@@ -135,6 +135,8 @@ public class Row {
   /**
    * Get the value from a column whose type is {@literal <map>}.
    *
+   * @param <K> the type of the keys in the map
+   * @param <V> the type of the values in the map
    * @param name column name
    * @return the value of the column
    */
@@ -150,6 +152,7 @@ public class Row {
   /**
    * Get the value from a column whose type is {@literal <set>}.
    *
+   * @param <T> the type of the values in the set
    * @param name column name
    * @return the value of the column
    */

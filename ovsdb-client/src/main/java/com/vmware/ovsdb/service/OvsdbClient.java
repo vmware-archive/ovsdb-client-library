@@ -39,6 +39,7 @@ public interface OvsdbClient {
    * management protocol connection.
    *
    * @return a {@link CompletableFuture} from which the database names array can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<String[]> listDatabases() throws OvsdbClientException;
 
@@ -47,6 +48,7 @@ public interface OvsdbClient {
    *
    * @param dbName the database name
    * @return a {@link CompletableFuture} from which the schema can be got
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<DatabaseSchema> getSchema(String dbName) throws OvsdbClientException;
 
@@ -56,6 +58,7 @@ public interface OvsdbClient {
    * @param dbName the database name
    * @param operations a list of operations in this transaction
    * @return a {@link CompletableFuture} from which the operation results can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<OperationResult[]> transact(String dbName, List<Operation> operations)
       throws OvsdbClientException;
@@ -69,6 +72,7 @@ public interface OvsdbClient {
    * @param monitorRequests monitor requests
    * @param monitorCallback will be called when there are updates on the monitored tables
    * @return a {@link CompletableFuture} from which the initial table updates can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<TableUpdates> monitor(
       String dbName, String monitorId, MonitorRequests monitorRequests,
@@ -80,6 +84,7 @@ public interface OvsdbClient {
    *
    * @param monitorId id of the monitor to be canceled
    * @return a {@link CompletableFuture} from which the cancel result can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<Void> cancelMonitor(String monitorId) throws OvsdbClientException;
 
@@ -89,6 +94,7 @@ public interface OvsdbClient {
    * @param lockId id of the lock to lock
    * @param lockCallback will be called when the lock is locked or stolen
    * @return a {@link CompletableFuture} from which the lock result can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<LockResult> lock(String lockId, LockCallback lockCallback)
       throws OvsdbClientException;
@@ -99,6 +105,7 @@ public interface OvsdbClient {
    * @param lockId id of the lock to steal
    * @param lockCallback will be called when the lock is stolen
    * @return a {@link CompletableFuture} from which the steal result can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<LockResult> steal(String lockId, LockCallback lockCallback)
       throws OvsdbClientException;
@@ -108,6 +115,7 @@ public interface OvsdbClient {
    *
    * @param lockId id of the lock to unlock
    * @return a {@link CompletableFuture} from which the unlock result can be retrieved
+   * @throws OvsdbClientException when the request doesn't go through
    */
   CompletableFuture<Void> unlock(String lockId) throws OvsdbClientException;
 

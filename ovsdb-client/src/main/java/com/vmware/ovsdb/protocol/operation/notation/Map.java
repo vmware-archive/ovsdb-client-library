@@ -55,7 +55,10 @@ public class Map<K, V> extends Value {
   /**
    * Create a {@link Map} object using a {@link java.util.Map} object.
    *
-   * @param map value of the map
+   * @param <K> key the type of keys maintained by this map
+   * @param <V> the type of mapped values
+   * @param map the {@link java.util.Map} object
+   * @return a {@link Map} object
    */
   public static <K, V> Map of(java.util.Map<K, V> map) {
     if (map == null) {

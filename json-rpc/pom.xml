@@ -5,10 +5,11 @@
   <parent>
     <artifactId>ovsdb-client-library</artifactId>
     <groupId>com.vmware.ovsdb</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
+  <name>JSON RPC 1.0</name>
   <artifactId>json-rpc</artifactId>
 
   <dependencies>

@@ -71,7 +71,9 @@ public class Set extends Value {
   /**
    * Create a {@link Set} object using a {@link java.util.Set} object.
    *
+   * @param <T> the type of the values in the set
    * @param set value of the set
+   * @return a {@link Set} object
    */
   public static <T> Set of(java.util.Set<T> set) {
     if (set == null) {

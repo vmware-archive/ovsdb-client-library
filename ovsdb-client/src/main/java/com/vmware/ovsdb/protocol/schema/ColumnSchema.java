@@ -59,6 +59,8 @@ public class ColumnSchema {
 
   /**
    * Create a {@link ColumnSchema} object.
+   *
+   * @param type value of the "type" field
    */
   public ColumnSchema(Type type) {
     this(type, null, null);
