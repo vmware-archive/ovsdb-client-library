@@ -2,7 +2,8 @@
 # OVSDB Client Library
 ![Travis](https://img.shields.io/travis/vmware/ovsdb-client-library.svg)
 ![Coveralls github](https://img.shields.io/coveralls/github/vmware/ovsdb-client-library.svg)
-
+![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.vmware.ovsdb/ovsdb-client-library.svg)
+![Maven Central](https://img.shields.io/maven-central/v/com.vmware.ovsdb/ovsdb-client-library.svg)
 
 ## Overview
 This is a schema-independent OVSDB client implementation of OVSDB Management Protocol 
@@ -12,26 +13,14 @@ implemented.
 ## Getting Started
 
 ### Dependency
-Currently, only 1.0-SNAPSHOT version is available and we temporarily use github as a maven 
-repository. In order to use this library you have to add github repository and dependency to 
-the pom file:
+In order to use this library you have to add a dependency to the pom file:
 
 ```xml
-<repositories>
-    <repository>
-        <id>ovsdb-client-repo</id>
-        <url>https://raw.github.com/vmware/ovsdb-client-library/mvn-repo/</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
-    </repository>
-</repositories>
 <dependencies>
     <dependency>
         <groupId>com.vmware.ovsdb</groupId>
         <artifactId>ovsdb-client</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </dependency>
 </dependencies>
 ```
@@ -51,7 +40,7 @@ Note: You can also configure it to read connection methods from a db table. For 
 table in hardware_vtep database.
 
 ```java
-ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);    
+ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();    
 OvsdbPassiveConnectionListener listener = new OvsdbPassiveConnectionListenerImpl(executorService);  // (1)
 
 CompletableFuture<OvsdbClient> ovsdbClientFuture = new CompletableFuture<>();
@@ -64,7 +53,7 @@ ConnectionCallback connectionCallback = new ConnectionCallback() {      // (2)
         System.out.println(ovsdbClient + " disconnected");
     }
 };
-listener.startListening(6640, connectionCallback);       // (3)
+listener.startListening(6640, connectionCallback).join();       // (3)
 
 OvsdbClient ovsdbClient = ovsdbClientFuture.get(3, TimeUnit.SECONDS);   // (4)
 CompletableFuture<String[]> f = ovsdbClient.listDatabases();
@@ -73,7 +62,7 @@ System.out.println(Arrays.toString(dbs));
 
 ```
 
-From above example we can see the steps of getting an `OvsdbClient` object.
+From above example we can see the steps of getting an `OvsdbClient` object from a passive connection.
 
 (1) Construct a `OvsdbPassiveConnectionListener`. The `OvsdbPassiveConnectionListenerImpl`
 takes a `ScheduledExecutorService` for asynchronous operations.  
@@ -97,39 +86,30 @@ In the following example, the ovsdb-server is started by command:
 $ ovsdb-server --remote=ptcp:6640
 ``` 
 ```java
-ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);    
-OvsdbActiveConnectionConnectorImpl connector = new OvsdbActiveConnectionConnectorImpl(executorService);  // (1)
+ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();    
+OvsdbActiveConnectionConnector connector = new OvsdbActiveConnectionConnectorImpl(executorService);  // (1)
 
-CompletableFuture<OvsdbClient> ovsdbClientFuture = new CompletableFuture<>();
-ConnectionCallback connectionCallback = new ConnectionCallback() {      // (2)
-    public void connected(OvsdbClient ovsdbClient) {
-        System.out.println(ovsdbClient + " connected");
-        ovsdbClientFuture.complete(ovsdbClient);
-    }
-    public void disconnected(OvsdbClient ovsdbClient) {
-        System.out.println(ovsdbClient + " disconnected");
-    }
-};
-connector.connect("192.168.33.74", 6640, connectionCallback);       // (3)
+CompletableFuture<OvsdbClient> ovsdbClientFuture = connector.connect("192.168.33.74", 6640);       // (2)
 
-OvsdbClient ovsdbClient = ovsdbClientFuture.get(3, TimeUnit.SECONDS);   // (4)
+OvsdbClient ovsdbClient = ovsdbClientFuture.get(3, TimeUnit.SECONDS);   // (3)
 CompletableFuture<String[]> f = ovsdbClient.listDatabases();
 String[] dbs = f.get(3, TimeUnit.SECONDS);
 System.out.println(Arrays.toString(dbs));
 
 ```
-The code is same as that of passive connection, except that this time we use a 
-`OvsdbActiveConnectionConnectorImpl` to initiate the connection.
+From above example we can see the steps of getting an `OvsdbClient` object from an active connection.
+
+(1) Construct a `OvsdbActiveConnectionConnector`. The `OvsdbActiveConnectionConnectorImpl`
+takes a `ScheduledExecutorService` for asynchronous operations.  
+(2) Connect to the host:port and get a `CompletableFuture<OvsdbClient>`.  
+(3) Get the `OvsdbClient` object from the `CompletableFuture<OvsdbClient>`.
 
 ## TODOs
 1. **ORM layer**. Currently, to perform a transaction, the user has to construct the `Row` object. 
 Ideally, there should be an ORM layer through which the user only needs to define the entity object 
 annotated with certain annotations. And one entity object can be used to represent one row.
 This is similar to JPA.
-2. **Integration tests with containers and CI/CD pipeline**. 
-3. **Use central maven repo**. After the first release, upload the jar to central maven repo. 
-See [Guide to uploading artifacts to the Central Repository](https://maven.apache.org/guides/mini/guide-central-repository-upload.html)
-4. **Use Wiki for documentation.**
+2. **Use Wiki for documentation.**
 
 ## Contributing
 
