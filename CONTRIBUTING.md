@@ -62,8 +62,7 @@ notification when you git push.
 
 ### Code Style
 Google Java style is used: [intellij-java-google-style](https://github.com/google/styleguide/blob/gh-pages/intellij-java-google-style.xml)
-or [eclipse-java-google-style](https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml).
-The only difference is: tab size is 4 instead of 2.
+or [eclipse-java-google-style](https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml). checkstyle plugin is used with google_checks.xml.
 
 ### Formatting Commit Messages
 
