@@ -1,7 +1,7 @@
 
 # OVSDB Client Library
-![Travis](https://img.shields.io/travis/vmware/ovsdb-client-library.svg)
-![Coveralls github](https://img.shields.io/coveralls/github/vmware/ovsdb-client-library.svg)
+[![Build Status](https://travis-ci.org/vmware/ovsdb-client-library.svg?branch=master)](https://travis-ci.org/vmware/ovsdb-client-library)
+[![Coverage Status](https://coveralls.io/repos/github/vmware/ovsdb-client-library/badge.svg?branch=master)](https://coveralls.io/github/vmware/ovsdb-client-library?branch=master)
 ![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.vmware.ovsdb/ovsdb-client-library.svg)
 ![Maven Central](https://img.shields.io/maven-central/v/com.vmware.ovsdb/ovsdb-client-library.svg)
 
@@ -104,12 +104,8 @@ takes a `ScheduledExecutorService` for asynchronous operations.
 (2) Connect to the host:port and get a `CompletableFuture<OvsdbClient>`.  
 (3) Get the `OvsdbClient` object from the `CompletableFuture<OvsdbClient>`.
 
-## TODOs
-1. **ORM layer**. Currently, to perform a transaction, the user has to construct the `Row` object. 
-Ideally, there should be an ORM layer through which the user only needs to define the entity object 
-annotated with certain annotations. And one entity object can be used to represent one row.
-This is similar to JPA.
-2. **Use Wiki for documentation.**
+## Documentation
+For detailed documentation, see [Wiki](https://github.com/vmware/ovsdb-client-library/wiki/).
 
 ## Contributing
 
