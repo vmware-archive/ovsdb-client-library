@@ -74,7 +74,7 @@ and commits.
 
 ## Reporting Bugs and Creating Issues
 
-When opening a new issue, try to roughly follow the commit message format conventions above.
+Please report any issues [here](https://github.com/vmware/ovsdb-client-library/issues). When opening a new issue, try to roughly follow the commit message format conventions above.
 
 ## Repository Structure
 ```
@@ -96,3 +96,20 @@ ovsdb-client-library
  |      |
  |      +---src
 ```
+## How to Run Tests
+### Prerequisites
+* Maven 3+
+* Docker (For integration test only)
+
+### Unit Tests
+Under root directory, run:
+```bash
+$ mvn clean test
+```
+
+### Integration Tests
+Make sure you have docker service installed. Then run the following command:
+```bash
+$ mvn clean verify -Dhost.ip=<host-ip>
+```
+For Mac OS, `<host-ip>` is the IP of your host. For Linux, `<host-ip>` is the IP of the `docker0` interface.
