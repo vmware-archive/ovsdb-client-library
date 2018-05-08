@@ -7,7 +7,7 @@
   <groupId>com.vmware.ovsdb</groupId>
   <artifactId>ovsdb-client-library</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>OVSDB Client Library</name>
   <description>An OVSDB client for interacting with an OVSDB server.</description>
   <url>https://github.com/vmware/ovsdb-client-library/</url>

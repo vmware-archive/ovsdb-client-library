@@ -20,7 +20,7 @@ In order to use this library you have to add a dependency to the pom file:
     <dependency>
         <groupId>com.vmware.ovsdb</groupId>
         <artifactId>ovsdb-client</artifactId>
-        <version>1.0.0</version>
+        <version>LATEST</version>
     </dependency>
 </dependencies>
 ```
