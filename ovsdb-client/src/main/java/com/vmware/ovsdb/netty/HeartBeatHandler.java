@@ -21,15 +21,15 @@ import com.vmware.ovsdb.jsonrpc.v1.model.JsonRpcV1Request;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonRpcConstant;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 import com.vmware.ovsdb.util.PropertyManager;
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 
-class HeartBeatHandler extends ChannelDuplexHandler {
+class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
