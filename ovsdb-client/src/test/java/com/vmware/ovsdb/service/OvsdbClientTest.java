@@ -18,6 +18,7 @@ import static com.vmware.ovsdb.protocol.util.OvsdbConstant.LOCK;
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.STEAL;
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.UNLOCK;
 import static com.vmware.ovsdb.testutils.SslUtil.newSelfSignedSslContextPair;
+import static com.vmware.ovsdb.testutils.TestConstants.VERIFY_TIMEOUT_MILLIS;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertArrayEquals;
@@ -74,8 +75,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -124,6 +128,7 @@ abstract class OvsdbClientTest {
     testConnectionInfo();
     testErrorOperation();
     testLock();
+    testEchoResponse();
   }
 
   void testTcpConnection()
@@ -507,8 +512,6 @@ abstract class OvsdbClientTest {
   }
 
   private void testLock() throws OvsdbClientException {
-    int VERIFY_TIMEOUT_MILLIS = 5000;
-
     // Get lock-1
     String lockId1 = "lock-1";
     LockCallback lockCallback1 = mock(LockCallback.class);
@@ -556,6 +559,38 @@ abstract class OvsdbClientTest {
     ovsdbServerEmulator.write("{\"method\":\"stolen\", "
         + "\"params\":[\"" + lockId3 + "\"], \"id\":null}");
     verify(lockCallback3, timeout(VERIFY_TIMEOUT_MILLIS)).stolen();
+  }
+
+  private void testEchoResponse() {
+    CompletableFuture<Void> successFuture1 = new CompletableFuture<>();
+    final String expectedResponse1 = "{\"result\":[]," + "\"error\":null,\"id\":\"echo\"}";
+    ovsdbServerEmulator.registerReadCallback(msg -> {
+      if (msg.equals(expectedResponse1)) {
+        successFuture1.complete(null);
+      }
+    });
+    ovsdbServerEmulator.write("{\"method\":\"echo\",\"params\":[],\"id\":\"echo\"}");
+    try {
+      successFuture1.get(VERIFY_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+      fail(e.getMessage());
+    }
+
+    CompletableFuture<Void> successFuture2 = new CompletableFuture<>();
+    final String expectedResponse2 = "{\"result\":[123,\"456\",true]," + "\"error\":null,"
+        + "\"id\":\"echo\"}";
+    ovsdbServerEmulator.registerReadCallback(msg -> {
+      if (msg.equals(expectedResponse2)) {
+        successFuture2.complete(null);
+      }
+    });
+    ovsdbServerEmulator.write("{\"method\":\"echo\",\"params\":[123,\"456\",true],"
+        + "\"id\":\"echo\"}");
+    try {
+      successFuture2.get(VERIFY_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+      fail(e.getMessage());
+    }
   }
 
   private void setupOvsdbEmulator(
