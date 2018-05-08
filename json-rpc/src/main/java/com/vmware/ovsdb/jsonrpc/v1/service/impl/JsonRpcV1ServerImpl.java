@@ -140,7 +140,7 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
 
     Object[] actualParams = new Object[methodParamSize];
     if (methodParamSize != actualParamSize) {
-      // This is not an error only if the last arg is an vararg
+      // This is not an error only if the last arg is a vararg
       // And the actual params number must be >= methods params number - 1
       // For e.g. if a methods has n params, the last one is an vararg,
       // then the number of actual params can be [n-1, ...)
@@ -149,10 +149,8 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
           && parameters[lastIndex].isVarArgs()
           && actualParamSize >= lastIndex) {
 
-        if (actualParamSize > lastIndex) {
-          Class<?> type = parameters[lastIndex].getType().getComponentType();
-          actualParams[lastIndex] = buildVarargParam(paramsNode, lastIndex, type);
-        }
+        Class<?> type = parameters[lastIndex].getType().getComponentType();
+        actualParams[lastIndex] = buildVarargParam(paramsNode, lastIndex, type);
         // We have handled the last param, no need to handle it later
         --methodParamSize;
       } else {
@@ -169,11 +167,9 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
         actualParams[i] = JsonUtil.treeToValue(paramNode, type);
       } catch (JsonProcessingException ex) {
         throw new IllegalArgumentException(
-            "Failed to convert param " + paramNode + " to type " + type
-        );
+              "Failed to convert param " + paramNode + " to type " + type);
       }
     }
-
     return actualParams;
   }
 
