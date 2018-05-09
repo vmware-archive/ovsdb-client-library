@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.vmware.ovsdb.jsonrpc.v1.util.JsonUtil;
 
+import java.util.Objects;
+
 /**
  * The request is a single object serialized using  JSON. It has three properties:
  * <p>
@@ -86,6 +88,26 @@ public class JsonRpcV1Request {
 
   public String getId() {
     return id;
+  }
+
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof JsonRpcV1Request)) {
+      return false;
+    }
+    JsonRpcV1Request that = (JsonRpcV1Request) other;
+    return Objects.equals(method, that.method)
+        && Objects.equals(params, that.params)
+        && Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(method, params, id);
   }
 
   @Override

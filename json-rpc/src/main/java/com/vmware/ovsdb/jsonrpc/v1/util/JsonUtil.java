@@ -44,30 +44,6 @@ public class JsonUtil {
   }
 
   /**
-   * Deserialize a JSON string to an object of given class.
-   *
-   * @param jsonString JSON string to deserialize
-   * @param klass class of the object
-   * @return the deserialized object
-   * @throws IOException if fail to deserialize the object
-   */
-  public static <T> T deserialize(String jsonString, Class<T> klass) throws IOException {
-    return objectMapper.readValue(jsonString, klass);
-  }
-
-  /**
-   * Deserialize a JSON file to an object of given class.
-   *
-   * @param url URL to the JSON file to deserialize
-   * @param klass class of the object
-   * @return the deserialized object
-   * @throws IOException if fail to deserialize the object
-   */
-  public static <T> T deserialize(URL url, Class<T> klass) throws IOException {
-    return objectMapper.readValue(url, klass);
-  }
-
-  /**
    * Convert a {@link JsonNode} to an object of given class without throwing an exception.
    *
    * @param jsonNode JsonNode to deserialize
@@ -96,6 +72,40 @@ public class JsonUtil {
     } catch (Exception ex) {
       return null;
     }
+  }
+
+  /**
+   * Convert an object to a {@link JsonNode}.
+   *
+   * @param object the object to convert
+   * @return the {@link JsonNode} converted from the object
+   */
+  public static JsonNode toJsonNode(Object object) {
+    return objectMapper.valueToTree(object);
+  }
+
+  /**
+   * Deserialize a JSON string to an object of given class.
+   *
+   * @param jsonString JSON string to deserialize
+   * @param klass class of the object
+   * @return the deserialized object
+   * @throws IOException if fail to deserialize the object
+   */
+  public static <T> T deserialize(String jsonString, Class<T> klass) throws IOException {
+    return objectMapper.readValue(jsonString, klass);
+  }
+
+  /**
+   * Deserialize a JSON file to an object of given class.
+   *
+   * @param url URL to the JSON file to deserialize
+   * @param klass class of the object
+   * @return the deserialized object
+   * @throws IOException if fail to deserialize the object
+   */
+  public static <T> T deserialize(URL url, Class<T> klass) throws IOException {
+    return objectMapper.readValue(url, klass);
   }
 
   /**
@@ -136,16 +146,6 @@ public class JsonUtil {
    */
   public static String serialize(Object object) throws JsonProcessingException {
     return objectMapper.writeValueAsString(object);
-  }
-
-  /**
-   * Convert an object to a {@link JsonNode}.
-   *
-   * @param object the object to convert
-   * @return the {@link JsonNode} converted from the object
-   */
-  public static JsonNode toJsonNode(Object object) {
-    return objectMapper.valueToTree(object);
   }
 
   /**
