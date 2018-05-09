@@ -22,13 +22,16 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vmware.ovsdb.callback.ConnectionCallback;
 import com.vmware.ovsdb.util.PropertyManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HeartBeatHandlerTest {
+import java.util.concurrent.ScheduledExecutorService;
+
+public class OvsdbConnectionHandlerTest {
 
   private final ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
 
@@ -44,7 +47,7 @@ public class HeartBeatHandlerTest {
 
   @Test
   public void testReadRegularMessage() {
-    HeartBeatHandler heartBeatHandler = new HeartBeatHandler();
+    OvsdbConnectionHandler heartBeatHandler = newOvsdbConnectionHandler();
     JsonNode jsonNode = JsonNodeFactory.instance.objectNode();
     ((ObjectNode) jsonNode).put("id", "123");
     ((ObjectNode) jsonNode).put("method", "echo");
@@ -56,7 +59,7 @@ public class HeartBeatHandlerTest {
 
   @Test
   public void testReadRegularEvent() {
-    HeartBeatHandler heartBeatHandler = new HeartBeatHandler();
+    OvsdbConnectionHandler heartBeatHandler = newOvsdbConnectionHandler();
     Object userEvent = new Object();
     heartBeatHandler.userEventTriggered(ctx, userEvent);
 
@@ -65,7 +68,7 @@ public class HeartBeatHandlerTest {
 
   @Test
   public void testChannelReadTimeout() {
-    HeartBeatHandler heartBeatHandler = new HeartBeatHandler();
+    OvsdbConnectionHandler heartBeatHandler = newOvsdbConnectionHandler();
     for (int i = 0; i < MAX_READ_IDLE_BEFORE_CLOSE; i++) {
       heartBeatHandler.userEventTriggered(ctx, idleStateEvent);
     }
@@ -74,7 +77,7 @@ public class HeartBeatHandlerTest {
 
   @Test
   public void testReceiveHeartbeatResponseInTime() {
-    HeartBeatHandler heartBeatHandler = new HeartBeatHandler();
+    OvsdbConnectionHandler heartBeatHandler = newOvsdbConnectionHandler();
     for (int i = 0; i < MAX_READ_IDLE_BEFORE_CLOSE - 1; i++) {
       heartBeatHandler.userEventTriggered(ctx, idleStateEvent);
     }
@@ -86,5 +89,10 @@ public class HeartBeatHandlerTest {
     heartBeatHandler.channelRead(ctx, jsonNode);
     heartBeatHandler.userEventTriggered(ctx, idleStateEvent);
     verify(ctx, times(0)).close();
+  }
+
+  private OvsdbConnectionHandler newOvsdbConnectionHandler() {
+    return new OvsdbConnectionHandler(mock(ConnectionCallback.class),
+        mock(ScheduledExecutorService.class));
   }
 }
