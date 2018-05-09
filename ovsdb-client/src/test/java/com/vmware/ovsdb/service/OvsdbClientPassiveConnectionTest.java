@@ -39,6 +39,7 @@ public class OvsdbClientPassiveConnectionTest extends OvsdbClientTest {
 
   @After
   public void tearDown() {
+    super.teardown();
     activeOvsdbServer.disconnect().join();
     passiveListener.stopListening(PORT).join();
   }

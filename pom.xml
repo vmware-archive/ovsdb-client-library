@@ -93,11 +93,6 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${log4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${log4j.version}</version>
       </dependency>
@@ -143,10 +138,6 @@
 
   <dependencies>
     <!-- Common dependencies for all modules -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -218,6 +209,11 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>${cobertura.plugin.version}</version>
         <configuration>
+          <instrumentation>
+            <excludes>
+              <exclude>**/util/*.class</exclude>
+            </excludes>
+          </instrumentation>
           <check>
             <branchRate>90</branchRate>
             <lineRate>90</lineRate>

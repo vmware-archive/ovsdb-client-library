@@ -113,7 +113,19 @@ abstract class OvsdbClientTest {
 
   abstract void setUp(boolean withSsl);
 
-  private void testAll() throws IOException, OvsdbClientException {
+  void teardown() {
+    ovsdbClient.shutdown();
+
+    OvsdbClientException exception = null;
+    try {
+      ovsdbClient.listDatabases();
+    } catch (OvsdbClientException e) {
+      exception = e;
+    }
+    assertNotNull(exception);
+  }
+
+  private void testBasic() throws OvsdbClientException, IOException {
     testListDatabases();
     testGetSchema();
     testInsertTransact();
@@ -128,7 +140,17 @@ abstract class OvsdbClientTest {
     testConnectionInfo();
     testErrorOperation();
     testLock();
-    testEchoResponse();
+    testEcho();
+  }
+
+  private void testNegative() throws OvsdbClientException, IOException {
+    testInvalidJsonRpcMessage();
+    testInvalidMonitorUpdate();
+  }
+
+  private void testAll() throws IOException, OvsdbClientException {
+    testBasic();
+    testNegative();
   }
 
   void testTcpConnection()
@@ -437,7 +459,7 @@ abstract class OvsdbClientTest {
         .monitor("hardware_vtep", monitorId, monitorRequests, monitorCallback);
     f.join();
 
-    expectedRequest = getJsonRequestString("monitor_cancel", "1");
+    expectedRequest = getJsonRequestString("monitor_cancel", monitorId);
     setupOvsdbEmulator(expectedRequest, "{}", null);
     f = ovsdbClient.cancelMonitor(monitorId);
     f.join();
@@ -561,7 +583,7 @@ abstract class OvsdbClientTest {
     verify(lockCallback3, timeout(VERIFY_TIMEOUT_MILLIS)).stolen();
   }
 
-  private void testEchoResponse() {
+  private void testEcho() {
     CompletableFuture<Void> successFuture1 = new CompletableFuture<>();
     final String expectedResponse1 = "{\"result\":[]," + "\"error\":null,\"id\":\"echo\"}";
     ovsdbServerEmulator.registerReadCallback(msg -> {
@@ -591,6 +613,20 @@ abstract class OvsdbClientTest {
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       fail(e.getMessage());
     }
+  }
+
+  private void testInvalidJsonRpcMessage() throws OvsdbClientException, IOException {
+    // Send an invalid JSON-RPC message
+    ovsdbServerEmulator.write("{\"method\":\"foo\"}");
+    // Make sure it still works after receiving this invalid message.
+    testBasic();
+  }
+
+  private void testInvalidMonitorUpdate() throws OvsdbClientException, IOException {
+    // Send an invalid monitor update message
+    ovsdbServerEmulator.write("{\"method\":\"update\", \"params\":[\"blabla\"], \"id\":null}");
+    // Make sure it still works after processing this invalid message.
+    testBasic();
   }
 
   private void setupOvsdbEmulator(
