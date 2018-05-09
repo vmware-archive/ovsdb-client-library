@@ -37,6 +37,7 @@ public class OvsdbClientActiveConnectionTest extends OvsdbClientTest {
 
   @After
   public void tearDown() {
+    super.teardown();
     passiveOvsdbServer.stopListening().join();
   }
 
