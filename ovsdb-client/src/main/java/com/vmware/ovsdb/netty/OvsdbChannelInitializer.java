@@ -99,14 +99,13 @@ public class OvsdbChannelInitializer extends ChannelInitializer<SocketChannel> {
     pipeline.addLast("logger", new LoggingHandler(LogLevel.TRACE));
     pipeline.addLast("decoder", new JsonNodeDecoder());
     pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-    pipeline.addLast("heartbeatHandler", new HeartBeatHandler());
-    OvsdbClientHandler ovsdbClientHandler;
+    OvsdbConnectionHandler ovsdbConnectionHandler;
     if (isPassiveMode()) {
-      ovsdbClientHandler = new OvsdbClientHandler(connectionCallback, executorService);
+      ovsdbConnectionHandler = new OvsdbConnectionHandler(connectionCallback, executorService);
     } else {
-      ovsdbClientHandler = new OvsdbClientHandler(ovsdbClientFuture, executorService);
+      ovsdbConnectionHandler = new OvsdbConnectionHandler(ovsdbClientFuture, executorService);
     }
-    pipeline.addLast("ovsdbClientHandler", ovsdbClientHandler);
+    pipeline.addLast("ovsdbConnectionHandler", ovsdbConnectionHandler);
     pipeline.addLast("exceptionHandler", new ExceptionHandler());
   }
 
