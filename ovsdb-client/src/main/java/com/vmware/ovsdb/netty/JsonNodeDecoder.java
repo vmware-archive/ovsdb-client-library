@@ -31,6 +31,11 @@ class JsonNodeDecoder extends JsonObjectDecoder {
   private static final Logger LOGGER = LoggerFactory.getLogger(
       MethodHandles.lookup().lookupClass());
 
+  JsonNodeDecoder() {
+    // Max message length 1 GB.
+    super(1024 * 1024 * 1024);
+  }
+
   @Override
   protected void decode(
       ChannelHandlerContext ctx, ByteBuf in, List<Object> out
