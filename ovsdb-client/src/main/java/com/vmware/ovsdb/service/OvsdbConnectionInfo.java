@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
 import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 
 public class OvsdbConnectionInfo {
 
@@ -108,12 +109,15 @@ public class OvsdbConnectionInfo {
     Certificate localCertificate = null;
     Certificate remoteCertificate = null;
     if (sslHandler != null) {
+      SSLSession sslSession = sslHandler.engine().getSession();
       try {
-        remoteCertificate = sslHandler.engine().getSession().getPeerCertificates()[0];
+        remoteCertificate = sslSession.getPeerCertificates()[0];
       } catch (SSLPeerUnverifiedException ex) {
         LOGGER.error("Failed to get peer certificate of channel " + channel, ex);
       }
-      localCertificate = sslHandler.engine().getSession().getLocalCertificates()[0];
+      if (sslSession.getLocalCertificates() != null) {
+        localCertificate = sslSession.getLocalCertificates()[0];
+      }
     }
     return new OvsdbConnectionInfo(
         localAddress, localPort, remoteAddress, remotePort, localCertificate, remoteCertificate

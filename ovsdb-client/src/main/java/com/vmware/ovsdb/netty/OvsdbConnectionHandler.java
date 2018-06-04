@@ -122,7 +122,7 @@ class OvsdbConnectionHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelInactive(ChannelHandlerContext ctx) {
     LOGGER.info("Channel {} is now inactive", ctx.channel());
-    if (connectionCallback != null) {
+    if (connectionCallback != null && ovsdbClient != null) {
       executorService.submit(() -> connectionCallback.disconnected(ovsdbClient));
     }
   }
