@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 public class JsonRpcHandler extends ChannelInboundHandlerAdapter {
@@ -37,6 +38,8 @@ public class JsonRpcHandler extends ChannelInboundHandlerAdapter {
   private final JsonRpcV1Client jsonRpcClient;
 
   private final JsonRpcV1Server jsonRpcServer;
+
+  private CompletableFuture<Void> completableFuture = CompletableFuture.completedFuture(null);
 
   /**
    * Create a {@link JsonRpcHandler} that can handle JSON-RPC inbound messages.
@@ -57,25 +60,30 @@ public class JsonRpcHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
     JsonNode jsonNode = (JsonNode) msg;
+    Runnable runnable = null;
     if (isRequestOrNotification(jsonNode)) {
-      executorService.submit(() -> {
+      runnable = () -> {
         try {
           jsonRpcServer.handleRequest(jsonNode);
         } catch (JsonRpcException ex) {
           LOGGER.error("Failed to handle request " + jsonNode, ex);
         }
-      });
+      };
     } else if (isResponse(jsonNode)) {
-      executorService.submit(() -> {
+      runnable = () -> {
         try {
           jsonRpcClient.handleResponse(jsonNode);
         } catch (JsonRpcException ex) {
           LOGGER.error("Failed to handle response " + jsonNode, ex);
         }
-      });
+      };
     } else {
       // Ignore non-JSON_RPC messages
       LOGGER.warn("Received invalid message {}", jsonNode);
+    }
+
+    if (runnable != null) {
+      completableFuture = completableFuture.thenRunAsync(runnable, executorService);
     }
   }
 
