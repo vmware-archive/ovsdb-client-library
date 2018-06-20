@@ -62,6 +62,7 @@ public class UpdateTest {
   public void testSerialization() throws JsonProcessingException {
     String expectedResult
         = "{\"op\":\"update\",\"table\":\"" + tableName + "\","
+        + "\"row\":{\"name\":\"ls2\",\"tunnel_key\":5002},"
         + "\"where\":[[\"string_column\",\"includes\",\"A string\"],"
         + "[\"integer_column\",\"<\",42],"
         + "[\"bool_column\",\"==\",true],"
@@ -69,7 +70,7 @@ public class UpdateTest {
         + "[\"named-uuid_column\",\"excludes\",[\"named-uuid\",\"uuid-name\"]],"
         + "[\"map_column\",\">=\",[\"map\",[[\"key\",\"value\"]]]],"
         + "[\"set_column\",\"<=\",[\"set\",[\"value2\",\"value1\"]]]"
-        + "],\"row\":{\"name\":\"ls2\",\"tunnel_key\":5002}}";
+        + "]}";
 
     assertEquals(expectedResult, JsonUtil.serialize(update));
   }

@@ -15,7 +15,9 @@
 package com.vmware.ovsdb.protocol.operation;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.MUTATE;
+import static com.vmware.ovsdb.protocol.util.OvsdbConstant.WHERE;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import com.vmware.ovsdb.protocol.operation.notation.Condition;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
@@ -84,7 +86,8 @@ public class Mutate extends Operation {
 
   private final String table;
 
-  private List<Condition> where;
+  @JsonProperty(value = WHERE)
+  private List<Condition> conditions;
 
   private List<Mutation> mutations;
 
@@ -96,20 +99,20 @@ public class Mutate extends Operation {
    * Create a {@link Mutate} object.
    *
    * @param table value of the "table" field
-   * @param where value of the "where" field
+   * @param conditions value of the "where" field
    * @param mutations value of the "mutations" field
    */
   public Mutate(
-      String table, List<Condition> where, List<Mutation> mutations
+      String table, List<Condition> conditions, List<Mutation> mutations
   ) {
     super(MUTATE);
     this.table = table;
-    this.where = where;
+    this.conditions = conditions;
     this.mutations = mutations;
   }
 
   public Mutate where(String column, Function function, Value value) {
-    where.add(new Condition(column, function, value));
+    conditions.add(new Condition(column, function, value));
     return this;
   }
 
@@ -187,7 +190,7 @@ public class Mutate extends Operation {
   }
 
   public List<Condition> getWhere() {
-    return where;
+    return conditions;
   }
 
   public List<Mutation> getMutations() {
@@ -204,21 +207,21 @@ public class Mutate extends Operation {
     }
     Mutate that = (Mutate) other;
     return Objects.equals(table, that.getTable())
-        && Objects.equals(where, that.getWhere())
+        && Objects.equals(conditions, that.getWhere())
         && Objects.equals(mutations, that.getMutations());
   }
 
   @Override
   public int hashCode() {
 
-    return Objects.hash(table, where, mutations);
+    return Objects.hash(table, conditions, mutations);
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + " ["
         + "table=" + table
-        + ", where=" + where
+        + ", where=" + conditions
         + ", mutations=" + mutations
         + "]";
   }

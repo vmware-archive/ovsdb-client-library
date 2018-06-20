@@ -17,6 +17,8 @@ package com.vmware.ovsdb.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 import java.util.function.Function;
@@ -32,10 +34,13 @@ public class PropertyManager {
 
   static {
     try {
-      properties.load(
-          PropertyManager.class.getClassLoader().getResourceAsStream(PROPERTY_FILE_NAME)
-      );
-    } catch (Throwable ex) {
+      ClassLoader classLoader = PropertyManager.class.getClassLoader();
+      if (classLoader != null) {
+        InputStream is = classLoader.getResourceAsStream(PROPERTY_FILE_NAME);
+        properties.load(is);
+        is.close();
+      }
+    } catch (IOException ex) {
       LOGGER.error("Failed to load properties", ex);
     }
   }

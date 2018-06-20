@@ -102,4 +102,6 @@ public class OvsdbConstant {
   public static final String UPDATE = "update";
 
   public static final String WAIT = "wait";
+
+  public static final String WHERE = "where";
 }
