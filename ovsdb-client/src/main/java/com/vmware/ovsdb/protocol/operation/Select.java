@@ -15,6 +15,7 @@
 package com.vmware.ovsdb.protocol.operation;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.SELECT;
+import static com.vmware.ovsdb.protocol.util.OvsdbConstant.WHERE;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -73,7 +74,8 @@ public class Select extends Operation {
 
   private final String table;
 
-  private List<Condition> where;
+  @JsonProperty(value = WHERE)
+  private List<Condition> conditions;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<String> columns;
@@ -82,31 +84,31 @@ public class Select extends Operation {
     this(table, new ArrayList<>(), null);
   }
 
-  public Select(String table, List<Condition> where) {
-    this(table, where, null);
+  public Select(String table, List<Condition> conditions) {
+    this(table, conditions, null);
   }
 
   /**
    * Create an {@link Select} object.
    *
    * @param table value of the "table" field
-   * @param where value of the "where" field
+   * @param conditions value of the "where" field
    * @param columns value of the "columns" field
    */
   @JsonCreator
   public Select(
       @JsonProperty(value = "table", required = true) String table,
-      @JsonProperty(value = "where", required = true) List<Condition> where,
+      @JsonProperty(value = "conditions", required = true) List<Condition> conditions,
       @JsonProperty(value = "columns") List<String> columns
   ) {
     super(SELECT);
     this.table = table;
-    this.where = where;
+    this.conditions = conditions;
     this.columns = columns;
   }
 
   public Select where(String column, Function function, Value value) {
-    where.add(new Condition(column, function, value));
+    conditions.add(new Condition(column, function, value));
     return this;
   }
 
@@ -152,7 +154,7 @@ public class Select extends Operation {
   }
 
   public List<Condition> getWhere() {
-    return where;
+    return conditions;
   }
 
   public List<String> getColumns() {
@@ -169,20 +171,20 @@ public class Select extends Operation {
     }
     Select that = (Select) other;
     return Objects.equals(table, that.getTable())
-        && Objects.equals(where, that.getWhere())
+        && Objects.equals(conditions, that.getWhere())
         && Objects.equals(columns, that.getColumns());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(table, where, columns);
+    return Objects.hash(table, conditions, columns);
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + " ["
         + "table=" + table
-        + ", where=" + where
+        + ", where=" + conditions
         + ", columns=" + columns
         + "]";
   }

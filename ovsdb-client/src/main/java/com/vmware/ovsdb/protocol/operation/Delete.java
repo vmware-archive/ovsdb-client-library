@@ -15,7 +15,9 @@
 package com.vmware.ovsdb.protocol.operation;
 
 import static com.vmware.ovsdb.protocol.util.OvsdbConstant.DELETE;
+import static com.vmware.ovsdb.protocol.util.OvsdbConstant.WHERE;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vmware.ovsdb.protocol.operation.notation.Atom;
 import com.vmware.ovsdb.protocol.operation.notation.Condition;
 import com.vmware.ovsdb.protocol.operation.notation.Function;
@@ -28,7 +30,6 @@ import com.vmware.ovsdb.protocol.operation.notation.Value;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Representation of delete operation.
@@ -55,7 +56,8 @@ public class Delete extends Operation {
 
   private final String table;
 
-  private final List<Condition> where;
+  @JsonProperty(value = WHERE)
+  private final List<Condition> conditions;
 
   public Delete(String table) {
     this(table, new ArrayList<>());
@@ -65,16 +67,16 @@ public class Delete extends Operation {
    * Create a {@link Delete} object.
    *
    * @param table value of the "table" field
-   * @param where value of the "where" field
+   * @param conditions value of the "where" field
    */
-  public Delete(String table, List<Condition> where) {
+  public Delete(String table, List<Condition> conditions) {
     super(DELETE);
     this.table = table;
-    this.where = where;
+    this.conditions = conditions;
   }
 
   public Delete where(String column, Function function, Value value) {
-    where.add(new Condition(column, function, value));
+    conditions.add(new Condition(column, function, value));
     return this;
   }
 
@@ -115,7 +117,7 @@ public class Delete extends Operation {
   }
 
   public List<Condition> getWhere() {
-    return where;
+    return conditions;
   }
 
   @Override
@@ -128,20 +130,20 @@ public class Delete extends Operation {
     }
     Delete that = (Delete) other;
     return Objects.equals(table, that.getTable())
-        && Objects.equals(where, that.getWhere());
+        && Objects.equals(conditions, that.getWhere());
   }
 
   @Override
   public int hashCode() {
 
-    return Objects.hash(table, where);
+    return Objects.hash(table, conditions);
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + " ["
         + "table=" + table
-        + ", where=" + where
+        + ", where=" + conditions
         + "]";
   }
 }

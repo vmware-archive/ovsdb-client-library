@@ -57,14 +57,6 @@ public class MutateTest {
         .mutation("column7", Mutator.DELETE, ImmutableSet.of("value1", "value2"));
 
     String expectedResult = "{\"op\":\"mutate\",\"table\":\"Logical_Switch\","
-        + "\"where\":[[\"string_column\",\"includes\",\"A string\"],"
-        + "[\"integer_column\",\"<\",42],"
-        + "[\"bool_column\",\"==\",true],"
-        + "[\"uuid_column\",\"!=\",[\"uuid\",\"" + uuid + "\"]],"
-        + "[\"named-uuid_column\",\"excludes\",[\"named-uuid\",\"uuid-name\"]],"
-        + "[\"map_column\",\">=\",[\"map\",[[\"key\",\"value\"]]]],"
-        + "[\"set_column\",\"<=\",[\"set\",[\"value2\",\"value1\"]]]"
-        + "],"
         + "\"mutations\":[[\"column1\",\"+=\",1],"
         + "[\"column2\",\"-=\",true],"
         + "[\"column3\",\"*=\",\"abc\"],"
@@ -72,6 +64,14 @@ public class MutateTest {
         + "[\"column5\",\"%=\",[\"named-uuid\",\"uuid-name\"]],"
         + "[\"column6\",\"insert\",[\"map\",[[\"key\",\"value\"]]]],"
         + "[\"column7\",\"delete\",[\"set\",[\"value2\",\"value1\"]]]"
+        + "],"
+        + "\"where\":[[\"string_column\",\"includes\",\"A string\"],"
+        + "[\"integer_column\",\"<\",42],"
+        + "[\"bool_column\",\"==\",true],"
+        + "[\"uuid_column\",\"!=\",[\"uuid\",\"" + uuid + "\"]],"
+        + "[\"named-uuid_column\",\"excludes\",[\"named-uuid\",\"uuid-name\"]],"
+        + "[\"map_column\",\">=\",[\"map\",[[\"key\",\"value\"]]]],"
+        + "[\"set_column\",\"<=\",[\"set\",[\"value2\",\"value1\"]]]"
         + "]}";
 
     assertEquals(expectedResult, JsonUtil.serialize(mutate));
