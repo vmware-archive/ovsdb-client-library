@@ -33,15 +33,20 @@ public class PropertyManager {
   private static final String PROPERTY_FILE_NAME = "ovsdb-client.properties";
 
   static {
-    try {
-      ClassLoader classLoader = PropertyManager.class.getClassLoader();
-      if (classLoader != null) {
-        InputStream is = classLoader.getResourceAsStream(PROPERTY_FILE_NAME);
+    ClassLoader classLoader = PropertyManager.class.getClassLoader();
+    if (classLoader != null) {
+      InputStream is = classLoader.getResourceAsStream(PROPERTY_FILE_NAME);
+      try {
         properties.load(is);
-        is.close();
+      } catch (IOException ex) {
+        LOGGER.error("Failed to load properties", ex);
+      } finally {
+        try {
+          is.close();
+        } catch (IOException ex) {
+          LOGGER.error("Failed to close {}", PROPERTY_FILE_NAME);
+        }
       }
-    } catch (IOException ex) {
-      LOGGER.error("Failed to load properties", ex);
     }
   }
 
