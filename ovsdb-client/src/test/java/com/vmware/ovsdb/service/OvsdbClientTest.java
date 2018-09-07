@@ -613,6 +613,22 @@ abstract class OvsdbClientTest {
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       fail(e.getMessage());
     }
+
+    CompletableFuture<Void> successFuture3 = new CompletableFuture<>();
+    final String expectedResponse3 = "{\"result\":[\"inactivity probe\"]," + "\"error\":null,"
+        + "\"id\":\"echo\"}";
+    ovsdbServerEmulator.registerReadCallback(msg -> {
+      if (msg.equals(expectedResponse3)) {
+        successFuture3.complete(null);
+      }
+    });
+    ovsdbServerEmulator.write("{\"method\":\"echo\",\"params\":[\"inactivity probe\"],"
+        + "\"id\":\"echo\"}");
+    try {
+      successFuture3.get(VERIFY_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+      fail(e.getMessage());
+    }
   }
 
   private void testInvalidJsonRpcMessage() throws OvsdbClientException, IOException {

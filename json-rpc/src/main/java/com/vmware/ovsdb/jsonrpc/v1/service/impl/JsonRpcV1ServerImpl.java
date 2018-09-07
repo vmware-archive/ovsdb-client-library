@@ -139,25 +139,19 @@ public class JsonRpcV1ServerImpl implements JsonRpcV1Server {
     int actualParamSize = paramsNode.size();
 
     Object[] actualParams = new Object[methodParamSize];
-    if (methodParamSize != actualParamSize) {
-      // This is not an error only if the last arg is a vararg
-      // And the actual params number must be >= methods params number - 1
-      // For e.g. if a methods has n params, the last one is an vararg,
-      // then the number of actual params can be [n-1, ...)
-      int lastIndex = methodParamSize - 1;
-      if (lastIndex >= 0
-          && parameters[lastIndex].isVarArgs()
-          && actualParamSize >= lastIndex) {
+    int lastIndex = methodParamSize - 1;
 
-        Class<?> type = parameters[lastIndex].getType().getComponentType();
-        actualParams[lastIndex] = buildVarargParam(paramsNode, lastIndex, type);
-        // We have handled the last param, no need to handle it later
-        --methodParamSize;
-      } else {
-        throw new IllegalArgumentException(
-            "Parameters number doesn't match. Expected: "
-                + methodParamSize + ". Got: " + paramsNode.size());
-      }
+    // If a methods has n params and the last one is a vararg,
+    // then the number of actual params must be in range [n-1, ...)
+    if (lastIndex >= 0 && parameters[lastIndex].isVarArgs() && actualParamSize >= lastIndex) {
+      Class<?> type = parameters[lastIndex].getType().getComponentType();
+      actualParams[lastIndex] = buildVarargParam(paramsNode, lastIndex, type);
+      // We have handled the last param, no need to handle it later
+      --methodParamSize;
+    } else if (methodParamSize != actualParamSize) {
+      throw new IllegalArgumentException(
+          "Parameters number doesn't match. Expected: "
+              + methodParamSize + ". Got: " + paramsNode.size());
     }
 
     for (int i = 0; i < methodParamSize; i++) {
